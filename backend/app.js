@@ -71,6 +71,18 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'TapID API is running' });
 });
 
+// Serve frontend build if present (e.g. in unified Render deployment)
+const path = require('path');
+const fs = require('fs');
+const distPath = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    app.get('*', (req, res, next) => {
+        if (req.path.startsWith('/api')) return next();
+        res.sendFile(path.join(distPath, 'index.html'));
+    });
+}
+
 app.use((err, req, res, next) => {
   logger.error(err.message);
   if (err.name === 'MulterError' || err.message.startsWith('Only images')) {

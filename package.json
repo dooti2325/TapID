@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "npm --prefix backend test && npm --prefix frontend test",
-    "build": "npm --prefix frontend run build",
+    "postinstall": "npm --prefix backend install && npm --prefix frontend install",
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "start": "npm --prefix backend start",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
-    "start:backend": "npm --prefix backend start"
+    "test": "npm --prefix backend test && npm --prefix frontend test"
   }
 }
