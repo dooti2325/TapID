@@ -1,0 +1,330 @@
+.attendance-container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.timetable-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.timetable-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.timetable-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #818cf8, #c084fc);
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.timetable-card:hover::before {
+  opacity: 1;
+}
+
+.timetable-card:hover {
+  transform: translateY(-4px);
+}
+
+.timetable-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.subject-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.section-badge {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.timetable-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-start-session {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: white;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  width: 100%;
+  cursor: pointer;
+}
+
+.btn-start-session:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+/* Live Attendance Specific */
+.live-attendance-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.live-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.pulse-indicator {
+  position: relative;
+  display: flex;
+  height: 12px;
+  width: 12px;
+}
+
+.pulse-indicator .ping {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  background-color: #ef4444;
+  opacity: 0.75;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.pulse-indicator .dot {
+  position: relative;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background-color: #ef4444;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.btn-end-session {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-end-session:hover {
+  background: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.live-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .live-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.attendance-table-container {
+  overflow: hidden;
+}
+
+.attendance-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.attendance-count {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+.attendance-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.attendance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s;
+}
+
+.attendance-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.student-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.student-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+}
+
+.student-details h4 {
+  color: #e2e8f0;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.student-details p {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.scan-time {
+  text-align: right;
+}
+
+.scan-time p {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.status-present {
+  display: inline-block;
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.empty-state {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.device-status-card {
+  padding: 1.5rem;
+  height: fit-content;
+}
+
+.device-status-card h3 {
+  color: #e2e8f0;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.status-indicator .text {
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.reader-online-pulse {
+  position: relative;
+  display: flex;
+  height: 10px;
+  width: 10px;
+}
+
+.reader-online-pulse .ping {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  background-color: #34d399;
+  opacity: 0.75;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.reader-online-pulse .dot {
+  position: relative;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.device-status-card p {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}

@@ -1,0 +1,12 @@
+{
+  "name": "tapid",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "npm --prefix backend test && npm --prefix frontend test",
+    "build": "npm --prefix frontend run build",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "start:backend": "npm --prefix backend start"
+  }
+}

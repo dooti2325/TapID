@@ -1,0 +1,90 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: tapid
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Initialize Database
+        run: |
+          mysql -h 127.0.0.1 -u root -proot tapid < database/schema.sql
+          mysql -h 127.0.0.1 -u root -proot tapid < database/triggers.sql
+          mysql -h 127.0.0.1 -u root -proot tapid < database/indexes.sql
+          mysql -h 127.0.0.1 -u root -proot tapid < database/seed.sql
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Run Backend Lint
+        working-directory: ./backend
+        run: npx eslint . --ext .js || echo "Lint warnings"
+
+      - name: Run Backend Tests
+        working-directory: ./backend
+        env:
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASSWORD: root
+          DB_NAME: tapid
+          JWT_SECRET: test_secret
+        run: npx jest --forceExit
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run Frontend Lint
+        working-directory: ./frontend
+        run: npx eslint src --ext .js,.jsx || echo "Lint warnings"
+
+      - name: Run Frontend Tests
+        working-directory: ./frontend
+        run: npx vitest run
+
+      - name: Build Docker Images
+        run: |
+          docker build -t tapid-backend:latest -f deployment/docker/backend.Dockerfile .
+          docker build -t tapid-frontend:latest -f deployment/docker/frontend.Dockerfile .
+
+      - name: Push to Docker Hub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.DOCKER_USERNAME != ''
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+        run: |
+          echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          docker tag tapid-backend:latest $DOCKER_USERNAME/tapid-backend:latest
+          docker tag tapid-frontend:latest $DOCKER_USERNAME/tapid-frontend:latest
+          docker push $DOCKER_USERNAME/tapid-backend:latest
+          docker push $DOCKER_USERNAME/tapid-frontend:latest
