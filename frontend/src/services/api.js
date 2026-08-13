@@ -1,7 +1,13 @@
 import axios from 'axios';
 
+// Automatically normalize base URL so both 'https://domain.com' and 'https://domain.com/api' work
+let baseURL = import.meta.env.VITE_API_URL || '/api';
+if (baseURL.startsWith('http') && !baseURL.endsWith('/api') && !baseURL.endsWith('/api/')) {
+  baseURL = baseURL.replace(/\/+$/, '') + '/api';
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -26,7 +32,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Redirect to login without causing a full page cycle in React
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }

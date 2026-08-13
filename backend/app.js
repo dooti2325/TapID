@@ -40,7 +40,30 @@ app.use(express.json());
 app.use(loggerMiddleware);
 const auditLogger = require('./middleware/audit.middleware');
 app.use(auditLogger);
-app.use(limiter);
+// Auto-normalize requests sent without /api prefix
+app.use((req, res, next) => {
+  if (!req.url.startsWith('/api') && (
+    req.url.startsWith('/auth') ||
+    req.url.startsWith('/session') ||
+    req.url.startsWith('/attendance') ||
+    req.url.startsWith('/students') ||
+    req.url.startsWith('/classrooms') ||
+    req.url.startsWith('/devices') ||
+    req.url.startsWith('/reports') ||
+    req.url.startsWith('/admin') ||
+    req.url.startsWith('/subjects') ||
+    req.url.startsWith('/faculty') ||
+    req.url.startsWith('/upload') ||
+    req.url.startsWith('/logs') ||
+    req.url.startsWith('/analytics') ||
+    req.url.startsWith('/timetable') ||
+    req.url.startsWith('/revocation') ||
+    req.url.startsWith('/sections')
+  )) {
+    req.url = '/api' + req.url;
+  }
+  next();
+});
 
 // Routes
 const authRoutes = require('./routes/auth.routes');
