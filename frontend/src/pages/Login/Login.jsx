@@ -32,7 +32,7 @@ const Login = () => {
     <div className="login-container fade-in">
       <div className="login-box glass-panel">
         <div className="login-header">
-          <Radio className="logo-icon text-accent mb-2" size={48} />
+          <center><Radio className="logo-icon text-accent mb-2" size={48} /></center>
           <h1>Welcome to TapID</h1>
           <p>Smart NFC Attendance Management</p>
         </div>
@@ -42,23 +42,23 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="login-form">
           <div className="input-group">
             <Mail className="input-icon" size={20} />
-            <input 
-              type="email" 
-              placeholder="Email Address" 
+            <input
+              type="email"
+              placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required 
+              required
             />
           </div>
 
           <div className="input-group">
             <Lock className="input-icon" size={20} />
-            <input 
-              type="password" 
-              placeholder="Password" 
+            <input
+              type="password"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required 
+              required
             />
           </div>
 
