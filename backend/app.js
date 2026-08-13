@@ -22,7 +22,18 @@ app.use((req, res, next) => {
   next();
 });
 app.use(cors({
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : true,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (
+      origin.includes('localhost') ||
+      origin.includes('vercel.app') ||
+      origin.includes('onrender.com') ||
+      (process.env.CORS_ORIGIN && process.env.CORS_ORIGIN.split(',').some(o => o.trim() === origin))
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true
 }));
 app.use(express.json());
