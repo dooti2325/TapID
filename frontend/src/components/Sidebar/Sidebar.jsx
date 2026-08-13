@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { 
-  LayoutDashboard, 
-  Users, 
-  ClipboardList, 
-  BookOpen, 
+import {
+  LayoutDashboard,
+  Users,
+  ClipboardList,
+  BookOpen,
   MonitorPlay,
   CreditCard,
   ScrollText,
@@ -15,9 +15,15 @@ import {
   Cpu,
   GraduationCap,
   Library,
-  Settings
+  Settings,
+  CalendarDays,
+  Building2,
+  Layers,
+  User,
 } from 'lucide-react';
 import './Sidebar.css';
+
+const navItem = ({ isActive }) => `nav-item ${isActive ? 'active' : ''}`;
 
 const Sidebar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -31,74 +37,101 @@ const Sidebar = () => {
   return (
     <aside className="sidebar glass-panel">
       <div className="sidebar-header">
-        <Radio className="logo-icon text-accent" size={32} />
-        <h2>TapID</h2>
+        <div className="sidebar-logo">
+          <Radio size={20} />
+        </div>
+        <div>
+          <h2>TapID</h2>
+          <span className="sidebar-tagline">Smart Attendance</span>
+        </div>
       </div>
 
       <nav className="sidebar-nav">
+        {/* ─── Admin Only Dashboard ─── */}
         {user?.role === 'admin' && (
-          <NavLink to="/admin-dashboard" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-            <LayoutDashboard size={20} />
+          <NavLink to="/admin-dashboard" className={navItem}>
+            <LayoutDashboard size={18} />
             <span>Overview</span>
           </NavLink>
         )}
-        
+
+        {/* ─── Faculty Only Dashboard ─── */}
         {user?.role === 'faculty' && (
-          <NavLink to="/dashboard" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-            <LayoutDashboard size={20} />
+          <NavLink to="/dashboard" className={navItem}>
+            <LayoutDashboard size={18} />
             <span>Dashboard</span>
           </NavLink>
         )}
 
-        <NavLink to="/attendance" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-          <ClipboardList size={20} />
-          <span>Attendance</span>
+        {/* ─── Shared ─── */}
+        <div className="nav-section-label">Attendance</div>
+
+        <NavLink to="/attendance" className={navItem}>
+          <ClipboardList size={18} />
+          <span>Sessions</span>
         </NavLink>
 
-        <NavLink to="/students" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-          <Users size={20} />
-          <span>Students</span>
-        </NavLink>
-        
-        <NavLink to="/subjects" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-          <Library size={20} />
-          <span>Subjects</span>
-        </NavLink>
-
-        <NavLink to="/classrooms" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-          <MonitorPlay size={20} />
-          <span>Classrooms</span>
-        </NavLink>
-
-        <NavLink to="/reports" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-          <BookOpen size={20} />
+        <NavLink to="/reports" className={navItem}>
+          <BookOpen size={18} />
           <span>Reports</span>
         </NavLink>
 
+        <div className="nav-section-label">Management</div>
+
+        <NavLink to="/students" className={navItem}>
+          <Users size={18} />
+          <span>Students</span>
+        </NavLink>
+
+        <NavLink to="/subjects" className={navItem}>
+          <Library size={18} />
+          <span>Subjects</span>
+        </NavLink>
+
+        {/* ─── Admin Only ─── */}
         {user?.role === 'admin' && (
           <>
-            <NavLink to="/faculty" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-              <GraduationCap size={20} />
+            <NavLink to="/faculty" className={navItem}>
+              <GraduationCap size={18} />
               <span>Faculty</span>
             </NavLink>
 
-            <NavLink to="/devices" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-              <Cpu size={20} />
+            <NavLink to="/sections" className={navItem}>
+              <Layers size={18} />
+              <span>Sections</span>
+            </NavLink>
+
+            <NavLink to="/timetable" className={navItem}>
+              <CalendarDays size={18} />
+              <span>Timetable</span>
+            </NavLink>
+
+            <div className="nav-section-label">Infrastructure</div>
+
+            <NavLink to="/classrooms" className={navItem}>
+              <Building2 size={18} />
+              <span>Classrooms</span>
+            </NavLink>
+
+            <NavLink to="/devices" className={navItem}>
+              <Cpu size={18} />
               <span>Devices</span>
             </NavLink>
 
-            <NavLink to="/rfid-cards" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-              <CreditCard size={20} />
+            <NavLink to="/rfid-cards" className={navItem}>
+              <CreditCard size={18} />
               <span>RFID Cards</span>
             </NavLink>
 
-            <NavLink to="/audit-logs" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-              <ScrollText size={20} />
+            <div className="nav-section-label">System</div>
+
+            <NavLink to="/audit-logs" className={navItem}>
+              <ScrollText size={18} />
               <span>Audit Logs</span>
             </NavLink>
 
-            <NavLink to="/upload" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-              <UploadCloud size={20} />
+            <NavLink to="/upload" className={navItem}>
+              <UploadCloud size={18} />
               <span>Uploads</span>
             </NavLink>
           </>
@@ -106,13 +139,17 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-footer">
-        <NavLink to="/settings" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
-          <Settings size={20} />
+        <NavLink to="/profile" className={navItem}>
+          <User size={18} />
+          <span>Profile</span>
+        </NavLink>
+        <NavLink to="/settings" className={navItem}>
+          <Settings size={18} />
           <span>Settings</span>
         </NavLink>
         <button onClick={handleLogout} className="logout-btn">
-          <LogOut size={20} />
-          <span>Logout</span>
+          <LogOut size={18} />
+          <span>Sign Out</span>
         </button>
       </div>
     </aside>

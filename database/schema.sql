@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS faculty (
     name VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
     department VARCHAR(100),
+    address TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

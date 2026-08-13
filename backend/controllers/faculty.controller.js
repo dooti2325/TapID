@@ -17,11 +17,15 @@ exports.getAllFaculty = async (req, res) => {
 
 exports.addFaculty = async (req, res) => {
     const { name, email, phone, department, password } = req.body;
+    if (!name || !email) {
+        return res.status(400).json({ message: 'name and email are required' });
+    }
     try {
         const connection = await db.getConnection();
         try {
             await connection.beginTransaction();
-            const hashedPassword = await bcrypt.hash(password || 'password123', 12);
+            const effectivePassword = password && password.length >= 8 ? password : 'TapID@2026';
+            const hashedPassword = await bcrypt.hash(effectivePassword, 12);
             const [userResult] = await connection.query(
                 'INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)',
                 [email, hashedPassword, 'faculty']
@@ -31,9 +35,12 @@ exports.addFaculty = async (req, res) => {
                 [userResult.insertId, name, phone || null, department || null]
             );
             await connection.commit();
-            res.status(201).json({ id: facultyResult.insertId, user_id: userResult.insertId, name, email, role: 'faculty' });
+            res.status(201).json({ id: facultyResult.insertId, user_id: userResult.insertId, name, email, role: 'faculty', temp_password: !password ? effectivePassword : undefined });
         } catch (err) {
             await connection.rollback();
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.status(409).json({ message: 'Email already exists' });
+            }
             throw err;
         } finally {
             connection.release();
@@ -56,8 +63,8 @@ exports.updateFaculty = async (req, res) => {
                 return res.status(404).json({ message: 'Faculty not found' });
             }
             await connection.query(
-                'UPDATE faculty SET name = ?, phone = ?, department = ? WHERE id = ?',
-                [name, phone || null, department || null, id]
+                'UPDATE faculty SET name = ?, phone = ?, department = ?, address = ? WHERE id = ?',
+                [name, phone || null, department || null, req.body.address || null, id]
             );
             if (email) {
                 await connection.query('UPDATE users SET email = ? WHERE id = ?', [email, faculty.user_id]);

@@ -6,5 +6,6 @@ const verifyRole = require('../middleware/role.middleware');
 
 router.get('/', verifyToken, timetableController.getTimetable);
 router.post('/', verifyToken, verifyRole('admin'), timetableController.addTimetable);
+router.delete('/:id', verifyToken, verifyRole('admin'), timetableController.deleteTimetable);
 
 module.exports = router;

@@ -47,6 +47,7 @@ const logsRoutes = require('./routes/logs.js');
 const analyticsRoutes = require('./routes/analytics.js');
 const timetableRoutes = require('./routes/timetable.routes');
 const revocationRoutes = require('./routes/revocation.routes');
+const sectionsRoutes = require('./routes/sections.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/session', sessionRoutes);
@@ -63,6 +64,7 @@ app.use('/api/logs', logsRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/timetable', timetableRoutes);
 app.use('/api/revocation', revocationRoutes);
+app.use('/api/sections', sectionsRoutes);
 
 // Basic health check
 app.get('/api/health', (req, res) => {

@@ -15,11 +15,17 @@ services:
       - ./database/indexes.sql:/docker-entrypoint-initdb.d/02-indexes.sql:ro
       - ./database/seed.sql:/docker-entrypoint-initdb.d/03-seed.sql:ro
       - ./database/triggers.sql:/docker-entrypoint-initdb.d/04-triggers.sql:ro
-      - ./database/procedures.sql:/docker-entrypoint-initdb.d/05-procedures.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -27,19 +33,26 @@ services:
       - DB_USER=${MYSQL_USER:-tapid_user}
       - DB_PASS=${MYSQL_PASSWORD:-tapid_password}
       - DB_NAME=${MYSQL_DATABASE:-tapid}
-      - JWT_SECRET=${TAPID_JWT_SECRET:-change-this-development-secret-32-chars}
-      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:5173}
+      - JWT_SECRET=${TAPID_JWT_SECRET:-tapid-super-secure-jwt-secret-key-2026-change-in-production}
+      - CORS_ORIGIN=http://localhost,http://localhost:5173,http://localhost:80
       - PORT=3000
+      - NODE_ENV=production
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=/api
     ports:
-      - "5173:80"
+      - "80:80"
     depends_on:
       - backend
+    restart: unless-stopped
 
 volumes:
   db_data:

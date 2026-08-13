@@ -12,15 +12,24 @@ export const AuthProvider = ({ children }) => {
         const storedUser = localStorage.getItem('user');
 
         if (token && storedUser) {
-            setUser(JSON.parse(storedUser));
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            try {
+                const parsed = JSON.parse(storedUser);
+                setUser(parsed);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            } catch {
+                // Corrupted storage — clear it
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
         }
         setLoading(false);
     }, []);
 
     const login = (userData, token) => {
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        // Ensure we always store the full user object including name
+        const enrichedUser = { ...userData };
+        setUser(enrichedUser);
+        localStorage.setItem('user', JSON.stringify(enrichedUser));
         localStorage.setItem('token', token);
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     };
@@ -32,8 +41,14 @@ export const AuthProvider = ({ children }) => {
         delete axios.defaults.headers.common['Authorization'];
     };
 
+    const updateUserInContext = (updatedData) => {
+        const updated = { ...user, ...updatedData };
+        setUser(updated);
+        localStorage.setItem('user', JSON.stringify(updated));
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, logout, loading, updateUserInContext }}>
             {children}
         </AuthContext.Provider>
     );

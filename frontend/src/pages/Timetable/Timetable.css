@@ -1,0 +1,57 @@
+.timetable-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.day-filter-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.day-pill {
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-color);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.day-pill:hover {
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+.day-pill.active {
+  background: var(--accent-color-transparent);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.day-chip {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.section-chip {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}

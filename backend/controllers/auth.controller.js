@@ -23,7 +23,17 @@ exports.login = async (req, res) => {
         }
 
         const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, getJwtSecret(), { expiresIn: '1d' });
-        res.json({ token, user: { id: user.id, email: user.email, role: user.role, profile } });
+        const userName = profile.name || user.email.split('@')[0];
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                name: userName,
+                profile
+            }
+        });
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ message: 'Server Error', error: err.message });

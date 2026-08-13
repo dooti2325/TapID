@@ -20,7 +20,7 @@ class NemotronService:
             base_url="https://integrate.api.nvidia.com/v1",
             api_key=self.api_key
         )
-        self.model = "nvidia/nemotron-3-ultra-550b-a55b"
+        self.model = "nvidia/llama-3.3-nemotron-super-49b-v1"
 
     def generate_response(self, prompt: str, system_prompt: str = None, temperature: float = 0.7, max_tokens: int = 3000) -> str:
         """

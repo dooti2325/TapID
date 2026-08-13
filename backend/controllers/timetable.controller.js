@@ -37,7 +37,23 @@ exports.addTimetable = async (req, res) => {
         );
         res.json({ message: 'Timetable entry added' });
     } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ message: 'Timetable slot conflict — this slot already exists' });
+        }
         console.error(err);
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+exports.deleteTimetable = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [result] = await db.execute('DELETE FROM timetable WHERE id=?', [id]);
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'Timetable entry not found' });
+        res.json({ message: 'Timetable entry deleted' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+

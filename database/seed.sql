@@ -1,6 +1,6 @@
 USE tapid;
 
-SET @demo_password_hash = '$2b$12$.G/7iJTLk2JZOLAph.yum.B3B8BQEfwUVhiLUgFNHIuNkJsEhCsDO';
+SET @demo_password_hash = '$2b$10$E1NSnAY21jNZbxh557eqBe1f6iQSkmxdtmp.OEekmqfx7DFR5k5aC';
 
 INSERT INTO users (email, password_hash, role) VALUES
 ('admin@tapid.edu', @demo_password_hash, 'admin'),

@@ -24,6 +24,11 @@
             "date": 1786625402824,
             "name": "D:\\TapID\\backend\\logs\\app-2026-08-13.log",
             "hash": "da83c8f45f3ebd92f48114e121893971a616873d7d21f639b290397111bf1834"
+        },
+        {
+            "date": 1786646074782,
+            "name": "D:\\TapID\\backend\\logs\\app-2026-08-14.log",
+            "hash": "0be7e4fe7302dcfa1272c73046df79f03e367b536a09ea7dad85703463c063da"
         }
     ],
     "hashType": "sha256"
