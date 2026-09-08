@@ -43,12 +43,14 @@ TapID/
   firmware/esp32/             ESP32 NFC reader firmware
   frontend/
     src/
-      components/             Layout, sidebar, topbar
+      components/             Cards, Tables, Charts, Loader, Modal, Badge, Navbar, Layout, Sidebar, Topbar
       context/                Auth state provider
-      pages/                  Login, dashboard, attendance, reports, admin pages
-      services/api.js         Axios API client with token injection
+      hooks/                  Custom hooks (useDebounce, useFetch, useModal)
+      pages/                  Login, dashboard, attendance, reports, admin, students, faculty, devices
+      services/               Modular API client and domain services (auth, attendance, students, etc.)
       styles/                 Shared CSS tokens/utilities
-    tests/                    Vitest + Testing Library tests
+      utils/                  Formatting, constants, CSV/data export utilities
+    tests/                    Vitest + Testing Library component and utility tests
 ```
 
 Generated folders such as `node_modules/`, `frontend/dist/`, `backend/logs/`, and `backend/uploads/` are intentionally excluded from the structure above.
@@ -210,18 +212,33 @@ npm run build
 Verified in this workspace:
 
 - Backend Jest/Supertest: 3 suites, 5 tests passing
-- Frontend Vitest/Testing Library: 1 suite, 3 tests passing
+- Frontend Vitest/Testing Library: 5 suites, 17 tests passing
 - Frontend production build: passing
+- Firmware MinGW C++ unit tests: 5 tests passing (npm run test:firmware)
 
 ## Firmware
 
-Open `firmware/esp32/main.ino` or `firmware/esp32/tapid_reader/tapid_reader.ino` in Arduino IDE. Configure Wi-Fi and backend API URL, then flash the ESP32. The attendance endpoint is:
+The ESP32 firmware features a modular architecture with live recording, offline buffering, NTP time synchronization, debounce cooldown, and multi-tone acoustic/visual signaling.
 
+- **Flashing with Arduino IDE**: Open [tapid_reader.ino](file:///d:/TapID/firmware/esp32/tapid_reader/tapid_reader.ino) or [main.ino](file:///d:/TapID/firmware/esp32/main.ino). Configure Wi-Fi and backend URL in `secrets.h`.
+- **Flashing with PlatformIO**: Open `firmware/` with PlatformIO in VS Code; dependencies (`MFRC522`, `ArduinoJson`) are managed automatically via `platformio.ini`.
+- **Firmware Unit Tests**: Run `npm run test:firmware` to test the offline queue, FIFO ring buffer, and JSON serialization.
+- Full wiring diagram, pinout table, and feedback tone matrix: see [firmware/README.md](file:///d:/TapID/firmware/README.md).
+
+Endpoints used:
 ```text
 POST /api/attendance/record
 {
   "rfid_uid": "A1B2C3D4",
   "mac_address": "24:0A:C4:00:00:01"
+}
+
+POST /api/attendance/bulk-record
+{
+  "mac_address": "24:0A:C4:00:00:01",
+  "records": [
+    { "rfid_uid": "A1B2C3D4", "timestamp": "2026-09-08T10:00:00Z" }
+  ]
 }
 ```
 

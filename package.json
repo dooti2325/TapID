@@ -9,6 +9,7 @@
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "test": "npm --prefix backend test && npm --prefix frontend test",
+    "test:firmware": "g++ -std=c++11 -I firmware/esp32 tests/firmware/test_offline_queue.cpp firmware/esp32/offline_queue.cpp -o tests/firmware/test_offline_queue.exe && .\\tests\\firmware\\test_offline_queue.exe",
     "setup:cloud-db": "node backend/setup_cloud_db.js"
   }
 }

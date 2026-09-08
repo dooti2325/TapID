@@ -6,29 +6,9 @@
     "auditLog": "D:\\TapID\\backend\\logs\\.1f8492603e976e6ca675d62cf28e100236d12a5e-audit.json",
     "files": [
         {
-            "date": 1786082625107,
-            "name": "D:\\TapID\\backend\\logs\\app-2026-08-07.log",
-            "hash": "394bbecda1ce0407b414b78df5e98dc1fe51d5fe2df5f2d8e3b09cca1fd2ac76"
-        },
-        {
-            "date": 1786345094295,
-            "name": "D:\\TapID\\backend\\logs\\app-2026-08-10.log",
-            "hash": "f41bf98abd9e7cdc823adb538e1e88fee3801dfa773be8ce725a72496c900493"
-        },
-        {
-            "date": 1786425097251,
-            "name": "D:\\TapID\\backend\\logs\\app-2026-08-11.log",
-            "hash": "e55cc191433444947b8b2a2d149edc30950433a6831213959b731110a5e37fe0"
-        },
-        {
-            "date": 1786625402824,
-            "name": "D:\\TapID\\backend\\logs\\app-2026-08-13.log",
-            "hash": "da83c8f45f3ebd92f48114e121893971a616873d7d21f639b290397111bf1834"
-        },
-        {
-            "date": 1786646074782,
-            "name": "D:\\TapID\\backend\\logs\\app-2026-08-14.log",
-            "hash": "0be7e4fe7302dcfa1272c73046df79f03e367b536a09ea7dad85703463c063da"
+            "date": 1788874050567,
+            "name": "D:\\TapID\\backend\\logs\\app-2026-09-08.log",
+            "hash": "000069273ef6d956a9d2404d013e00f0482c282573aaea896a6ff0199d188a67"
         }
     ],
     "hashType": "sha256"
