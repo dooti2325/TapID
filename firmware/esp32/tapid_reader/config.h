@@ -32,8 +32,9 @@
 // =============================================================================
 // NTP / Time Synchronization Settings
 // =============================================================================
-#define NTP_SERVER_1            "pool.ntp.org"
-#define NTP_SERVER_2            "time.nist.gov"
+#define NTP_SERVER_1            "time.google.com"
+#define NTP_SERVER_2            "pool.ntp.org"
+#define NTP_SERVER_3            "time.cloudflare.com"
 #define GMT_OFFSET_SEC          0       // UTC offset in seconds (can be overridden)
 #define DAYLIGHT_OFFSET_SEC     0
 
@@ -42,5 +43,6 @@
 // =============================================================================
 #define ENDPOINT_ATTENDANCE_RECORD      "/attendance/record"
 #define ENDPOINT_ATTENDANCE_BULK_RECORD "/attendance/bulk-record"
+#define ENDPOINT_DEVICE_STATUS          "/devices/status"
 
 #endif // CONFIG_H

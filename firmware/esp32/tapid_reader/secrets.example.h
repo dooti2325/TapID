@@ -18,7 +18,8 @@
 // Or specify a fixed MAC string matching the database devices table, e.g. "24:0A:C4:00:00:01"
 #define DEVICE_MAC      "24:0A:C4:00:00:01"
 
-// Optional Device Authentication Token / API Key (if backend requires it)
-#define DEVICE_API_KEY  ""
+// Device Authentication Token / API Key
+// Must match DEVICE_API_KEY in backend .env (sent via X-Device-Key header)
+#define DEVICE_API_KEY  "your-device-api-key-matching-backend-env"
 
 #endif // SECRETS_EXAMPLE_H

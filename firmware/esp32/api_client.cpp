@@ -149,6 +149,35 @@ AttendanceResponse ApiClient::bulkRecordAttendance(const String& macAddress, con
     return res;
 }
 
+bool ApiClient::updateDeviceStatus(const String& macAddress, const String& status) {
+    String endpoint = _baseUrl + ENDPOINT_DEVICE_STATUS;
+
+    _http.begin(_wifiClient, endpoint);
+    _http.addHeader("Content-Type", "application/json");
+    _http.setTimeout(HTTP_TIMEOUT_MS);
+
+    String apiKey = String(DEVICE_API_KEY);
+    apiKey.trim();
+    if (apiKey.length() > 0) {
+        _http.addHeader("X-Device-Key", apiKey);
+    }
+
+    String payload = "{\"mac_address\":\"" + macAddress + "\",\"status\":\"" + status + "\"}";
+    Serial.printf("[API] Reporting status '%s' for MAC: %s\n", status.c_str(), macAddress.c_str());
+
+    int httpCode = _http.POST(payload);
+    bool success = (httpCode >= 200 && httpCode < 300);
+
+    if (httpCode > 0) {
+        Serial.printf("[API] Device status update response %d: %s\n", httpCode, _http.getString().c_str());
+    } else {
+        Serial.printf("[API] Device status update failed: %s\n", _http.errorToString(httpCode).c_str());
+    }
+
+    _http.end();
+    return success;
+}
+
 bool ApiClient::checkHealth() {
     String endpoint = _baseUrl + "/health";
     _http.begin(_wifiClient, endpoint);
@@ -159,3 +188,4 @@ bool ApiClient::checkHealth() {
     _http.end();
     return ok;
 }
+

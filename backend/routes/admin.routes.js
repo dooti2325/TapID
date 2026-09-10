@@ -8,5 +8,7 @@ router.use(auth, role('admin'));
 
 router.get('/stats', adminController.getDashboardStats);
 router.get('/rfid-cards', adminController.getRfidCards);
+router.post('/rfid-cards/assign', adminController.assignRfidCard);
+router.post('/rfid-cards/status', adminController.updateRfidCardStatus);
 
 module.exports = router;

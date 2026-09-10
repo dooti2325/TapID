@@ -31,14 +31,14 @@ const Topbar = () => {
         </button>
 
         <div className="user-profile" onClick={() => setProfileOpen(p => !p)}>
+          <div className="user-info">
+            <span className="user-role">{user?.role === 'admin' ? 'Administrator' : user?.role === 'faculty' ? 'Teacher' : 'Student'}</span>
+            <span className="user-name">{displayName}</span>
+          </div>
           <div className="user-avatar">
             {initials}
           </div>
-          <div className="user-info">
-            <span className="user-name">{displayName}</span>
-            <span className="user-role">{user?.role === 'admin' ? 'Administrator' : user?.role === 'faculty' ? 'Faculty' : 'Student'}</span>
-          </div>
-          <ChevronDown size={16} className={`chevron ${profileOpen ? 'open' : ''}`} />
+          <ChevronDown size={14} className={`chevron ${profileOpen ? 'open' : ''}`} />
         </div>
 
         {profileOpen && (

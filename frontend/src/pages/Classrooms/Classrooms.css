@@ -1,136 +1,185 @@
+/* =====================================================
+   Classroom Status - Light Theme Institutional SaaS
+   ===================================================== */
 .classrooms-page {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  animation: fade-in 0.4s ease-out forwards;
+  animation: fade-in 0.3s ease-out;
 }
 
-.page-header {
+.classrooms-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.page-header h1 {
-  font-size: 2.25rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 0.25rem;
+.classrooms-page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.25rem 0;
 }
 
-.classrooms-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+.classrooms-page-subtitle {
+  font-size: 0.925rem;
+  color: #64748b;
+  margin: 0;
 }
 
-.classroom-card {
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+.btn-refresh-terminals {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.btn-refresh-terminals:hover {
+  background: #f8fafc;
+  color: #1e5bff;
+  border-color: #1e5bff;
+}
+
+/* Card Container */
+.classrooms-table-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 1.5rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   overflow: hidden;
 }
 
-.classroom-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.classroom-card-header {
+.classrooms-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
-}
-
-.classroom-title h2 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin: 0;
-  color: #fff;
-}
-
-.classroom-title p {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  margin: 4px 0 0 0;
-}
-
-.device-status {
-  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.classrooms-card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.classrooms-card-subtitle {
+  font-size: 0.825rem;
+  color: #64748b;
+  margin: 0.2rem 0 0 0;
+}
+
+.terminal-summary-badge {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.classrooms-table-wrap {
+  overflow-x: auto;
+}
+
+.classrooms-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.classrooms-table th {
+  background: #f8fafc;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.775rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.status-active {
-  background: rgba(34, 197, 94, 0.15);
-  color: #4ade80;
-  border: 1px solid rgba(34, 197, 94, 0.3);
+.classrooms-table td {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
 }
 
-.status-offline {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+.classrooms-table tbody tr:hover td {
+  background-color: #f8fafc;
 }
 
-.status-maintenance {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.status-none {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.device-info {
-  background: rgba(0, 0, 0, 0.2);
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.02);
-}
-
-.device-info-row {
+.room-name-box {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.room-title {
+  color: #0f172a;
+  font-size: 0.9rem;
+}
+
+.room-bldg {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.device-id-badge {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.775rem;
+  color: #334155;
+}
+
+.teacher-text {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.subject-lecture-text {
+  color: #475569;
+}
+
+.heartbeat-time {
+  display: flex;
   align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: #64748b;
 }
 
-.device-info-row span:first-child {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
+.btn-ping-terminal {
+  background: #eff6ff;
+  color: #1e5bff;
+  border: 1px solid #bfdbfe;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.775rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.device-info-row span:last-child {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', Courier, monospace;
-  font-size: 0.875rem;
-  color: #fff;
-}
-
-.device-icon {
-  position: absolute;
-  bottom: -20px;
-  right: -20px;
-  opacity: 0.05;
-  transform: rotate(-15deg);
-  transition: opacity 0.3s ease;
-}
-
-.classroom-card:hover .device-icon {
-  opacity: 0.1;
+.btn-ping-terminal:hover {
+  background: #1e5bff;
+  color: #ffffff;
 }

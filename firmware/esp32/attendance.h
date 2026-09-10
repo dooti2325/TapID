@@ -30,6 +30,7 @@ private:
     OfflineQueue _queue;
 
     unsigned long _lastQueueFlushAttempt;
+    bool _wasOnline;
     void provideFeedback(const AttendanceResponse& res);
 };
 

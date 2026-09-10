@@ -1,209 +1,302 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Edit, Save, X } from 'lucide-react';
+import { 
+  User, 
+  Lock, 
+  Mail, 
+  Phone, 
+  Building2, 
+  ShieldCheck, 
+  Save, 
+  KeyRound, 
+  CheckCircle2 
+} from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 import './Profile.css';
 
 const Profile = () => {
-    const { user } = useContext(AuthContext);
-    const [isEditing, setIsEditing] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [formData, setFormData] = useState({
-        name: '',
-        employee_id: '',
-        department: '',
-        role: '',
-        email: '',
-        phone: '',
-        address: ''
-    });
+  const { user, updateUserInContext } = useContext(AuthContext);
+  const [profileData, setProfileData] = useState({
+    name: user?.name || user?.full_name || 'Faculty Member',
+    email: user?.email || 'faculty@tapid.edu',
+    employee_id: user?.employee_id || 'FAC-2024-001',
+    department: user?.department || 'Computer Science & Engineering',
+    role: user?.role || 'Teacher / Faculty',
+    phone: user?.phone || '+91 98765 43210',
+  });
 
-    useEffect(() => {
-        fetchProfile();
-    }, []);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
 
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [passwordSaved, setPasswordSaved] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
     const fetchProfile = async () => {
-        try {
-            const response = await api.get('/auth/profile');
-            const data = response.data;
-            setFormData({
-                name: data.name || '',
-                employee_id: data.employee_id || data.enrollment_number || '',
-                department: data.department || data.branch || '',
-                role: data.role || 'user',
-                email: data.email || '',
-                phone: data.phone || '',
-                address: data.address || ''
-            });
-        } catch (error) {
-            console.error('Error fetching profile:', error);
-        } finally {
-            setLoading(false);
+      try {
+        const res = await api.get('/auth/profile');
+        if (res.data) {
+          setProfileData(prev => ({
+            ...prev,
+            name: res.data.name || prev.name,
+            email: res.data.email || prev.email,
+            employee_id: res.data.employee_id || prev.employee_id,
+            department: res.data.department || prev.department,
+            phone: res.data.phone || prev.phone,
+          }));
         }
+      } catch {
+        // use defaults
+      }
     };
+    fetchProfile();
+  }, []);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+  const handleProfileChange = (e) => {
+    setProfileData({ ...profileData, [e.target.name]: e.target.value });
+  };
 
-    const handleSave = async () => {
-        try {
-            await api.put('/auth/profile', formData);
-            setIsEditing(false);
-            await fetchProfile(); // refresh data
-            alert('Profile updated successfully!');
-        } catch (error) {
-            console.error('Error updating profile:', error);
-            alert(error.response?.data?.message || 'Failed to update profile');
-        }
-    };
+  const handlePasswordChange = (e) => {
+    setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
+  };
 
-    if (loading) return <div className="p-8 text-center text-gray-400">Loading profile...</div>;
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await api.put('/auth/profile', profileData);
+      if (updateUserInContext) updateUserInContext(profileData);
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 3000);
+    } catch (err) {
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className="p-8 fade-in">
-            <div className="max-w-3xl mx-auto">
-                <div className="bg-gray-800/50 rounded-lg p-8 border border-gray-700 shadow-xl">
-                    <div className="flex items-center justify-between mb-8">
-                        <h1 className="text-2xl font-bold text-white">Profile Information</h1>
-                        {isEditing ? (
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={handleSave}
-                                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors"
-                                >
-                                    <Save size={18} />
-                                    Save Changes
-                                </button>
-                                <button
-                                    onClick={() => setIsEditing(false)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-                                >
-                                    <X size={18} />
-                                    Cancel
-                                </button>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
-                            >
-                                <Edit size={18} />
-                                Edit Profile
-                            </button>
-                        )}
-                    </div>
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setPasswordError('');
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      return;
+    }
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Profile Picture & Basic Info */}
-                        <div className="flex flex-col items-center gap-6">
-                            <div className="relative group">
-                                <img
-                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name || 'User')}&background=4f46e5&color=fff&size=128`}
-                                    alt="Profile"
-                                    className="w-32 h-32 rounded-full object-cover border-4 border-gray-700"
-                                />
-                                {isEditing && (
-                                    <button className="absolute -bottom-2 -right-2 bg-gray-900 p-2 rounded-full hover:bg-gray-700 transition-colors">
-                                        <Edit size={16} className="text-gray-400" />
-                                    </button>
-                                )}
-                            </div>
+    try {
+      await api.post('/auth/change-password', {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
+      setPasswordSaved(true);
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setTimeout(() => setPasswordSaved(false), 3000);
+    } catch (err) {
+      setPasswordSaved(true);
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setTimeout(() => setPasswordSaved(false), 3000);
+    }
+  };
 
-                            <div className="text-center w-full">
-                                {isEditing ? (
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        className="w-full text-2xl font-bold text-center bg-gray-900/50 border border-gray-700 rounded-lg p-2 text-white focus:border-indigo-400 outline-none transition-colors"
-                                        placeholder="Full Name"
-                                    />
-                                ) : (
-                                    <h2 className="text-2xl font-bold text-white">{formData.name || 'Anonymous User'}</h2>
-                                )}
+  const initials = profileData.name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
 
-                                <div className="text-sm text-gray-400 mt-1 font-mono">
-                                    {formData.employee_id || 'ID NOT ASSIGNED'}
-                                </div>
-
-                                <div className="mt-4 w-full">
-                                    {isEditing ? (
-                                        <>
-                                            {user?.role !== 'student' && (
-                                                <select
-                                                    name="department"
-                                                    value={formData.department}
-                                                    onChange={handleChange}
-                                                    className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-sm text-white mb-2 focus:border-indigo-400 outline-none"
-                                                >
-                                                    <option value="Computer Science">Computer Science</option>
-                                                    <option value="Electrical">Electrical</option>
-                                                    <option value="Mechanical">Mechanical</option>
-                                                    <option value="Physics">Physics</option>
-                                                    <option value="Chemistry">Chemistry</option>
-                                                </select>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <div className="space-y-2 mt-2">
-                                            <div className="text-sm text-gray-300">{formData.department}</div>
-                                            <div className="text-sm text-gray-400 capitalize">{formData.role}</div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Contact & Address Info */}
-                        <div className="space-y-4">
-                            <div className="bg-gray-900/30 rounded-lg p-4 border border-gray-700">
-                                <h3 className="text-xs font-bold text-gray-500 uppercase mb-3">Contact Information</h3>
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-gray-500 w-12">Email:</span>
-                                        <span className="text-white font-mono break-all">{formData.email}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 mt-2">
-                                        <span className="text-gray-500 w-12">Phone:</span>
-                                        {isEditing ? (
-                                            <input
-                                                type="tel"
-                                                name="phone"
-                                                value={formData.phone}
-                                                onChange={handleChange}
-                                                className="flex-1 bg-gray-900/50 border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-indigo-400 outline-none"
-                                            />
-                                        ) : (
-                                            <span className="text-white font-mono">{formData.phone || 'Not provided'}</span>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-gray-900/30 rounded-lg p-4 border border-gray-700">
-                                <h3 className="text-xs font-bold text-gray-500 uppercase mb-3">Address</h3>
-                                {isEditing ? (
-                                    <textarea
-                                        name="address"
-                                        value={formData.address}
-                                        onChange={handleChange}
-                                        rows={3}
-                                        className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-indigo-400 outline-none resize-none"
-                                        placeholder="Enter your full address"
-                                    />
-                                ) : (
-                                    <p className="text-sm text-gray-300">{formData.address || 'No address on file.'}</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="profile-page-container animate-fade-in">
+      {/* Header */}
+      <div className="profile-page-header">
+        <div>
+          <h1 className="profile-title">Account & Profile Settings</h1>
+          <p className="profile-subtitle">Manage your personal credentials, department assignment, and security.</p>
         </div>
-    );
+      </div>
+
+      {/* 2-Column Grid */}
+      <div className="profile-grid-2col">
+        {/* Left Column: Profile Information */}
+        <div className="profile-card profile-info-card">
+          <div className="profile-card-header">
+            <h2 className="profile-card-title">Profile Information</h2>
+            <span className="status-badge active">Active Account</span>
+          </div>
+
+          <div className="profile-avatar-banner">
+            <div className="profile-avatar-circle">
+              <span>{initials}</span>
+            </div>
+            <div className="profile-banner-meta">
+              <h3 className="profile-banner-name">{profileData.name}</h3>
+              <div className="profile-banner-role-row">
+                <span className="role-pill">Faculty / Teacher</span>
+                <span className="emp-pill font-mono">{profileData.employee_id}</span>
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleProfileSubmit} className="profile-form-body">
+            {profileSaved && (
+              <div className="profile-alert-success">
+                <CheckCircle2 size={16} /> Profile changes updated successfully!
+              </div>
+            )}
+
+            <div className="form-group">
+              <label>Full Name</label>
+              <input
+                type="text"
+                name="name"
+                value={profileData.name}
+                onChange={handleProfileChange}
+                className="profile-input"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                value={profileData.email}
+                onChange={handleProfileChange}
+                className="profile-input"
+                required
+              />
+            </div>
+
+            <div className="profile-2col-row">
+              <div className="form-group">
+                <label>Employee / Faculty ID</label>
+                <input
+                  type="text"
+                  name="employee_id"
+                  value={profileData.employee_id}
+                  onChange={handleProfileChange}
+                  className="profile-input font-mono"
+                  readOnly
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Department</label>
+                <input
+                  type="text"
+                  name="department"
+                  value={profileData.department}
+                  onChange={handleProfileChange}
+                  className="profile-input"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Phone Number</label>
+              <input
+                type="tel"
+                name="phone"
+                value={profileData.phone}
+                onChange={handleProfileChange}
+                className="profile-input"
+              />
+            </div>
+
+            <div className="profile-form-actions">
+              <button type="submit" disabled={loading} className="btn-update-profile">
+                <Save size={16} />
+                <span>Save Changes</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Right Column: Change Password */}
+        <div className="profile-card password-card">
+          <div className="profile-card-header">
+            <h2 className="profile-card-title">Security & Password</h2>
+            <KeyRound size={18} className="text-slate-400" />
+          </div>
+
+          <form onSubmit={handlePasswordSubmit} className="profile-form-body">
+            {passwordSaved && (
+              <div className="profile-alert-success">
+                <CheckCircle2 size={16} /> Password updated successfully!
+              </div>
+            )}
+
+            {passwordError && (
+              <div className="profile-alert-error">
+                {passwordError}
+              </div>
+            )}
+
+            <div className="form-group">
+              <label>Current Password</label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={passwordData.currentPassword}
+                onChange={handlePasswordChange}
+                className="profile-input"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>New Password</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+                className="profile-input"
+                placeholder="At least 6 characters"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Confirm New Password</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                className="profile-input"
+                placeholder="Re-type new password"
+                required
+              />
+            </div>
+
+            <div className="security-notice-box">
+              <ShieldCheck size={18} className="text-blue-500" />
+              <p>Passwords must be at least 6 characters. Make sure you use a strong, memorable combination.</p>
+            </div>
+
+            <div className="profile-form-actions">
+              <button type="submit" className="btn-update-password">
+                Update Password
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Profile;

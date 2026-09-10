@@ -35,6 +35,7 @@ public:
 
     AttendanceResponse recordAttendance(const String& rfidUid, const String& macAddress);
     AttendanceResponse bulkRecordAttendance(const String& macAddress, const String& recordsJsonArray);
+    bool updateDeviceStatus(const String& macAddress, const String& status);
     bool checkHealth();
 
 private:

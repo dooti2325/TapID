@@ -3,27 +3,45 @@
 @tailwind utilities;
 
 /* =====================================================
-   TapID Design System — Global CSS
+   TapID Design System — Institutional SaaS Light Theme
+   Matches Official Reference Mockup Architecture
    ===================================================== */
 
 :root {
-  --bg-primary:   #0a0f1e;
-  --bg-secondary: #111827;
-  --bg-panel:     rgba(17, 24, 39, 0.75);
+  /* Canvas & Panel Surfaces */
+  --bg-primary:   #f4f6fb;
+  --bg-secondary: #ffffff;
+  --bg-panel:     #ffffff;
+  --bg-card:      #ffffff;
+  
+  /* Sidebar Palette — Deep Royal Navy */
+  --bg-sidebar:        #0b2351;
+  --bg-sidebar-dark:   #081b40;
+  --sidebar-text:      #93a8cf;
+  --sidebar-active:    #1e5bff;
+  --sidebar-hover:     rgba(255, 255, 255, 0.08);
 
-  --text-primary:   #f1f5f9;
-  --text-secondary: #94a3b8;
+  /* Typography */
+  --text-primary:   #0f172a;
+  --text-secondary: #64748b;
+  --text-muted:     #94a3b8;
 
-  --accent-color:             #3b82f6;
-  --accent-hover:             #2563eb;
-  --accent-color-transparent: rgba(59, 130, 246, 0.12);
+  /* Brand Accents */
+  --accent-color:             #1e5bff;
+  --accent-hover:             #1748cc;
+  --accent-color-transparent: rgba(30, 91, 255, 0.1);
 
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.15);
+  /* Borders & Shadows */
+  --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
+  --card-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  --card-shadow-hover: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
 
+  /* Status Colors */
   --error-color:   #ef4444;
-  --success-color: #22c55e;
+  --success-color: #16a34a;
   --warning-color: #f59e0b;
+  --info-color:    #0284c7;
 }
 
 @layer base {
@@ -52,24 +70,27 @@
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.15);
+    background: #cbd5e1;
     border-radius: 3px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 }
 
 /* =====================================================
-   Glassmorphism Panel
+   Card / Panel Primitives (White Container)
    ===================================================== */
 .glass-panel {
-  background: var(--bg-panel);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.glass-panel:hover {
+  box-shadow: var(--card-shadow-hover);
 }
 
 /* =====================================================
@@ -79,7 +100,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  animation: fade-in 0.35s ease-out both;
+  animation: fade-in 0.3s ease-out both;
 }
 
 .page-header {
@@ -90,17 +111,29 @@
   gap: 1rem;
 }
 
+.page-header h1 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.page-header p {
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0;
+  font-size: 0.92rem;
+}
+
 /* =====================================================
    Typography Utilities
    ===================================================== */
-.text-accent   { color: var(--accent-color); }
+.text-accent    { color: var(--accent-color); }
 .text-secondary { color: var(--text-secondary); }
 
 .gradient-text {
-  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
+  font-weight: 700;
 }
 
 /* =====================================================
@@ -111,7 +144,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: 600;
   font-size: 0.875rem;
   border: none;
@@ -121,46 +154,57 @@
 }
 
 .btn:disabled {
-  opacity: 0.55;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none !important;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  background: var(--accent-color);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  background: var(--accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 14px rgba(30, 91, 255, 0.35);
 }
 
-.btn-danger {
+.btn-success, .btn-start {
+  background: var(--success-color);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled), .btn-start:hover:not(:disabled) {
+  background: #15803d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+}
+
+.btn-danger, .btn-stop {
   background: var(--error-color);
   color: white;
 }
 
-.btn-danger:hover:not(:disabled) {
+.btn-danger:hover:not(:disabled), .btn-stop:hover:not(:disabled) {
   background: #dc2626;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
+  background: #ffffff;
   border: 1px solid var(--border-color);
   color: var(--text-primary);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+  background: #f8fafc;
   border-color: var(--border-hover);
 }
 
 /* =====================================================
-   Status Badges & Pills
+   Status Badges & Pills (Pastel BG with Deep Text)
    ===================================================== */
 .status-badge, .status-pill {
   display: inline-flex;
@@ -168,46 +212,59 @@
   gap: 0.35rem;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .status-badge.online,
 .status-badge.active,
 .status-badge.present,
+.status-badge.registered,
 .status-pill.online,
 .status-pill.active {
-  background: rgba(34, 197, 94, 0.12);
-  color: #4ade80;
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
 }
 
+.status-badge.pending,
+.status-badge.waiting,
+.status-badge.late,
 .status-badge.offline,
-.status-pill.offline {
-  background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.25);
+.status-pill.offline,
+.status-pill.late {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
 }
 
 .status-badge.revoked,
 .status-badge.absent,
+.status-badge.inactive,
 .status-badge.completed,
 .status-pill.revoked,
 .status-pill.completed {
-  background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.status-badge.info,
+.status-pill.info {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
 }
 
 /* =====================================================
-   Shared Table Styles
+   Shared Table Styles (Crisp White Card Container)
    ===================================================== */
 .data-table-wrap {
   overflow-x: auto;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
+  background: #ffffff;
 }
 
 .data-table {
@@ -222,8 +279,8 @@
   font-weight: 600;
   font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  background: rgba(10, 15, 30, 0.5);
+  letter-spacing: 0.05em;
+  background: #f8fafc;
   border-bottom: 1px solid var(--border-color);
   white-space: nowrap;
 }
@@ -231,7 +288,7 @@
 .data-table td {
   padding: 1rem 1.25rem;
   color: var(--text-primary);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid #f1f5f9;
   font-size: 0.875rem;
   transition: background 0.15s;
 }
@@ -239,7 +296,7 @@
 .data-table tr:last-child td { border-bottom: none; }
 
 .data-table tbody tr:hover td {
-  background: rgba(255, 255, 255, 0.025);
+  background: #f8fafc;
 }
 
 /* =====================================================
@@ -248,8 +305,8 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(5, 10, 22, 0.8);
-  backdrop-filter: blur(6px);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -259,20 +316,22 @@
 }
 
 .modal-box {
-  background: var(--bg-secondary);
+  background: #ffffff;
   border: 1px solid var(--border-color);
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 2rem;
   width: 100%;
   max-width: 480px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
   animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  position: relative;
 }
 
 .modal-box h2, .modal-box h3 {
   margin: 0 0 1.5rem;
   font-size: 1.25rem;
   font-weight: 700;
+  color: var(--text-primary);
 }
 
 .modal-actions {
@@ -293,35 +352,33 @@
 }
 
 .form-group label {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .form-input,
 .form-select {
   width: 100%;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.04);
+  padding: 0.7rem 1rem;
+  background: #ffffff;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 8px;
   color: var(--text-primary);
   font-size: 0.9rem;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-input:focus,
 .form-select:focus {
   border-color: var(--accent-color);
-  background: rgba(59, 130, 246, 0.06);
+  box-shadow: 0 0 0 3px rgba(30, 91, 255, 0.12);
 }
 
 .form-select option {
-  background: var(--bg-secondary);
+  background: #ffffff;
   color: var(--text-primary);
 }
 
@@ -329,7 +386,7 @@
    Loader Spinner
    ===================================================== */
 .loader {
-  border: 3px solid rgba(255, 255, 255, 0.08);
+  border: 3px solid #e2e8f0;
   border-left-color: var(--accent-color);
   border-radius: 50%;
   width: 36px;
@@ -355,14 +412,9 @@
   to { transform: rotate(360deg); }
 }
 
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-  50%       { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
-}
-
-.animate-fade-in  { animation: fade-in 0.35s ease-out both; }
+.animate-fade-in  { animation: fade-in 0.3s ease-out both; }
 .animate-slide-up { animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.fade-in          { animation: fade-in 0.35s ease-out both; }
+.fade-in          { animation: fade-in 0.3s ease-out both; }
 
 /* =====================================================
    Misc Utilities
@@ -381,20 +433,18 @@
 .font-mono {
   font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   font-size: 0.88em;
+  color: #6366f1;
 }
 
 .cell-details       { display: flex; flex-direction: column; gap: 2px; }
 .cell-details-sub   { font-size: 0.75rem; color: var(--text-secondary); }
 .cell-truncate      { max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* =====================================================
-   Modal Close Button
-   ===================================================== */
 .modal-close-btn {
   position: absolute;
   top: 1.125rem;
   right: 1.125rem;
-  background: rgba(255, 255, 255, 0.06);
+  background: #f1f5f9;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-secondary);
@@ -407,59 +457,46 @@
 }
 
 .modal-close-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: #e2e8f0;
   color: var(--text-primary);
 }
 
-.modal-box {
-  position: relative;
-}
-
-/* =====================================================
-   Action Icon Buttons (used in tables)
-   ===================================================== */
 .action-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 7px;
+  border-radius: 6px;
   border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.04);
+  background: #ffffff;
   cursor: pointer;
   transition: all 0.15s;
   color: var(--text-secondary);
 }
 
 .action-icon-btn.edit:hover {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.3);
-  color: #60a5fa;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: var(--accent-color);
 }
 
 .action-icon-btn.delete:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #f87171;
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: var(--error-color);
 }
 
-/* =====================================================
-   Form Error Display
-   ===================================================== */
 .form-error {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  color: #fca5a5;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
   padding: 0.75rem 1rem;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 0.875rem;
   margin-bottom: 1rem;
 }
 
-/* =====================================================
-   RFID Badge (used in Students table)
-   ===================================================== */
 .badge-rfid {
   display: inline-flex;
   align-items: center;
@@ -473,80 +510,13 @@
 }
 
 .badge-rfid.issued {
-  background: rgba(139, 92, 246, 0.12);
-  color: #c4b5fd;
-  border: 1px solid rgba(139, 92, 246, 0.25);
+  background: #f5f3ff;
+  color: #7c3aed;
+  border: 1px solid #ddd6fe;
 }
 
 .badge-rfid.missing {
-  background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  animation: pulse-glow-amber 2s ease-in-out infinite;
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
 }
-
-@keyframes pulse-glow-amber {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
-  50%       { box-shadow: 0 0 0 5px rgba(245, 158, 11, 0); }
-}
-
-/* =====================================================
-   Small icon button (used in Devices)
-   ===================================================== */
-.btn-icon-sm {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 7px;
-  border: 1px solid var(--border-color);
-  background: rgba(255,255,255,0.04);
-  cursor: pointer;
-  transition: all 0.15s;
-  color: var(--text-secondary);
-}
-
-.btn-icon-sm.danger:hover {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #f87171;
-}
-
-/* =====================================================
-   Devices Summary Pills
-   ===================================================== */
-.devices-summary {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.summary-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.summary-pill.online {
-  background: rgba(34, 197, 94, 0.08);
-  color: #4ade80;
-  border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-.summary-pill.offline {
-  background: rgba(245, 158, 11, 0.08);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.2);
-}
-
-.summary-pill.revoked {
-  background: rgba(239, 68, 68, 0.08);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-

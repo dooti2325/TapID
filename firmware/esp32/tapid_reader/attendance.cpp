@@ -4,7 +4,8 @@ AttendanceController::AttendanceController()
     : _rfid(SS_PIN, RST_PIN),
       _buzzer(BUZZER_PIN),
       _led(LED_GREEN_PIN, LED_RED_PIN),
-      _lastQueueFlushAttempt(0) {}
+      _lastQueueFlushAttempt(0),
+      _wasOnline(false) {}
 
 void AttendanceController::begin() {
     Serial.println("==================================================");
@@ -29,9 +30,12 @@ void AttendanceController::begin() {
     _wifi.begin();
 
     if (_wifi.isConnected()) {
+        _wasOnline = true;
         _led.showReady();
         _buzzer.playWiFiConnected();
+        _api.updateDeviceStatus(_wifi.getMacAddress(), "online");
     } else {
+        _wasOnline = false;
         _led.setRed(true);
         Serial.println("[INFO] Terminal starting in Offline Buffering Mode.");
     }
@@ -161,10 +165,15 @@ void AttendanceController::loop() {
 
     // Flush any pending offline taps when online
     if (_wifi.isConnected()) {
+        if (!_wasOnline) {
+            _wasOnline = true;
+            _api.updateDeviceStatus(_wifi.getMacAddress(), "online");
+        }
         _led.setGreen(true);
         _led.setRed(false);
         flushOfflineQueue();
     } else {
+        _wasOnline = false;
         // Red indicator for offline status
         _led.setGreen(false);
         _led.setRed(true);

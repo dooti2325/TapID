@@ -100,8 +100,9 @@ Open `firmware/esp32/secrets.h` (or copy from `secrets.example.h`):
 // or leave empty "" to use the ESP32's native factory MAC.
 #define DEVICE_MAC      "24:0A:C4:00:00:01"
 
-// Optional Device API Key
-#define DEVICE_API_KEY  ""
+// Device Authentication Token / API Key
+// Must match DEVICE_API_KEY in backend .env. Sent as "X-Device-Key" header.
+#define DEVICE_API_KEY  "your-device-api-key-matching-backend-env"
 
 #endif // SECRETS_H
 ```
@@ -165,9 +166,22 @@ All firmware unit tests PASSED successfully!
 
 ## 5. Backend REST Contract
 
-The terminal interacts with two endpoints on the TapID API:
+The terminal interacts with three endpoints on the TapID API. All requests include the `X-Device-Key: <DEVICE_API_KEY>` header for hardware authentication when configured on the backend.
 
-### Live Scan (`POST /api/attendance/record`)
+### 1. Device Heartbeat / Status (`POST /api/devices/status`)
+Sent automatically upon successful Wi-Fi connection and re-connection:
+```json
+{
+  "mac_address": "24:0A:C4:00:00:01",
+  "status": "online"
+}
+```
+**Responses**:
+- `200 OK`: `{"message":"Device status updated"}`
+- `401 Unauthorized`: Missing or invalid `X-Device-Key`
+- `403 Forbidden`: Attempted to modify status of a revoked device
+
+### 2. Live Card Tap (`POST /api/attendance/record`)
 ```json
 {
   "rfid_uid": "A1B2C3D4",
@@ -175,12 +189,15 @@ The terminal interacts with two endpoints on the TapID API:
 }
 ```
 **Responses**:
-- `200 OK`: `{"message":"Attendance recorded successfully","student":{"name":"John Doe"}}`
-- `409 Conflict`: `{"message":"Attendance already recorded for this session"}`
-- `400 Bad Request`: `{"message":"No active session found for this classroom"}`
-- `403/404`: `{"message":"Device revoked or card not registered"}`
+- `200 OK`: `{"success":true,"message":"Attendance recorded","student_name":"John Doe"}`
+- `401 Unauthorized`: Missing or invalid `X-Device-Key`
+- `409 Conflict`: `{"success":false,"message":"Attendance already recorded"}`
+- `400 Bad Request`: `{"message":"No active session in this classroom"}`
+- `403 Forbidden`: `{"message":"Device revoked"}` or `{"message":"Card not active"}`
+- `404 Not Found`: `{"message":"Device not registered"}` or `{"message":"Card not found"}`
 
-### Bulk Reconnect Flush (`POST /api/attendance/bulk-record`)
+### 3. Bulk Offline Sync (`POST /api/attendance/bulk-record`)
+Flushed automatically from the local ring buffer when Wi-Fi reconnects (batches of up to 20 records, server maximum 50):
 ```json
 {
   "mac_address": "24:0A:C4:00:00:01",
@@ -190,6 +207,11 @@ The terminal interacts with two endpoints on the TapID API:
   ]
 }
 ```
+**Responses**:
+- `200 OK`: `{"success":true,"added":2,"errors":0}`
+- `401 Unauthorized`: Missing or invalid `X-Device-Key`
+- `400 Bad Request`: Batch size exceeds limit of 50 records or invalid records array
+
 
 ---
 

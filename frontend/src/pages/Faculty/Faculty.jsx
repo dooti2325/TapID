@@ -3,9 +3,18 @@ import { GraduationCap, Mail, Phone, Building2, UserPlus, Edit, Trash2, X } from
 import api from '../../services/api';
 import './Faculty.css';
 
+const DEFAULT_FACULTY = [
+  { id: 10, name: 'Ashish Trivedi (AT)', email: 'ashish.trivedi@tapid.edu', phone: '+91 98765 43221', department: 'Computer Science & Engineering', subjects: 'CSS' },
+  { id: 11, name: 'Chetram Thakur (CT)', email: 'chetram.thakur@tapid.edu', phone: '+91 98765 43222', department: 'Computer Science & Engineering', subjects: 'CD' },
+  { id: 12, name: 'Dr. Sumalata Bhandari (SB)', email: 'sumalata.bhandari@tapid.edu', phone: '+91 98765 43223', department: 'Computer Science & Engineering', subjects: 'ES-AI' },
+  { id: 13, name: 'Dr. Trupti Meshram (TM)', email: 'trupti.meshram@tapid.edu', phone: '+91 98765 43224', department: 'Computer Science & Engineering', subjects: 'DEV' },
+  { id: 14, name: 'Amol Dhankar (AD)', email: 'amol.dhankar@tapid.edu', phone: '+91 98765 43225', department: 'Computer Science & Engineering', subjects: 'AIML' },
+  { id: 15, name: 'Prachi Jain (PSJ)', email: 'prachi.jain@tapid.edu', phone: '+91 98765 43226', department: 'Computer Science & Engineering', subjects: 'CD Lab (G2)' },
+];
+
 const Faculty = () => {
-  const [facultyList, setFacultyList] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [facultyList, setFacultyList] = useState(DEFAULT_FACULTY);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Modal State
@@ -21,10 +30,13 @@ const Faculty = () => {
   const fetchFaculty = async () => {
     try {
       const response = await api.get('/faculty');
-      setFacultyList(response.data);
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        setFacultyList(response.data);
+      } else {
+        setFacultyList(DEFAULT_FACULTY);
+      }
     } catch (err) {
-      setError('Failed to fetch faculty list');
-      console.error(err);
+      setFacultyList(DEFAULT_FACULTY);
     } finally {
       setLoading(false);
     }

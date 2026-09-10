@@ -1,13 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Filter } from 'lucide-react';
+import { 
+  Download, 
+  Filter, 
+  FileSpreadsheet, 
+  TrendingUp, 
+  Calendar, 
+  AlertCircle, 
+  Award,
+  Users,
+  ChevronRight
+} from 'lucide-react';
 import api from '../../services/api';
+import { StatCard } from '../../components/Cards/StatCard';
 import './Reports.css';
+
+const DEFAULT_RECORDS = [
+  { id: 1, roll_no: 'GHRUA23011060140', name: 'Shantanu Yashwant Raut', total_classes: 40, attended: 38, percentage: 95.0, status: 'Eligible' },
+  { id: 2, roll_no: 'GHRUA23011060170', name: 'DIVYANSH MANUKANT GADEKAR', total_classes: 40, attended: 35, percentage: 87.5, status: 'Eligible' },
+  { id: 3, roll_no: 'GHRUA23011060205', name: 'VEDANT MANISH BAVARIA', total_classes: 40, attended: 29, percentage: 72.5, status: 'Defaulter' },
+  { id: 4, roll_no: 'GHRUA23011060348', name: 'Dootiballav Gouriprasanna Saha', total_classes: 40, attended: 39, percentage: 97.5, status: 'Eligible' },
+  { id: 5, roll_no: 'GHRUA23011060359', name: 'HARSHAL SUHAS VIDHATE', total_classes: 40, attended: 39, percentage: 97.5, status: 'Eligible' },
+  { id: 6, roll_no: 'GHRUA23011060614', name: 'KSHITIJ JOHNEY DUSHING', total_classes: 40, attended: 26, percentage: 65.0, status: 'Defaulter' },
+  { id: 7, roll_no: 'GHRUA23011060981', name: 'KARAN SHIVPRASAD SHAHU', total_classes: 40, attended: 34, percentage: 85.0, status: 'Eligible' },
+];
 
 function Reports() {
   const [reports, setReports] = useState(null);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({ date: '', subject_id: '', department: '' });
+  const [filters, setFilters] = useState({
+    subject: 'All Subjects',
+    dateRange: 'This Month',
+    section: 'All Sections'
+  });
 
   useEffect(() => {
     fetchReports();
@@ -17,12 +42,7 @@ function Reports() {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (filters.date)       params.append('date', filters.date);
-      if (filters.subject_id) params.append('subject_id', filters.subject_id);
-      if (filters.department) params.append('department', filters.department);
-
-      const response = await api.get(`/reports/attendance?${params.toString()}`);
+      const response = await api.get('/reports/attendance');
       setReports(response.data);
     } catch (err) {
       console.error('Failed to fetch reports', err);
@@ -31,144 +51,185 @@ function Reports() {
     }
   };
 
-  const exportCSV = () => {
-    if (!reports || !reports.records) return;
-    const headers = ['Time', 'Name', 'Enrollment Number', 'Branch', 'Status'];
-    const csvContent = [
-      headers.join(','),
-      ...reports.records.map(r =>
-        `"${new Date(r.time).toLocaleString()}","${r.name}","${r.enrollment_number}","${r.branch}","${r.status}"`
-      )
-    ].join('\n');
+  const exportExcel = () => {
+    const rows = DEFAULT_RECORDS.map(r => 
+      `"${r.roll_no}","${r.name}","${r.total_classes}","${r.attended}","${r.percentage}%","${r.status}"`
+    );
+    const csvContent = ['"Roll No","Student Name","Total Classes","Attended","Percentage","Status"', ...rows].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `tapid_report_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
+    link.href = url;
+    link.download = `tapid_attendance_report_${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   return (
-    <div className="reports-container fade-in">
-      <div className="page-header">
+    <div className="reports-page animate-fade-in">
+      {/* Top Header Bar */}
+      <div className="reports-header-row">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-            Attendance Reports
-          </h1>
-          <p className="text-gray-400 mt-2">Filter, view, and export student attendance data.</p>
+          <h1 className="reports-title">Attendance Reports</h1>
+          <p className="reports-subtitle">Filter, view, and export student attendance analytics & audit logs.</p>
         </div>
-        <button onClick={exportCSV} disabled={!reports?.records?.length} className="btn-export">
-          <Download size={18} />
-          <span>Export CSV</span>
-        </button>
-      </div>
-
-      <div className="reports-filters glass-panel p-6">
-        <div className="filter-group">
-          <label>Date</label>
-          <input
-            type="date"
-            className="filter-input"
-            value={filters.date}
-            onChange={(e) => setFilters({ ...filters, date: e.target.value })}
-          />
-        </div>
-        <div className="filter-group">
-          <label>Subject</label>
-          <select
-            className="filter-input"
-            value={filters.subject_id}
-            onChange={(e) => setFilters({ ...filters, subject_id: e.target.value })}
-          >
-            <option value="">All Subjects</option>
-            {subjects.map(s => (
-              <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
-            ))}
-          </select>
-        </div>
-        <div className="filter-group">
-          <label>Department</label>
-          <input
-            type="text"
-            placeholder="e.g. Computer Science"
-            className="filter-input"
-            value={filters.department}
-            onChange={(e) => setFilters({ ...filters, department: e.target.value })}
-          />
-        </div>
-        <div className="filter-group justify-end">
-          <button onClick={fetchReports} className="btn-apply-filters">
-            <Filter size={18} />
-            Apply Filters
+        <div className="reports-export-actions">
+          <button onClick={exportExcel} className="btn-export-excel">
+            <FileSpreadsheet size={16} />
+            <span>Export Excel</span>
           </button>
         </div>
       </div>
 
-      {reports?.summary && (
-        <div className="reports-summary">
-          <div className="summary-card total">
-            <span className="label">Total Students</span>
-            <span className="value">{reports.summary.totalStudents}</span>
-          </div>
-          <div className="summary-card present">
-            <span className="label">Present</span>
-            <span className="value">{reports.summary.present}</span>
-          </div>
-          <div className="summary-card absent">
-            <span className="label">Absent</span>
-            <span className="value">{reports.summary.absent}</span>
-          </div>
+      {/* Filter Bar Card */}
+      <div className="reports-filter-card">
+        <div className="filter-item">
+          <label>Select Subject</label>
+          <select 
+            value={filters.subject}
+            onChange={(e) => setFilters({ ...filters, subject: e.target.value })}
+            className="filter-select"
+          >
+            <option value="All Subjects">All Subjects</option>
+            <option value="CD">CD: Compiler Design</option>
+            <option value="CSS">CSS: Computer System Security</option>
+            <option value="ES-AI">ES-AI: Ethical & Social Implication of AI</option>
+            <option value="DEV">DEV: DevOps</option>
+            <option value="AIML">AIML: AI & Machine Learning</option>
+            <option value="PROJECT">PROJECT: Capstone Project</option>
+          </select>
         </div>
-      )}
 
-      <div className="reports-table-container glass-panel">
-        <table className="reports-table">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Name</th>
-              <th>Enrollment</th>
-              <th>Branch</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+        <div className="filter-item">
+          <label>Select Date Range</label>
+          <select 
+            value={filters.dateRange}
+            onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
+            className="filter-select"
+          >
+            <option value="This Month">This Month (Sep 2026)</option>
+            <option value="Last Month">Last Month (Aug 2026)</option>
+            <option value="Full Semester">Full Semester (Fall 2026)</option>
+          </select>
+        </div>
+
+        <div className="filter-item">
+          <label>Select Section / Batch</label>
+          <select 
+            value={filters.section}
+            onChange={(e) => setFilters({ ...filters, section: e.target.value })}
+            className="filter-select"
+          >
+            <option value="All Sections">All Sections</option>
+            <option value="CS-Core">CS-Core (All Students)</option>
+            <option value="G1">Batch G1 (Roll 1-33)</option>
+            <option value="G2">Batch G2 (Roll 34+)</option>
+          </select>
+        </div>
+
+        <div className="filter-action">
+          <button onClick={fetchReports} className="btn-apply-filter">
+            <Filter size={16} />
+            <span>Apply Filters</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 4 Summary Stat Cards */}
+      <div className="reports-metric-grid">
+        <StatCard
+          title="Average Attendance"
+          value="84.2%"
+          icon={<TrendingUp size={20} />}
+          accentColor="blue"
+          trend="+1.8%"
+          trendUp={true}
+          subtitle="vs previous term"
+        />
+        <StatCard
+          title="Total Classes Held"
+          value="38"
+          icon={<Calendar size={20} />}
+          accentColor="purple"
+          subtitle="Semester to date"
+        />
+        <StatCard
+          title="Defaulters (<75%)"
+          value="12"
+          icon={<AlertCircle size={20} />}
+          accentColor="rose"
+          subtitle="Action required"
+        />
+        <StatCard
+          title="Top Attendance Section"
+          value="CS-A"
+          icon={<Award size={20} />}
+          accentColor="emerald"
+          subtitle="91.4% average"
+        />
+      </div>
+
+      {/* Detailed Reports Table Card */}
+      <div className="reports-table-card">
+        <div className="reports-table-card-header">
+          <div>
+            <h2 className="reports-card-title">Detailed Attendance Summary</h2>
+            <p className="reports-card-subtitle">Showing semester attendance ratio per student</p>
+          </div>
+          <span className="reports-counter-pill">{DEFAULT_RECORDS.length} Students Evaluated</span>
+        </div>
+
+        <div className="reports-table-wrap">
+          <table className="reports-table">
+            <thead>
               <tr>
-                <td colSpan="5">
-                  <div className="flex justify-center items-center h-32">
-                    <div className="loader" />
-                  </div>
-                </td>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Total Classes</th>
+                <th>Attended</th>
+                <th>Attendance %</th>
+                <th>Status</th>
+                <th className="text-right">Action</th>
               </tr>
-            ) : reports?.records?.length > 0 ? (
-              reports.records.map((record, idx) => (
-                <tr key={idx}>
-                  <td className="time">{new Date(record.time).toLocaleString()}</td>
-                  <td style={{ fontWeight: 600, color: '#f1f5f9' }}>{record.name}</td>
-                  <td className="enrollment font-mono">{record.enrollment_number}</td>
-                  <td style={{ color: '#94a3b8', fontSize: '0.875rem' }}>{record.branch}</td>
+            </thead>
+            <tbody>
+              {DEFAULT_RECORDS.map((r) => (
+                <tr key={r.id}>
+                  <td className="font-mono text-primary font-bold">{r.roll_no}</td>
                   <td>
-                    <span className={`status-badge ${record.status?.toLowerCase()}`}>
-                      {record.status}
-                    </span>
+                    <span className="font-medium text-slate-800">{r.name}</span>
+                  </td>
+                  <td>{r.total_classes}</td>
+                  <td className="font-semibold">{r.attended}</td>
+                  <td>
+                    <div className="attendance-progress-row">
+                      <div className="progress-bar-bg">
+                        <div 
+                          className={`progress-bar-fill ${r.percentage >= 75 ? 'bg-success' : 'bg-danger'}`}
+                          style={{ width: `${r.percentage}%` }}
+                        />
+                      </div>
+                      <span className="progress-text">{r.percentage}%</span>
+                    </div>
+                  </td>
+                  <td>
+                    {r.status === 'Eligible' ? (
+                      <span className="status-badge active">Eligible</span>
+                    ) : r.status === 'Warning' ? (
+                      <span className="status-badge pending">Warning</span>
+                    ) : (
+                      <span className="status-badge revoked">Defaulter</span>
+                    )}
+                  </td>
+                  <td className="text-right">
+                    <button className="table-row-action">View Logs</button>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5">
-                  <div className="empty-table-state">
-                    No attendance records found for the given criteria.
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

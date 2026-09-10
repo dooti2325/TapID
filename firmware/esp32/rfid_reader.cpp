@@ -7,7 +7,15 @@ RfidReader::RfidReader(uint8_t ssPin, uint8_t rstPin)
       _debouncePeriodMs(CARD_DEBOUNCE_MS) {}
 
 bool RfidReader::init() {
-    SPI.begin();
+    // Explicitly initialize SPI with defined pins to prevent board pin mapping conflicts
+    SPI.begin(SPI_SCK_PIN, SPI_MISO_PIN, SPI_MOSI_PIN, SS_PIN);
+
+    pinMode(SS_PIN, OUTPUT);
+    digitalWrite(SS_PIN, HIGH);
+    pinMode(RST_PIN, OUTPUT);
+    digitalWrite(RST_PIN, HIGH);
+    delay(20);
+
     _mfrc522.PCD_Init();
     delay(50);
 

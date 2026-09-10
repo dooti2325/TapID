@@ -101,16 +101,16 @@ int WiFiManager::getRSSI() {
 
 void WiFiManager::initTimeSync() {
     Serial.println("[NTP] Initializing time synchronization...");
-    configTime(GMT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC, NTP_SERVER_1, NTP_SERVER_2);
+    configTime(GMT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC, NTP_SERVER_1, NTP_SERVER_2, NTP_SERVER_3);
 
     struct tm timeinfo;
-    if (getLocalTime(&timeinfo, 3000)) {
+    if (getLocalTime(&timeinfo, 5000)) {
         _timeSynced = true;
         char timeStr[64];
         strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S UTC", &timeinfo);
         Serial.printf("[NTP] Time synchronized: %s\n", timeStr);
     } else {
-        Serial.println("[NTP] Time sync pending or timed out.");
+        Serial.println("[NTP] Time sync pending or timed out (will retry in background).");
     }
 }
 
