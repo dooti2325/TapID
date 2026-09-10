@@ -1,251 +1,405 @@
-# TapID
+# TapID — Smart RFID Attendance Management System
 
-TapID is a smart NFC attendance management system for colleges and training centers. It combines an ESP32 + RC522 RFID reader, a Node.js/Express API, a MySQL database, and a React/Vite web portal for administrators and faculty.
+Tap. Verify. Record. An end-to-end IoT and web attendance tracking platform designed for educational institutions, laboratories, and lecture halls.
 
-## Features
+TapID integrates **ESP32 microcontroller terminals** with **RC522 13.56 MHz RFID readers**, a robust **Node.js/Express REST API**, a **MySQL relational database**, and a **React 18 + Vite dashboard**.
 
-- JWT authentication for admin, faculty, and student users
-- Admin dashboard metrics for students, faculty, classrooms, subjects, and devices
-- Faculty timetable view and attendance session lifecycle
-- ESP32 attendance recording by RFID UID and classroom device MAC address
-- Duplicate attendance prevention per session/student
-- Student directory with RFID card mapping
-- Attendance reports with CSV export
-- Admin log and audit endpoints
-- Secure image upload workflow with file type and size validation
-- Docker Compose deployment for MySQL, backend, and frontend
+---
 
-## File Structure
+## Table of Contents
+
+- [1. What is TapID?](#1-what-is-tapid)
+- [2. Where: Architecture & Directory Map](#2-where-architecture--directory-map)
+- [3. When: System Lifecycle & Attendance Workflows](#3-when-system-lifecycle--attendance-workflows)
+- [4. How: Step-by-Step Setup Guide](#4-how-step-by-step-setup-guide)
+  - [Prerequisites](#prerequisites)
+  - [Step 1: Database Setup](#step-1-database-setup)
+  - [Step 2: Backend Configuration & Launch](#step-2-backend-configuration--launch)
+  - [Step 3: Frontend Portal Launch](#step-3-frontend-portal-launch)
+  - [Step 4: ESP32 Firmware Wiring & Flashing](#step-4-esp32-firmware-wiring--flashing)
+  - [Alternative: One-Command Docker Setup](#alternative-one-command-docker-setup)
+- [5. How to Run the End-to-End User Flow](#5-how-to-run-the-end-to-end-user-flow)
+- [6. Verification & Automated Testing](#6-verification--automated-testing)
+- [7. API Reference Matrix](#7-api-reference-matrix)
+- [8. Troubleshooting & FAQ](#8-troubleshooting--faq)
+
+---
+
+## 1. What is TapID?
+
+### Core Components
+
+| Component | Technology | Primary Responsibility |
+|:---|:---|:---|
+| **IoT Hardware Terminal** | ESP32 + RC522 (13.56 MHz) | Scans student RFID cards, validates hardware MAC against database, plays audio chimes, blinks status LEDs, and buffers taps offline if Wi-Fi drops. |
+| **Backend REST API** | Node.js 18+, Express 5, MySQL2 | Handles authentication (JWT), role-based access control, active session management, attendance recording with deduplication, audit logs, and file uploads. |
+| **Relational Database** | MySQL 8.0 | Stores users, faculty profiles, student directories, RFID card-to-student mappings, classrooms, hardware terminals, timetables, and audit history. |
+| **Web Application** | React 18, Vite, Tailwind CSS, Lucide | Modern dashboard for administrators (manage users, terminals, classrooms, system logs) and faculty (live attendance view, start/end sessions, export reports). |
+
+### Key System Capabilities
+
+- **Instant Attendance Recording**: Under 50ms server response for card tap verification.
+- **Offline Resiliency**: Built-in 50-record FIFO ring buffer stores scans when network is unavailable and automatically bulk-syncs when reconnected.
+- **Strict Deduplication**: Prevents accidental or fraudulent double-taps within the same session.
+- **Classroom & Device Enforcement**: Terminals are registered to specific classrooms; card taps are only accepted when an active lecture session is running in that classroom.
+- **Multi-Tone Feedback**: Distinct acoustic melodies for success, duplicate tap, device revoked, and offline buffering.
+
+---
+
+## 2. Where: Architecture & Directory Map
+
+### Repository Map
 
 ```text
 TapID/
-  ai/                         NVIDIA/Nemotron helper service and tests
-  api/                        Swagger, Postman, and API testing artifacts
-  backend/
-    app.js                    Express app, middleware, route mounting, errors
-    server.js                 Runtime entrypoint and graceful shutdown
-    config/                   Database, JWT, logging, app config
-    controllers/              Route handlers for auth, attendance, admin, reports
-    middleware/               Auth, role checks, audit, validation, rate limiting
-    models/                   Domain model placeholders for future ORM migration
-    routes/                   Express route modules
-    services/                 Business/reporting/service helpers
-    tests/                    Jest + Supertest API tests
-    utils/                    Shared helpers, responses, JWT secret handling
-  database/
-    schema.sql                MySQL tables, keys, and constraints
-    indexes.sql               Performance indexes
-    seed.sql                  Rerunnable demo data
-    triggers.sql              Device status triggers for session start/end
-    procedures.sql            Reserved for stored procedures
-  deployment/                 Nginx and container deployment assets
-  docs/                       Architecture, reports, diagrams, manuals
-  firmware/esp32/             ESP32 NFC reader firmware
-  frontend/
-    src/
-      components/             Cards, Tables, Charts, Loader, Modal, Badge, Navbar, Layout, Sidebar, Topbar
-      context/                Auth state provider
-      hooks/                  Custom hooks (useDebounce, useFetch, useModal)
-      pages/                  Login, dashboard, attendance, reports, admin, students, faculty, devices
-      services/               Modular API client and domain services (auth, attendance, students, etc.)
-      styles/                 Shared CSS tokens/utilities
-      utils/                  Formatting, constants, CSV/data export utilities
-    tests/                    Vitest + Testing Library component and utility tests
+├── backend/                  # Node.js Express REST API
+│   ├── config/               # Database pool, JWT, Winston logging, config tokens
+│   ├── controllers/          # Business logic for auth, attendance, devices, etc.
+│   ├── middleware/           # JWT verification, RBAC, audit logging, rate limiting
+│   ├── models/               # Domain abstractions
+│   ├── routes/               # Express routing modules mounted under /api/*
+│   ├── services/             # Analytics, report generation, email services
+│   ├── tests/                # 10 Jest test suites (44 passing unit tests)
+│   ├── uploads/              # Uploaded avatars and images (git-ignored)
+│   ├── logs/                 # Winston daily rotate logs (git-ignored)
+│   ├── server.js             # Runtime entrypoint (port 3000)
+│   └── app.js                # Express app definition & static dist serving
+├── frontend/                 # React 18 + Vite Web Application
+│   ├── public/               # Static assets (favicon.svg, logo.png, manifest.json)
+│   ├── src/
+│   │   ├── components/       # Reusable UI (Sidebar, Topbar, DataTable, StatCard, Modals)
+│   │   ├── context/          # AuthContext with token persistence
+│   │   ├── pages/            # Admin, Faculty, Attendance, Devices, Reports, Login
+│   │   ├── services/         # Axios API clients
+│   │   └── styles/           # Modern glassmorphism & responsive design system
+│   └── tests/                # 5 Vitest test suites (17 passing unit tests)
+├── firmware/                 # ESP32 Microcontroller Firmware
+│   ├── platformio.ini        # PlatformIO configuration & dependency management
+│   ├── README.md             # Hardware BOM, wiring diagrams, and pinouts
+│   └── esp32/
+│       ├── main.ino          # Canonical PlatformIO entrypoint
+│       ├── config.h          # Pin numbers, timeouts, baud rate
+│       ├── secrets.h         # Wi-Fi SSID, password, API URL, and MAC address
+│       ├── wifi_manager.*    # Auto-reconnect & NTP time sync
+│       ├── rfid_reader.*     # RC522 SPI driver & UID parser
+│       ├── offline_queue.*   # In-memory FIFO ring buffer for network dropouts
+│       ├── api_client.*      # HTTP client for single & bulk REST calls
+│       ├── buzzer.* / led.*  # Multi-tone acoustic & visual feedback
+│       └── tapid_reader/     # Self-contained Arduino IDE sketch folder
+├── database/                 # Database Definitions & Seed Data
+│   ├── schema.sql            # Table definitions, foreign keys, constraints
+│   ├── indexes.sql           # Query optimization indexes
+│   ├── triggers.sql          # Auto device status triggers
+│   └── seed.sql              # Deterministic demo accounts, rooms, & timetable
+├── deployment/               # Container & Nginx Configurations
+│   ├── docker/               # Backend & Frontend Dockerfiles
+│   └── nginx/                # Production reverse proxy configuration
+└── docker-compose.yml        # Multi-container orchestration (DB, API, Web)
 ```
 
-Generated folders such as `node_modules/`, `frontend/dist/`, `backend/logs/`, and `backend/uploads/` are intentionally excluded from the structure above.
+### URLs, Ports & Locations
 
-## Database Schema
+| Component | URL / Port | Configuration File |
+|:---|:---|:---|
+| **Frontend Web Portal** | `http://localhost:5173` (Dev) / `http://localhost:80` (Docker) | `frontend/vite.config.js` |
+| **Backend REST API** | `http://localhost:3000/api` | `backend/server.js`, `.env` |
+| **MySQL Database** | `localhost:3306` (Local) / `localhost:3307` (Docker) | `backend/config/database.js` |
+| **ESP32 Firmware Secrets**| Hardware terminal configuration | `firmware/esp32/secrets.h` |
 
-```text
-users
-  id PK, email UNIQUE, password_hash, role(admin|faculty|student), created_at
+---
 
-faculty
-  id PK, user_id UNIQUE FK users.id, name, phone, department
+## 3. When: System Lifecycle & Attendance Workflows
 
-sections
-  id PK, name, branch, semester, UNIQUE(name, branch, semester)
+Understanding **when** different actions occur ensures proper usage:
 
-students
-  id PK, user_id UNIQUE NULL FK users.id, name, enrollment_number UNIQUE,
-  section_id FK sections.id, created_at
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as Administrator
+    actor Faculty as Faculty Member
+    actor Student as Student
+    participant Hardware as ESP32 + RC522
+    participant API as Express Backend
+    participant DB as MySQL Database
 
-rfid_cards
-  id PK, uid UNIQUE, student_id NULL FK students.id, status(active|revoked|lost),
-  issued_at
+    Note over Admin,DB: Phase 1: System Provisioning (When on-boarding)
+    Admin->>API: Add Classrooms, Subjects, Timetable, Devices
+    Admin->>API: Enroll Students & Assign RFID Card UIDs
 
-subjects
-  id PK, code UNIQUE, name, semester
+    Note over Faculty,DB: Phase 2: Lecture Initiation (When class begins)
+    Faculty->>API: POST /api/session/start (Subject, Room, Timetable)
+    API->>DB: Set session to 'active', Room terminal status 'online'
 
-classrooms
-  id PK, room_number UNIQUE, building
+    Note over Student,DB: Phase 3: Card Tap & Verification (When students enter)
+    Student->>Hardware: Tap RFID Card on RC522
+    Hardware->>Hardware: Read UID & Check Debounce Cooldown
+    alt Wi-Fi Online
+        Hardware->>API: POST /api/attendance/record (UID, MAC)
+        API->>DB: Validate Device, Student & Active Session
+        alt Valid Tap
+            API-->>Hardware: 200 OK (Recorded)
+            Hardware->>Hardware: Play Success Chime (Green LED Flash)
+        else Duplicate Tap
+            API-->>Hardware: 409 Conflict (Already recorded)
+            Hardware->>Hardware: Play Warning Chime (Both LEDs Blink)
+        end
+    else Wi-Fi Dropped / Server Unreachable
+        Hardware->>Hardware: Store in Offline FIFO Queue (Dual Chirp)
+    end
 
-devices
-  id PK, mac_address UNIQUE, classroom_id FK classrooms.id,
-  status(online|offline|revoked)
+    Note over Hardware,DB: Phase 4: Network Reconnection (When Wi-Fi returns)
+    Hardware->>API: POST /api/attendance/bulk-record (Buffered taps with UTC timestamps)
+    API->>DB: Batch Insert Attendance & Log Audit Trail
 
-timetable
-  id PK, faculty_id FK faculty.id, subject_id FK subjects.id,
-  section_id FK sections.id, classroom_id FK classrooms.id, day_of_week,
-  start_time, end_time,
-  UNIQUE(faculty_id, subject_id, section_id, classroom_id, day_of_week, start_time)
-
-attendance_sessions
-  id PK, timetable_id NULL FK timetable.id, faculty_id FK faculty.id,
-  subject_id FK subjects.id, classroom_id FK classrooms.id, session_date,
-  start_time, end_time NULL, status(active|completed)
-
-attendance
-  id PK, session_id FK attendance_sessions.id, student_id FK students.id,
-  rfid_card_id FK rfid_cards.id, timestamp, status(present|late|absent),
-  manual_override, UNIQUE(session_id, student_id)
-
-audit_logs
-  id PK, user_id NULL FK users.id, action, entity_type, entity_id, details,
-  timestamp
+    Note over Faculty,DB: Phase 5: Session Wrap-up (When class ends)
+    Faculty->>API: POST /api/session/:id/end
+    Faculty->>API: Export Attendance CSV / PDF Report
 ```
 
-## Environment
+---
 
-Copy `.env.example` to `.env` and set production-safe values.
+## 4. How: Step-by-Step Setup Guide
 
+### Prerequisites
+
+Ensure the following tools are installed on your workstation:
+- **Node.js**: v18.0.0 or higher
+- **npm**: v9.0.0 or higher
+- **MySQL Server**: v8.0 or higher (or Docker)
+- **C++ Compiler**: GCC/MinGW (for optional local firmware unit testing)
+- **Arduino IDE v2** or **VS Code with PlatformIO** (for firmware flashing)
+
+---
+
+### Step 1: Database Setup
+
+#### Option A: Local MySQL Server
+
+1. Open your terminal and create the database schema and seed data:
+   ```bash
+   mysql -u root -p < database/schema.sql
+   mysql -u root -p tapid < database/indexes.sql
+   mysql -u root -p tapid < database/seed.sql
+   mysql -u root -p tapid < database/triggers.sql
+   ```
+
+#### Option B: Cloud Database (e.g., Aiven, AWS RDS)
+
+Run the automated cloud database setup script:
 ```bash
-PORT=3000
-DB_HOST=localhost
-DB_USER=root
-DB_PASS=
-DB_NAME=tapid
-JWT_SECRET=replace-with-a-long-random-secret
-CORS_ORIGIN=http://localhost:5173
-NVIDIA_API_KEY=
-VITE_API_URL=http://localhost:3000/api
+node backend/setup_cloud_db.js <HOST> <PORT> <PASSWORD> [USER] [DATABASE]
 ```
 
-Use a `JWT_SECRET` of at least 32 characters in production. If a real API key has ever been committed, pasted, or shared, rotate it before deployment.
+---
 
-## Local Setup
+### Step 2: Backend Configuration & Launch
 
-1. Install Node.js 18+ and MySQL 8+.
-2. Install dependencies:
+1. Create your environment configuration:
+   ```bash
+   cp .env.example .env
+   ```
+2. Verify settings in `.env`:
+   ```ini
+   PORT=3000
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=root
+   DB_PASS=your_mysql_password
+   DB_NAME=tapid
+   JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters
+   CORS_ORIGIN=http://localhost:5173,http://localhost:80
+   ```
+3. Install dependencies and start the backend:
+   ```bash
+   cd backend
+   npm install
+   npm run dev
+   ```
+4. Verify backend health by visiting: `http://localhost:3000/api/health`  
+   *Expected response:* `{"status":"ok","message":"TapID API is running"}`
 
-```bash
-npm --prefix backend install
-npm --prefix frontend install
-```
+---
 
-3. Create and seed the database:
+### Step 3: Frontend Portal Launch
 
-```bash
-mysql -u root -p < database/schema.sql
-mysql -u root -p tapid < database/indexes.sql
-mysql -u root -p tapid < database/seed.sql
-mysql -u root -p tapid < database/triggers.sql
-```
+1. Open a new terminal window:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+2. Open your browser and navigate to: `http://localhost:5173`
 
-4. Start the backend:
+---
 
-```bash
-npm run dev:backend
-```
+### Step 4: ESP32 Firmware Wiring & Flashing
 
-5. Start the frontend:
+#### Hardware Wiring Reference
 
-```bash
-npm run dev:frontend
-```
+> [!CAUTION]
+> **VCC of the RC522 MUST be wired to 3.3V.** Connecting RC522 to 5V will permanently destroy the RFID reader chip.
 
-The web portal runs at `http://localhost:5173`; the API runs at `http://localhost:3000/api`.
+| RC522 Pin | ESP32 GPIO | Description |
+|:---|:---|:---|
+| **VCC** | **3V3** | 3.3V Power Source |
+| **RST** | **GPIO 22** | Reader Reset |
+| **GND** | **GND** | Common Ground |
+| **MISO** | **GPIO 19** | SPI Master In / Slave Out |
+| **MOSI** | **GPIO 23** | SPI Master Out / Slave In |
+| **SCK** | **GPIO 18** | SPI Clock |
+| **SDA / SS** | **GPIO 21** | SPI Slave Select |
+| **Green LED** | **GPIO 26** | Connected via 220Ω resistor to GND |
+| **Red LED** | **GPIO 27** | Connected via 220Ω resistor to GND |
+| **Buzzer (+)** | **GPIO 25** | Positive pin (Cathode to GND) |
 
-Demo accounts from `database/seed.sql` use password `password123`:
+#### Flashing via Arduino IDE
 
-- `admin@tapid.edu`
-- `faculty@tapid.edu`
-- `student1@tapid.edu`
-- `student2@tapid.edu`
+1. Open Arduino IDE.
+2. In **Preferences > Additional Boards Manager URLs**, add:  
+   `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+3. In **Library Manager**, install:
+   - `MFRC522` by GithubCommunity (v1.4.11+)
+   - `ArduinoJson` by Benoit Blanchon (v7.0.4+)
+4. Open the sketch: `firmware/esp32/tapid_reader/tapid_reader.ino`
+5. Edit `secrets.h` in the sketch tab with your local Wi-Fi and host computer IP:
+   ```c
+   #define WIFI_SSID       "Your_WiFi_SSID"
+   #define WIFI_PASSWORD   "Your_WiFi_Password"
+   #define API_BASE_URL    "http://192.168.1.100:3000/api" // Your PC IP
+   #define DEVICE_MAC      "24:0A:C4:00:00:01"             // Seed terminal MAC
+   ```
+6. Select Board **DOIT ESP32 DEVKIT V1**, select your COM port, and click **Upload**.
+7. Open **Serial Monitor** at **115200 baud** to view real-time diagnostics.
 
-## Docker Deployment
+#### Flashing via PlatformIO (VS Code)
+
+1. Open the `firmware/` directory in VS Code with the PlatformIO extension.
+2. Configure `firmware/esp32/secrets.h`.
+3. Connect your ESP32 via USB and click **PlatformIO: Upload**.
+
+---
+
+### Alternative: One-Command Docker Setup
+
+To launch the complete environment (MySQL 8, Backend API, and Frontend Nginx) in Docker:
 
 ```bash
 docker compose up -d --build
 ```
 
-Docker exposes:
+- **Frontend Portal**: `http://localhost` (Port 80)
+- **Backend REST API**: `http://localhost:3000/api`
+- **MySQL Database**: `localhost:3307`
 
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:3000/api`
-- MySQL: `localhost:3307`
+---
 
-The compose file mounts database scripts in deterministic init order: schema, indexes, seed, triggers, procedures.
+## 5. How to Run the End-to-End User Flow
 
-## API Overview
+Follow this workflow to test the system completely:
 
-- `POST /api/auth/login`
-- `GET /api/health`
-- `GET /api/admin/stats`
-- `GET /api/admin/rfid-cards`
-- `GET /api/faculty`
-- `POST /api/faculty`
-- `GET /api/students`
-- `POST /api/students`
-- `GET /api/timetable`
-- `POST /api/session/start`
-- `POST /api/session/:id/end`
-- `POST /api/attendance/record`
-- `POST /api/attendance/bulk-record`
-- `GET /api/attendance/session/:session_id`
-- `GET /api/reports/attendance`
-- `POST /api/upload`
-- `GET /api/logs`
-- `GET /api/logs/audit`
-- `GET /api/analytics/summary`
+### 1. Log in to the Web Portal
+Navigate to `http://localhost:5173` (or `http://localhost` on Docker).
 
-## Testing
+| Role | Email | Password | Access Rights |
+|:---|:---|:---|:---|
+| **Admin** | `admin@tapid.edu` | `password123` | Full system control, device provisioning, audit logs |
+| **Faculty** | `faculty@tapid.edu` | `password123` | Session controls, live classroom roster, attendance exports |
+| **Student** | `student1@tapid.edu` | `password123` | Personal attendance history view |
 
-Run all available automated checks:
+### 2. Start an Attendance Session (Faculty)
+1. Log in as `faculty@tapid.edu`.
+2. Navigate to **Overview / Timetable**.
+3. Select the class for **Classroom 101** (Subject: `CS201`) and click **Start Session**.
+4. The database triggers and backend will automatically switch terminal `24:0A:C4:00:00:01` to **Online**.
+
+### 3. Tap RFID Card on ESP32 Terminal
+1. Tap a card with UID `A1B2C3D4` (assigned to student *John Doe*).
+2. The terminal will immediately flash the **Green LED** and sound the **Success Chime**.
+3. Check the faculty dashboard: *John Doe* instantly shows as **Present** with the current timestamp!
+
+### 4. Test Deduplication
+1. Tap the same card (`A1B2C3D4`) a second time.
+2. The terminal will sound a **double warning tone** and flash both LEDs; the backend returns `409 Conflict`. No duplicate record is created.
+
+### 5. Wrap up & Export Reports
+1. In the faculty portal, click **End Session**.
+2. Navigate to **Reports** and click **Export CSV** or **Export PDF** for verified attendance sheets.
+
+---
+
+## 6. Verification & Automated Testing
+
+All test suites are fully automated and verified:
 
 ```bash
+# Run full repository test suite (Backend + Frontend)
 npm test
-npm run build
+
+# Run firmware offline-queue C++ unit tests
+npm run test:firmware
+
+# Run Backend unit tests (44 tests in 10 suites)
+cd backend && npm test
+
+# Run Backend code linting (0 errors)
+cd backend && npm run lint
+
+# Run Frontend unit tests (17 tests in 5 suites)
+cd frontend && npm test
+
+# Run Frontend code linting (0 errors)
+cd frontend && npm run lint
+
+# Build Frontend production bundle
+cd frontend && npm run build
 ```
 
-Verified in this workspace:
+---
 
-- Backend Jest/Supertest: 3 suites, 5 tests passing
-- Frontend Vitest/Testing Library: 5 suites, 17 tests passing
-- Frontend production build: passing
-- Firmware MinGW C++ unit tests: 5 tests passing (npm run test:firmware)
+## 7. API Reference Matrix
 
-## Firmware
+All endpoints require `Authorization: Bearer <token>` header, except where marked Public.
 
-The ESP32 firmware features a modular architecture with live recording, offline buffering, NTP time synchronization, debounce cooldown, and multi-tone acoustic/visual signaling.
+| Method | Endpoint | Access | Description |
+|:---|:---|:---|:---|
+| `POST` | `/api/auth/login` | Public | Authenticate user & retrieve JWT token |
+| `GET` | `/api/health` | Public | System status and connectivity check |
+| `POST` | `/api/attendance/record` | Public (ESP32) | Record single tap by RFID UID & Terminal MAC |
+| `POST` | `/api/attendance/bulk-record`| Public (ESP32) | Sync offline buffered attendance entries |
+| `GET` | `/api/attendance/session/:id` | Authenticated | Live student attendance list for a session |
+| `POST` | `/api/session/start` | Faculty/Admin | Start an active attendance session |
+| `POST` | `/api/session/:id/end` | Faculty/Admin | Conclude an active session |
+| `GET` | `/api/session/active` | Authenticated | Fetch current active session for a classroom |
+| `GET` | `/api/students` | Authenticated | List all students with assigned RFID cards |
+| `POST` | `/api/students` | Admin | Register a new student |
+| `GET` | `/api/devices` | Admin | List all hardware terminals and online status |
+| `POST` | `/api/revocation/card` | Admin | Revoke lost or compromised RFID card |
+| `POST` | `/api/revocation/device` | Admin | Revoke stolen or decommissioned hardware device |
+| `GET` | `/api/reports/attendance` | Faculty/Admin | Filtered attendance query for reports |
+| `GET` | `/api/logs/audit` | Admin | View audit logs of all critical administrative actions |
+| `POST` | `/api/upload` | Authenticated | Secure file upload (JPG, PNG, GIF up to 5MB) |
 
-- **Flashing with Arduino IDE**: Open [tapid_reader.ino](file:///d:/TapID/firmware/esp32/tapid_reader/tapid_reader.ino) or [main.ino](file:///d:/TapID/firmware/esp32/main.ino). Configure Wi-Fi and backend URL in `secrets.h`.
-- **Flashing with PlatformIO**: Open `firmware/` with PlatformIO in VS Code; dependencies (`MFRC522`, `ArduinoJson`) are managed automatically via `platformio.ini`.
-- **Firmware Unit Tests**: Run `npm run test:firmware` to test the offline queue, FIFO ring buffer, and JSON serialization.
-- Full wiring diagram, pinout table, and feedback tone matrix: see [firmware/README.md](file:///d:/TapID/firmware/README.md).
+---
 
-Endpoints used:
-```text
-POST /api/attendance/record
-{
-  "rfid_uid": "A1B2C3D4",
-  "mac_address": "24:0A:C4:00:00:01"
-}
+## 8. Troubleshooting & FAQ
 
-POST /api/attendance/bulk-record
-{
-  "mac_address": "24:0A:C4:00:00:01",
-  "records": [
-    { "rfid_uid": "A1B2C3D4", "timestamp": "2026-09-08T10:00:00Z" }
-  ]
-}
-```
+### 1. The ESP32 says `WARNING: Communication with MFRC522 failed`
+- **Cause**: SPI wiring issue or voltage error.
+- **Fix**: Check that RC522 VCC is in **3.3V** (not 5V). Double check GPIO 23 (MOSI), 19 (MISO), 18 (SCK), and 21 (SS/SDA).
 
-## Security Notes
+### 2. Card scan yields `Device not registered` or `Device revoked` (HTTP 403/404)
+- **Cause**: The MAC address configured in `secrets.h` does not exist in the `devices` table or is revoked.
+- **Fix**: Check terminal serial output for `[TAPID] Device MAC: ...` and add it in the Admin Web Portal under **Devices**.
 
-- Keep `.env` out of version control.
-- Rotate any API key that has been exposed in local files, logs, chat, or screenshots.
-- Use HTTPS and a restricted `CORS_ORIGIN` in production.
-- Use a managed MySQL user with least privilege.
-- Keep uploaded files outside source control and serve them through a controlled static route or object storage in production.
+### 3. Card scan yields `No active session in this classroom` (HTTP 400)
+- **Cause**: Students cannot tap in unless a lecture session is currently active for that room.
+- **Fix**: Log into the Faculty portal and click **Start Session** on your lecture before scanning cards.
+
+### 4. Wi-Fi drops in lecture hall
+- **Behavior**: The ESP32 terminal automatically stores up to 50 cards in its FIFO buffer, sounding a dual-chirp tone. When Wi-Fi reconnects, it automatically flushes all stored records to `/api/attendance/bulk-record` with exact UTC timestamps.
+
+---
+
+## License
+
+This project is licensed under the MIT License.

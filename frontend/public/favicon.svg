@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+  <!-- Rounded Base -->
+  <rect width="64" height="64" rx="16" fill="url(#bgGrad)" />
+  <!-- RFID / Contactless Wave Symbols -->
+  <circle cx="26" cy="38" r="4" fill="#ffffff" />
+  <path d="M 33 31 A 11 11 0 0 1 33 45" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" />
+  <path d="M 40 24 A 20 20 0 0 1 40 52" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" />
+  <path d="M 47 17 A 29 29 0 0 1 47 59" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" />
+</svg>

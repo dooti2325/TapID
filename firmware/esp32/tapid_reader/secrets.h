@@ -7,8 +7,8 @@
 // =============================================================================
 
 // Wi-Fi Credentials
-#define WIFI_SSID       "YOUR_WIFI_SSID"
-#define WIFI_PASSWORD   "YOUR_WIFI_PASSWORD"
+#define WIFI_SSID       "Dooti_S23"
+#define WIFI_PASSWORD   "123456789"
 
 // TapID Backend API Base URL
 #define API_BASE_URL    "http://192.168.1.100:3000/api"

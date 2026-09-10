@@ -1,6 +1,30 @@
+# Dependencies
 node_modules/
+.venv/
+
+# Environment variables
 .env
+.env.local
+.env.*.local
+
+# Logs and runtime data
 *.log
+backend/logs/*
+!backend/logs/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Build and binary artifacts
 *.exe
 *.o
-.pio/
+.pio/
+dist/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS artifacts
+.DS_Store
+Thumbs.db

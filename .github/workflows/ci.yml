@@ -48,7 +48,7 @@ jobs:
 
       - name: Run Backend Lint
         working-directory: ./backend
-        run: npx eslint . --ext .js || echo "Lint warnings"
+        run: npm run lint
 
       - name: Run Backend Tests
         working-directory: ./backend
@@ -66,7 +66,7 @@ jobs:
 
       - name: Run Frontend Lint
         working-directory: ./frontend
-        run: npx eslint src --ext .js,.jsx || echo "Lint warnings"
+        run: npm run lint
 
       - name: Run Frontend Tests
         working-directory: ./frontend

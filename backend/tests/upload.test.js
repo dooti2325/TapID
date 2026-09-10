@@ -5,6 +5,7 @@ const fs = require('fs');
 
 describe('Upload API', () => {
   let token;
+  let uploadedFilename;
 
   beforeAll(() => {
     const jwt = require('jsonwebtoken');
@@ -15,7 +16,15 @@ describe('Upload API', () => {
   });
 
   afterAll(() => {
-    fs.unlinkSync(path.join(__dirname, 'dummy.jpg'));
+    if (fs.existsSync(path.join(__dirname, 'dummy.jpg'))) {
+      fs.unlinkSync(path.join(__dirname, 'dummy.jpg'));
+    }
+    if (uploadedFilename) {
+      const uploadedPath = path.join(__dirname, '../uploads', uploadedFilename);
+      if (fs.existsSync(uploadedPath)) {
+        fs.unlinkSync(uploadedPath);
+      }
+    }
   });
 
   it('should allow file upload with valid token', async () => {
@@ -27,6 +36,7 @@ describe('Upload API', () => {
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('message', 'File uploaded successfully');
     expect(res.body.file).toHaveProperty('filename');
+    uploadedFilename = res.body.file.filename;
   });
 
   it('should reject file upload without token', async () => {
