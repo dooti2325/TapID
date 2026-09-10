@@ -12,6 +12,11 @@ app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: /uploads; connect-src 'self' https: http: ws: wss:;"
+  );
   next();
 });
 app.use(cors({
@@ -25,7 +30,7 @@ app.use(cors({
     ) {
       return callback(null, true);
     }
-    return callback(null, true);
+    return callback(new Error('Not allowed by CORS'), false);
   },
   credentials: true
 }));
@@ -114,6 +119,9 @@ if (fs.existsSync(distPath)) {
 
 app.use((err, req, res, next) => {
   logger.error(err.message);
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ message: err.message });
+  }
   if (err.name === 'MulterError' || err.message.startsWith('Only images')) {
     return res.status(400).json({ message: err.message });
   }

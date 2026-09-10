@@ -1,5 +1,6 @@
 const db = require('../config/database');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 exports.getAllFaculty = async (req, res) => {
     try {
@@ -24,7 +25,9 @@ exports.addFaculty = async (req, res) => {
         const connection = await db.getConnection();
         try {
             await connection.beginTransaction();
-            const effectivePassword = password && password.length >= 8 ? password : 'TapID@2026';
+            const effectivePassword = password && password.length >= 8 
+                ? password 
+                : `${crypto.randomBytes(9).toString('base64').replace(/[^a-zA-Z0-9]/g, 'A')}!9`;
             const hashedPassword = await bcrypt.hash(effectivePassword, 12);
             const [userResult] = await connection.query(
                 'INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)',

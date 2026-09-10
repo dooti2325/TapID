@@ -46,6 +46,18 @@ exports.bulkRecordAttendance = async (req, res) => {
     const { mac_address, records } = req.body;
     // records: [{ rfid_uid, timestamp }]
     
+    if (!Array.isArray(records)) {
+        return res.status(400).json({ message: 'records must be an array' });
+    }
+
+    if (records.length === 0) {
+        return res.status(400).json({ message: 'records array cannot be empty' });
+    }
+
+    if (records.length > 50) {
+        return res.status(400).json({ message: 'Batch size exceeds maximum limit of 50 records' });
+    }
+
     try {
         const [devices] = await db.execute('SELECT classroom_id, status FROM devices WHERE mac_address = ?', [mac_address]);
         if (devices.length === 0 || devices[0].status === 'revoked') return res.status(403).json({ message: 'Device invalid' });
@@ -60,10 +72,13 @@ exports.bulkRecordAttendance = async (req, res) => {
 
         for (const record of records) {
             try {
+                const parsedTime = record.timestamp && !isNaN(new Date(record.timestamp).getTime())
+                    ? new Date(record.timestamp)
+                    : new Date();
                 const [cards] = await db.execute('SELECT id, student_id, status FROM rfid_cards WHERE uid = ? AND status = "active"', [record.rfid_uid]);
                 if (cards.length > 0) {
                     await db.execute('INSERT INTO attendance (session_id, student_id, rfid_card_id, timestamp) VALUES (?, ?, ?, ?)', 
-                        [session_id, cards[0].student_id, cards[0].id, new Date(record.timestamp)]);
+                        [session_id, cards[0].student_id, cards[0].id, parsedTime]);
                     added++;
                 } else {
                     errors++;

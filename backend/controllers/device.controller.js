@@ -34,8 +34,26 @@ exports.addDevice = async (req, res) => {
 
 exports.updateDeviceStatus = async (req, res) => {
     const { mac_address, status } = req.body;
+    if (!mac_address || !status) {
+        return res.status(400).json({ message: 'mac_address and status are required' });
+    }
+
+    const allowedStatuses = ['online', 'offline'];
+    if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({ message: `Invalid status. Must be one of: ${allowedStatuses.join(', ')}` });
+    }
+
     try {
-        await db.query('UPDATE devices SET status=? WHERE mac_address=?', [status, mac_address]);
+        const [result] = await db.query(
+            "UPDATE devices SET status=? WHERE mac_address=? AND status != 'revoked'",
+            [status, mac_address]
+        );
+        if (result.affectedRows === 0) {
+            const [devices] = await db.query('SELECT status FROM devices WHERE mac_address=?', [mac_address]);
+            if (devices && devices.length > 0 && devices[0].status === 'revoked') {
+                return res.status(403).json({ message: 'Cannot update status of revoked device' });
+            }
+        }
         res.json({ message: 'Device status updated' });
     } catch (err) {
         res.status(500).json({ message: 'Error updating device status', error: err.message });

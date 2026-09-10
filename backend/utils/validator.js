@@ -16,9 +16,10 @@ const isValidMacAddress = (mac) => {
 
 const isValidRfidUid = (uid) => {
   if (!uid || typeof uid !== 'string') return false;
-  // RFID card UIDs are typically 4, 7, or 10 byte hex strings (8, 14, or 20 characters)
+  // RFID card UIDs are typically 4, 7, or 10 byte hex strings, with or without colons/dashes
+  const cleanUid = uid.trim().replace(/[:-]/g, '');
   const re = /^[0-9A-Fa-f]{4,32}$/;
-  return re.test(uid.trim());
+  return re.test(cleanUid);
 };
 
 const isValidEnrollment = (enrollment) => {
