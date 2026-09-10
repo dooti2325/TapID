@@ -12,6 +12,7 @@ const FACULTY_PRESETS = [
   { name: 'Dr. Trupti Meshram (TM)', role: 'DEV', email: 'trupti.meshram@tapid.edu' },
   { name: 'Amol Dhankar (AD)', role: 'AIML', email: 'amol.dhankar@tapid.edu' },
   { name: 'Prachi Jain (PSJ)', role: 'CD Lab', email: 'prachi.jain@tapid.edu' },
+  { name: 'Prof. Harshal Vidhate', role: 'Faculty HOD', email: 'harshal.vidhate@tapid.edu' },
   { name: 'System Admin', role: 'Admin', email: 'admin@tapid.edu' }
 ];
 
@@ -33,7 +34,7 @@ const Login = () => {
       login(response.data.user, response.data.token);
       navigate(response.data.user.role === 'admin' ? '/admin-dashboard' : '/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
+      setError(err.response?.data?.message || 'I nvalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }
