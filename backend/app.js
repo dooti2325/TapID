@@ -103,19 +103,30 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'TapID API is running' });
 });
 
-// Serve frontend build if present (e.g. in unified Render deployment)
+// Serve frontend build only when explicitly configured (e.g. unified production deployment)
 const path = require('path');
 const fs = require('fs');
-const distPath = path.join(__dirname, '../frontend/dist');
-if (fs.existsSync(distPath)) {
-    app.use(express.static(distPath));
-    app.use((req, res, next) => {
-        if (req.method === 'GET' && !req.path.startsWith('/api')) {
-            return res.sendFile(path.join(distPath, 'index.html'));
-        }
-        next();
-    });
+if (process.env.SERVE_STATIC === 'true') {
+    const distPath = path.join(__dirname, '../frontend/dist');
+    if (fs.existsSync(distPath)) {
+        app.use(express.static(distPath));
+        app.use((req, res, next) => {
+            if (req.method === 'GET' && !req.path.startsWith('/api')) {
+                return res.sendFile(path.join(distPath, 'index.html'));
+            }
+            next();
+        });
+    }
 }
+
+app.get('/', (req, res) => {
+    res.json({
+        status: 'ok',
+        service: 'TapID Backend API',
+        version: '1.0.0',
+        frontend_url: 'http://localhost:5173'
+    });
+});
 
 app.use((err, req, res, next) => {
   logger.error(err.message);

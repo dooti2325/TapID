@@ -21,6 +21,10 @@ backend/uploads/*
 *.o
 .pio/
 dist/
+frontend/dist/
+backend/dist/
+.vite/
+frontend/node_modules/.vite/
 
 # Python cache
 __pycache__/
