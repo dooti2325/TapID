@@ -1,6 +1,6 @@
 const logger = require('../config/logger');
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, _next) => {
   logger.error(`${req.method} ${req.originalUrl} - ${err.message}`);
 
   if (err.name === 'MulterError' || (err.message && err.message.startsWith('Only images'))) {

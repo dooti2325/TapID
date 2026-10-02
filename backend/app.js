@@ -134,7 +134,7 @@ app.get('/', (req, res) => {
     });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   logger.error(err.message);
   if (err.message === 'Not allowed by CORS') {
     return res.status(403).json({ message: err.message });

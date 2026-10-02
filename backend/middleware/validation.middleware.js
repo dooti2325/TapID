@@ -1,4 +1,4 @@
-const { isValidEmail, isValidMacAddress, isValidRfidUid, isValidEnrollment } = require('../utils/validator');
+const { isValidRfidUid, isValidEnrollment } = require('../utils/validator');
 
 /**
  * Middleware factory to check required body fields

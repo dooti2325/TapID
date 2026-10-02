@@ -4,7 +4,10 @@ module.exports = [
       'node_modules/**',
       'uploads/**',
       'logs/**',
-      'tests/**'
+      'tests/**',
+      'test_*.js',
+      'init_*.js',
+      'setup_*.js'
     ]
   },
   {
@@ -26,7 +29,8 @@ module.exports = [
         setInterval: 'readonly',
         clearInterval: 'readonly',
         setImmediate: 'readonly',
-        clearImmediate: 'readonly'
+        clearImmediate: 'readonly',
+        fetch: 'readonly'
       }
     },
     rules: {

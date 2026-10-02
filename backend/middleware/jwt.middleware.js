@@ -14,7 +14,7 @@ const verifyJwt = (req, res, next) => {
     const verified = jwt.verify(token, secret);
     req.user = verified;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }
 };

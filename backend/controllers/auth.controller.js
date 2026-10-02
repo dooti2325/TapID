@@ -241,7 +241,7 @@ exports.updateProfile = async (req, res) => {
                 [name, department, phone, address, userId]
             );
         } else if (role === 'student') {
-            const { name, phone, address } = req.body;
+            const { name } = req.body;
             await db.query(
                 'UPDATE students SET name = ? WHERE user_id = ?',
                 [name, userId]
