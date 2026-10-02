@@ -1,15 +1,21 @@
 services:
   - type: web
-    name: tapid-backend
+    name: tapid-app
     env: node
-    rootDir: backend
-    buildCommand: npm install
+    plan: free
+    buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVE_STATIC
+        value: "true"
       - key: PORT
         value: 3000
       - key: DB_HOST
         sync: false
+      - key: DB_PORT
+        value: "3306"
       - key: DB_USER
         sync: false
       - key: DB_PASS
@@ -17,4 +23,6 @@ services:
       - key: DB_NAME
         sync: false
       - key: JWT_SECRET
+        generateValue: true
+      - key: DEVICE_API_KEY
         generateValue: true
