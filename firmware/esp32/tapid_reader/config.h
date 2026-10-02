@@ -7,7 +7,7 @@
 // TapID ESP32 Hardware Pin Definitions
 // =============================================================================
 // RC522 RFID SPI Interface
-#define SS_PIN              21    // SDA / SS (Slave Select)
+#define SS_PIN              5     // SDA / SS (Slave Select) - Standard ESP32 VSPI SS
 #define RST_PIN             22    // Reset pin
 #define SPI_SCK_PIN         18    // SPI Clock
 #define SPI_MISO_PIN        19    // SPI Master In Slave Out
