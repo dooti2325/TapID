@@ -8,80 +8,60 @@ void Buzzer::init() {
 }
 
 void Buzzer::beep(unsigned int frequency, unsigned long durationMs) {
-    (void)frequency;
-    digitalWrite(_pin, HIGH);
+    tone(_pin, frequency, durationMs);
     delay(durationMs);
-    digitalWrite(_pin, LOW);
+    noTone(_pin);
 }
 
 void Buzzer::stop() {
+    noTone(_pin);
     digitalWrite(_pin, LOW);
 }
 
 void Buzzer::playBoot() {
-    digitalWrite(_pin, HIGH);
-    delay(80);
-    digitalWrite(_pin, LOW);
-    delay(80);
-    digitalWrite(_pin, HIGH);
-    delay(120);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 1046, 80); delay(100);  // C6
+    tone(_pin, 1318, 80); delay(100);  // E6
+    tone(_pin, 1568, 120); delay(150); // G6
+    noTone(_pin);
 }
 
 void Buzzer::playTap() {
-    digitalWrite(_pin, HIGH);
-    delay(50);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 2000, 60);
+    delay(70);
+    noTone(_pin);
 }
 
 void Buzzer::playSuccess() {
-    // One short beep (200ms) - Access Granted pattern
-    digitalWrite(_pin, HIGH);
-    delay(200);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 1760, 100); delay(120); // A6
+    tone(_pin, 2637, 180); delay(200); // E7
+    noTone(_pin);
 }
 
 void Buzzer::playDuplicate() {
-    for (int i = 0; i < 2; i++) {
-        digitalWrite(_pin, HIGH);
-        delay(80);
-        digitalWrite(_pin, LOW);
-        delay(80);
-    }
+    tone(_pin, 1200, 100); delay(150);
+    tone(_pin, 1200, 100); delay(120);
+    noTone(_pin);
 }
 
 void Buzzer::playError() {
-    // Three short beeps (150ms on / 150ms off) - Access Denied pattern
-    for (int i = 0; i < 3; i++) {
-        digitalWrite(_pin, HIGH);
-        delay(150);
-        digitalWrite(_pin, LOW);
-        delay(150);
-    }
+    tone(_pin, 440, 400); delay(450);  // Low A4
+    noTone(_pin);
 }
 
 void Buzzer::playOfflineBuffered() {
-    digitalWrite(_pin, HIGH);
-    delay(80);
-    digitalWrite(_pin, LOW);
-    delay(100);
-    digitalWrite(_pin, HIGH);
-    delay(80);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 880, 80); delay(120);
+    tone(_pin, 880, 80); delay(100);
+    noTone(_pin);
 }
 
 void Buzzer::playWiFiConnected() {
-    digitalWrite(_pin, HIGH);
-    delay(100);
-    digitalWrite(_pin, LOW);
-    delay(100);
-    digitalWrite(_pin, HIGH);
-    delay(150);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 880, 70); delay(90);
+    tone(_pin, 1320, 120); delay(140);
+    noTone(_pin);
 }
 
 void Buzzer::playWiFiLost() {
-    digitalWrite(_pin, HIGH);
-    delay(300);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 1320, 100); delay(120);
+    tone(_pin, 660, 200); delay(220);
+    noTone(_pin);
 }

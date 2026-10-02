@@ -183,7 +183,7 @@ SELECT '24:0A:C4:01', id, 'active' FROM students WHERE enrollment_number = 'GHRU
 ON DUPLICATE KEY UPDATE student_id = VALUES(student_id), status = VALUES(status);
 
 INSERT INTO rfid_cards (uid, student_id, status)
-SELECT '44:71:FD:06', id, 'active' FROM students WHERE enrollment_number = 'GHRUA23011060348'
+SELECT '24:0A:C4:00', id, 'active' FROM students WHERE enrollment_number = 'GHRUA23011060348'
 ON DUPLICATE KEY UPDATE student_id = VALUES(student_id), status = VALUES(status);
 
 INSERT INTO rfid_cards (uid, student_id, status)

@@ -46,52 +46,48 @@ void AttendanceController::begin() {
 void AttendanceController::provideFeedback(const AttendanceResponse& res) {
     switch (res.status) {
         case STATUS_SUCCESS:
-            Serial.println("================================");
-            Serial.println("       ACCESS GRANTED           ");
-            Serial.println("================================");
-            Serial.printf("Welcome, %s!\n\n", res.studentName.c_str());
-            _led.setGreen(true);
-            _led.setRed(false);
+            Serial.printf("[ATTENDANCE] SUCCESS: %s (%s)\n", res.studentName.c_str(), res.message.c_str());
+            _led.showSuccess();
             _buzzer.playSuccess();
-            delay(1000);
-            _led.setGreen(false);
             break;
 
         case STATUS_DUPLICATE:
-            Serial.println("--------------------------------");
-            Serial.println("ALREADY RECORDED / DEBOUNCED");
-            Serial.println("--------------------------------\n");
+            Serial.println("[ATTENDANCE] WARNING: Duplicate attendance already recorded for this session.");
             _led.showDuplicate();
             _buzzer.playDuplicate();
             break;
 
         case STATUS_NO_SESSION:
+            Serial.println("[ATTENDANCE] REJECTED: No active attendance session for this classroom.");
+            _led.showError();
+            _buzzer.playError();
+            break;
+
         case STATUS_DEVICE_INVALID:
+            Serial.println("[ATTENDANCE] REJECTED: Device is not authorized, invalid, or revoked.");
+            _led.showError();
+            _buzzer.playError();
+            break;
+
         case STATUS_CARD_NOT_FOUND:
+            Serial.println("[ATTENDANCE] REJECTED: RFID Card not registered or student not found.");
+            _led.showError();
+            _buzzer.playError();
+            break;
+
         case STATUS_NETWORK_ERROR:
         case STATUS_SERVER_ERROR:
         default:
-            Serial.println("================================");
-            Serial.println("        ACCESS DENIED           ");
-            Serial.println("================================");
-            Serial.printf("Reason: %s\n\n", res.message.c_str());
-            _led.setGreen(false);
-            _led.setRed(true);
+            Serial.printf("[ATTENDANCE] ERROR: Server/Network failure (HTTP %d: %s)\n", res.httpCode, res.message.c_str());
+            _led.showError();
             _buzzer.playError();
-            delay(700);
-            _led.setRed(false);
             break;
     }
 }
 
 void AttendanceController::handleTap(const String& uid) {
-    Serial.println("--------------------------------");
-    Serial.print("Card UID: ");
-    for (size_t i = 0; i < uid.length(); i += 2) {
-        Serial.print(uid.substring(i, i + 2));
-        Serial.print(" ");
-    }
-    Serial.println();
+    Serial.printf("\n[TAP] RFID Card Detected: %s\n", uid.c_str());
+    _buzzer.playTap();
 
     if (_wifi.isConnected()) {
         AttendanceResponse res = _api.recordAttendance(uid, _wifi.getMacAddress());
@@ -203,5 +199,4 @@ void AttendanceController::loop() {
     }
 
     handleTap(uid);
-    delay(1000);
 }

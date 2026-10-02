@@ -19,12 +19,14 @@ exports.recordAttendance = async (req, res) => {
         if (sessions.length === 0) return res.status(400).json({ message: 'No active session in this classroom' });
         const session_id = sessions[0].id;
 
-        // 3. Find student by RFID (support colon-separated, space-separated, and raw hex)
-        const normalizedUid = String(rfid_uid || '').replace(/[: -]/g, '').toUpperCase();
+        // 3. Find student by RFID (normalize with and without colons/spaces)
+        const cleanUid = rfid_uid ? rfid_uid.trim().toUpperCase() : '';
+        const uncolonUid = cleanUid.replace(/[^A-F0-9]/gi, '');
+        const colonUid = uncolonUid.match(/.{1,2}/g)?.join(':') || cleanUid;
+
         const [cards] = await db.execute(
-            `SELECT id, student_id, status FROM rfid_cards 
-             WHERE REPLACE(REPLACE(REPLACE(UPPER(uid), ':', ''), '-', ''), ' ', '') = ? OR uid = ?`,
-            [normalizedUid, rfid_uid]
+            'SELECT id, student_id, status FROM rfid_cards WHERE uid = ? OR uid = ? OR REPLACE(uid, ":", "") = ?',
+            [cleanUid, colonUid, uncolonUid]
         );
         if (cards.length === 0) return res.status(404).json({ message: 'Card not found' });
         if (cards[0].status !== 'active') return res.status(403).json({ message: 'Card not active' });
