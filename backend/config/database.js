@@ -1,3 +1,7 @@
+const path = require('path');
+if (!process.env.DB_PORT) {
+    require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+}
 const mysql = require('mysql2/promise');
 
 const isLocal = !process.env.DB_HOST || process.env.DB_HOST === 'localhost' || process.env.DB_HOST === '127.0.0.1' || process.env.DB_HOST === 'db';

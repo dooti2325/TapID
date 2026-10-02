@@ -15,7 +15,7 @@ const getDashboardAnalytics = async () => {
   ]);
 
   // Overall attendance rate
-  let attendanceRate = 85; // Fallback
+  let attendanceRate = 0;
   try {
     const [rateRows] = await db.execute(`
       SELECT 
@@ -23,11 +23,11 @@ const getDashboardAnalytics = async () => {
         SUM(CASE WHEN status = 'present' OR status = 'late' THEN 1 ELSE 0 END) as present_records
       FROM attendance
     `);
-    if (rateRows[0].total_records > 0) {
+    if (rateRows && rateRows[0] && rateRows[0].total_records > 0) {
       attendanceRate = Math.round((rateRows[0].present_records / rateRows[0].total_records) * 100);
     }
-  } catch {
-    // Keep fallback
+  } catch (err) {
+    console.error('Error calculating overall attendance rate:', err.message);
   }
 
   return {

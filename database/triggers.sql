@@ -9,7 +9,7 @@ FOR EACH ROW
 BEGIN
     UPDATE devices 
     SET status = 'online' 
-    WHERE classroom_id = NEW.classroom_id;
+    WHERE classroom_id = NEW.classroom_id AND status != 'revoked';
 END//
 
 DROP TRIGGER IF EXISTS after_session_end//
@@ -20,7 +20,7 @@ BEGIN
     IF NEW.status = 'completed' AND OLD.status = 'active' THEN
         UPDATE devices 
         SET status = 'offline' 
-        WHERE classroom_id = NEW.classroom_id;
+        WHERE classroom_id = NEW.classroom_id AND status != 'revoked';
     END IF;
 END//
 

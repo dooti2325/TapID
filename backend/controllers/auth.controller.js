@@ -250,6 +250,7 @@ exports.updateProfile = async (req, res) => {
 
         res.json({ message: 'Profile updated successfully' });
     } catch (err) {
-        res.json({ message: 'Profile updated in offline mode' });
+        console.error('Error updating profile:', err);
+        res.status(500).json({ message: 'Failed to update profile', error: err.message });
     }
 };

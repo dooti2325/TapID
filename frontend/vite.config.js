@@ -12,6 +12,16 @@ export default defineConfig({
       }
     }
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom', 'axios'],
+          lucide: ['lucide-react']
+        }
+      }
+    }
+  },
   test: {
     environment: 'jsdom',
     globals: true

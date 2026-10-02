@@ -1,3 +1,7 @@
+const path = require('path');
+if (process.env.NODE_ENV !== 'test') {
+    require('dotenv').config({ path: path.join(__dirname, '../.env') });
+}
 const express = require('express');
 const cors = require('cors');
 const logger = require('./config/logger');
@@ -38,9 +42,12 @@ app.use(express.json());
 app.use(loggerMiddleware);
 const auditLogger = require('./middleware/audit.middleware');
 app.use(auditLogger);
-// Auto-normalize requests sent without /api prefix
+// Auto-normalize API requests sent without /api prefix
 app.use((req, res, next) => {
-  if (!req.url.startsWith('/api') && (
+  const isJsonRequest = req.headers.accept && req.headers.accept.includes('application/json');
+  const isSpaNav = process.env.SERVE_STATIC === 'true' && req.method === 'GET' && !isJsonRequest;
+
+  if (!isSpaNav && !req.url.startsWith('/api') && (
     req.url.startsWith('/auth') ||
     req.url.startsWith('/session') ||
     req.url.startsWith('/attendance') ||
@@ -104,7 +111,6 @@ app.get('/api/health', (req, res) => {
 });
 
 // Serve frontend build only when explicitly configured (e.g. unified production deployment)
-const path = require('path');
 const fs = require('fs');
 if (process.env.SERVE_STATIC === 'true') {
     const distPath = path.join(__dirname, '../frontend/dist');

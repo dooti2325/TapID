@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class NemotronService:
-    def __init__(self, api_key: str = None):
+    def __init__(self, api_key: str = None, model: str = None):
         """
         Initialize the NemotronService with the NVIDIA API key.
         If api_key is not provided, it will attempt to read the NVIDIA_API_KEY
@@ -20,7 +20,7 @@ class NemotronService:
             base_url="https://integrate.api.nvidia.com/v1",
             api_key=self.api_key
         )
-        self.model = "nvidia/llama-3.3-nemotron-super-49b-v1"
+        self.model = model or os.environ.get("NVIDIA_MODEL", "mistralai/mistral-nemotron")
 
     def generate_response(self, prompt: str, system_prompt: str = None, temperature: float = 0.7, max_tokens: int = 3000) -> str:
         """

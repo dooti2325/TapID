@@ -18,6 +18,6 @@
 #define DEVICE_MAC      "24:0A:C4:00:00:01"
 
 // Optional Device Authentication Token
-#define DEVICE_API_KEY  ""
+#define DEVICE_API_KEY  "tapid-esp32-device-key-2026"
 
 #endif // SECRETS_H

@@ -32,6 +32,7 @@ const Profile = () => {
   });
 
   const [profileSaved, setProfileSaved] = useState(false);
+  const [profileError, setProfileError] = useState('');
   const [passwordSaved, setPasswordSaved] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -68,14 +69,15 @@ const Profile = () => {
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setProfileError('');
     try {
       await api.put('/auth/profile', profileData);
       if (updateUserInContext) updateUserInContext(profileData);
       setProfileSaved(true);
       setTimeout(() => setProfileSaved(false), 3000);
     } catch (err) {
-      setProfileSaved(true);
-      setTimeout(() => setProfileSaved(false), 3000);
+      console.error('Failed to update profile', err);
+      setProfileError(err.response?.data?.message || 'Failed to update profile.');
     } finally {
       setLoading(false);
     }
@@ -102,9 +104,8 @@ const Profile = () => {
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setTimeout(() => setPasswordSaved(false), 3000);
     } catch (err) {
-      setPasswordSaved(true);
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      setTimeout(() => setPasswordSaved(false), 3000);
+      console.error('Failed to change password', err);
+      setPasswordError(err.response?.data?.message || 'Failed to update password. Please check your current password.');
     }
   };
 
@@ -151,6 +152,12 @@ const Profile = () => {
             {profileSaved && (
               <div className="profile-alert-success">
                 <CheckCircle2 size={16} /> Profile changes updated successfully!
+              </div>
+            )}
+
+            {profileError && (
+              <div className="profile-alert-error" style={{ marginBottom: '1rem', color: '#b91c1c' }}>
+                {profileError}
               </div>
             )}
 

@@ -7,5 +7,6 @@ router.post('/start', auth, sessionController.startSession);
 router.post('/end/:id', auth, sessionController.endSession);
 router.post('/:id/end', auth, sessionController.endSession);
 router.get('/active', auth, sessionController.getActiveSession);
+router.get('/:id', auth, sessionController.getSessionById);
 
 module.exports = router;

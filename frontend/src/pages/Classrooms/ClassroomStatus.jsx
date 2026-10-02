@@ -13,31 +13,41 @@ import {
 } from 'lucide-react';
 import './Classrooms.css';
 
-const DEFAULT_ROOMS = [
-  { id: 1, room_number: 'C-102', building: 'Academic Block C (Theory)', device_id: 'TAPID-RDR-01', device_status: 'active', teacher: 'Ashish Trivedi / Chetram Thakur', current_subject: 'CD / CSS / DEV / ES-AI / AIML', last_ping: 'Just now' },
-  { id: 2, room_number: 'C-117', building: 'Academic Block C (Lab G1)', device_id: 'TAPID-RDR-02', device_status: 'active', teacher: 'Chetram Thakur (CT)', current_subject: 'CD Practical (G1 Batch)', last_ping: '1 min ago' },
-  { id: 3, room_number: 'C-102 (Lab)', building: 'Academic Block C (Lab G2)', device_id: 'TAPID-RDR-03', device_status: 'active', teacher: 'Prachi Jain (PSJ)', current_subject: 'CD Practical (G2 Batch)', last_ping: '2 mins ago' },
-  { id: 4, room_number: 'Ground', building: 'Campus Sports Arena', device_id: 'TAPID-RDR-04', device_status: 'active', teacher: 'Sports Dept', current_subject: 'Sports & Athletics', last_ping: 'Just now' },
-];
-
 const ClassroomStatus = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pingStatus, setPingStatus] = useState({});
 
   const fetchClassrooms = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await api.get('/classrooms');
-      if (Array.isArray(response.data) && response.data.length > 0) {
+      if (Array.isArray(response.data)) {
         setRooms(response.data);
-      } else {
-        setRooms(DEFAULT_ROOMS);
       }
     } catch (err) {
-      setRooms(DEFAULT_ROOMS);
+      console.error('Failed to fetch classrooms', err);
+      setError(err.response?.data?.message || 'Failed to fetch classrooms.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePing = async (roomId) => {
+    setPingStatus(prev => ({ ...prev, [roomId]: 'Pinging...' }));
+    try {
+      await fetchClassrooms();
+      setPingStatus(prev => ({ ...prev, [roomId]: 'ACK 200 (Online)' }));
+      setTimeout(() => {
+        setPingStatus(prev => ({ ...prev, [roomId]: null }));
+      }, 3000);
+    } catch {
+      setPingStatus(prev => ({ ...prev, [roomId]: 'Timeout' }));
+      setTimeout(() => {
+        setPingStatus(prev => ({ ...prev, [roomId]: null }));
+      }, 3000);
     }
   };
 
@@ -129,8 +139,12 @@ const ClassroomStatus = () => {
                       </div>
                     </td>
                     <td className="text-right">
-                      <button className="btn-ping-terminal">
-                        Ping
+                      <button 
+                        onClick={() => handlePing(room.id)}
+                        className="btn-ping-terminal"
+                        disabled={pingStatus[room.id] === 'Pinging...'}
+                      >
+                        {pingStatus[room.id] || 'Ping'}
                       </button>
                     </td>
                   </tr>

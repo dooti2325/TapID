@@ -1,12 +1,5 @@
 const db = require('../config/database');
 
-const DEFAULT_DEVICES = [
-    { id: 1, mac_address: '24:0A:C4:00:00:01', status: 'online', classroom_id: 1, room_number: 'C-102', building: 'Academic Block C' },
-    { id: 2, mac_address: '24:0A:C4:00:00:02', status: 'online', classroom_id: 2, room_number: 'C-117', building: 'Academic Block C (Lab)' },
-    { id: 3, mac_address: '24:0A:C4:00:00:03', status: 'offline', classroom_id: null, room_number: null, building: null }
-];
-let inMemoryDevices = [...DEFAULT_DEVICES];
-
 exports.getAllDevices = async (req, res) => {
     try {
         const [rows] = await db.query(`
@@ -16,12 +9,9 @@ exports.getAllDevices = async (req, res) => {
             LEFT JOIN classrooms c ON d.classroom_id = c.id
             ORDER BY FIELD(d.status, 'online', 'offline', 'revoked'), d.mac_address
         `);
-        if (Array.isArray(rows) && rows.length > 0) {
-            return res.json(rows);
-        }
-        res.json(inMemoryDevices);
+        res.json(rows);
     } catch (err) {
-        res.json(inMemoryDevices);
+        res.status(500).json({ message: 'Error fetching devices', error: err.message });
     }
 };
 
@@ -33,31 +23,17 @@ exports.addDevice = async (req, res) => {
             "INSERT INTO devices (mac_address, classroom_id, status) VALUES (?, ?, 'offline')",
             [mac_address, classroom_id || null]
         );
-        const newDev = {
+        res.status(201).json({
             id: result.insertId,
             mac_address,
             classroom_id: classroom_id || null,
-            room_number: classroom_id === '1' ? 'C-102' : classroom_id === '2' ? 'C-117' : null,
-            building: classroom_id ? 'Academic Block C' : null,
             status: 'offline'
-        };
-        inMemoryDevices.push(newDev);
-        res.status(201).json(newDev);
+        });
     } catch (err) {
         if (err.code === 'ER_DUP_ENTRY') {
             return res.status(409).json({ message: 'Device with this MAC address already exists' });
         }
-        const maxId = inMemoryDevices.reduce((max, d) => Math.max(max, Number(d.id) || 0), 0);
-        const newDev = {
-            id: maxId + 1,
-            mac_address,
-            classroom_id: classroom_id || null,
-            room_number: classroom_id === '1' ? 'C-102' : classroom_id === '2' ? 'C-117' : null,
-            building: classroom_id ? 'Academic Block C' : null,
-            status: 'offline'
-        };
-        inMemoryDevices.push(newDev);
-        res.status(201).json(newDev);
+        res.status(500).json({ message: 'Error adding device', error: err.message });
     }
 };
 
@@ -69,40 +45,37 @@ exports.updateDeviceStatus = async (req, res) => {
 
     const allowedStatuses = ['online', 'offline'];
     if (!allowedStatuses.includes(status)) {
-        return res.status(400).json({ message: `Invalid status. Must be one of: ${allowedStatuses.join(', ')}` });
+        return res.status(400).json({ message: `Invalid status. Allowed: ${allowedStatuses.join(', ')}` });
     }
 
     try {
         const [result] = await db.query(
-            "UPDATE devices SET status=? WHERE mac_address=? AND status != 'revoked'",
+            "UPDATE devices SET status = ? WHERE mac_address = ? AND status != 'revoked'",
             [status, mac_address]
         );
-        if (result.affectedRows === 0) {
-            const [devices] = await db.query('SELECT status FROM devices WHERE mac_address=?', [mac_address]);
-            if (devices && devices.length > 0 && devices[0].status === 'revoked') {
-                return res.status(403).json({ message: 'Cannot update status of revoked device' });
+        if (result && result.affectedRows === 0) {
+            const [check] = await db.query('SELECT status FROM devices WHERE mac_address = ?', [mac_address]);
+            if (check && check.length > 0 && check[0].status === 'revoked') {
+                return res.status(403).json({ message: 'Device is revoked and cannot change status' });
             }
+            return res.status(404).json({ message: 'Device not found' });
         }
-        const dev = inMemoryDevices.find(d => d.mac_address === mac_address);
-        if (dev) dev.status = status;
-        res.json({ message: 'Device status updated' });
+        res.json({ message: 'Device status updated successfully' });
     } catch (err) {
-        const dev = inMemoryDevices.find(d => d.mac_address === mac_address);
-        if (dev) dev.status = status;
-        res.json({ message: 'Device status updated' });
+        res.status(500).json({ message: 'Error updating device status', error: err.message });
     }
 };
 
 exports.deleteDevice = async (req, res) => {
     const { id } = req.params;
     try {
-        const [result] = await db.query('DELETE FROM devices WHERE id=?', [id]);
-        inMemoryDevices = inMemoryDevices.filter(d => String(d.id) !== String(id) && d.mac_address !== id);
-        if (result && result.affectedRows === 0) return res.status(404).json({ message: 'Device not found' });
+        const [result] = await db.query('DELETE FROM devices WHERE id = ? OR mac_address = ?', [id, id]);
+        if (result && result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Device not found' });
+        }
         res.json({ message: 'Device deleted successfully' });
     } catch (err) {
-        inMemoryDevices = inMemoryDevices.filter(d => String(d.id) !== String(id) && d.mac_address !== id);
-        res.json({ message: 'Device deleted successfully' });
+        res.status(500).json({ message: 'Error deleting device', error: err.message });
     }
 };
 
@@ -110,21 +83,12 @@ exports.assignClassroom = async (req, res) => {
     const { id } = req.params;
     const { classroom_id } = req.body;
     try {
-        await db.query('UPDATE devices SET classroom_id=? WHERE id=?', [classroom_id || null, id]);
-        const dev = inMemoryDevices.find(d => String(d.id) === String(id));
-        if (dev) {
-            dev.classroom_id = classroom_id || null;
-            dev.room_number = classroom_id === '1' ? 'C-102' : classroom_id === '2' ? 'C-117' : null;
-            dev.building = classroom_id ? 'Academic Block C' : null;
+        const [result] = await db.query('UPDATE devices SET classroom_id = ? WHERE id = ?', [classroom_id || null, id]);
+        if (result && result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Device not found' });
         }
-        res.json({ message: 'Classroom assigned' });
+        res.json({ message: 'Classroom assigned successfully' });
     } catch (err) {
-        const dev = inMemoryDevices.find(d => String(d.id) === String(id));
-        if (dev) {
-            dev.classroom_id = classroom_id || null;
-            dev.room_number = classroom_id === '1' ? 'C-102' : classroom_id === '2' ? 'C-117' : null;
-            dev.building = classroom_id ? 'Academic Block C' : null;
-        }
-        res.json({ message: 'Classroom assigned' });
+        res.status(500).json({ message: 'Error assigning classroom', error: err.message });
     }
 };

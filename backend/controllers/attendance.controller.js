@@ -1,7 +1,8 @@
 const db = require('../config/database');
 
 exports.recordAttendance = async (req, res) => {
-    const { rfid_uid, mac_address } = req.body;
+    const rfid_uid = req.body.rfid_uid || req.body.uid;
+    const mac_address = req.body.mac_address;
 
     try {
         // 1. Find device and its classroom
@@ -11,7 +12,10 @@ exports.recordAttendance = async (req, res) => {
         const classroom_id = devices[0].classroom_id;
 
         // 2. Find active session for this classroom
-        const [sessions] = await db.execute('SELECT id FROM attendance_sessions WHERE classroom_id = ? AND status = ?', [classroom_id, 'active']);
+        const [sessions] = await db.execute(
+            'SELECT id FROM attendance_sessions WHERE classroom_id = ? AND status = ? ORDER BY id DESC LIMIT 1',
+            [classroom_id, 'active']
+        );
         if (sessions.length === 0) return res.status(400).json({ message: 'No active session in this classroom' });
         const session_id = sessions[0].id;
 
@@ -103,9 +107,10 @@ exports.getSessionAttendance = async (req, res) => {
     const { session_id } = req.params;
     try {
         const [attendance] = await db.execute(`
-            SELECT a.timestamp, s.name, s.enrollment_number, a.status 
+            SELECT a.timestamp, s.name, s.enrollment_number, a.status, rc.uid AS rfid_tag_id, rc.uid AS card_uid 
             FROM attendance a 
             JOIN students s ON a.student_id = s.id 
+            LEFT JOIN rfid_cards rc ON a.rfid_card_id = rc.id
             WHERE a.session_id = ? 
             ORDER BY a.timestamp DESC
         `, [session_id]);

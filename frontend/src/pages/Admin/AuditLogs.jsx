@@ -3,33 +3,23 @@ import { ScrollText, Search, ShieldCheck, Filter, RefreshCw } from 'lucide-react
 import api from '../../services/api';
 import './Admin.css';
 
-const DEFAULT_AUDIT_LOGS = [
-  { id: 1, action: 'ATTENDANCE_SESSION_STARTED', details: 'Compiler Design (CD) Room C-102 session initialized', user_email: 'chetram.thakur@tapid.edu', timestamp: new Date(Date.now() - 1800000).toISOString() },
-  { id: 2, action: 'RFID_CARD_SCANNED', details: 'UID: A1:B2:C3:D4 - Shantanu Yashwant Raut (Present)', user_email: 'terminal_c102', timestamp: new Date(Date.now() - 1740000).toISOString() },
-  { id: 3, action: 'RFID_CARD_SCANNED', details: 'UID: 14:F2:3C:99 - Divyansh Manukant Gadekar (Present)', user_email: 'terminal_c102', timestamp: new Date(Date.now() - 1680000).toISOString() },
-  { id: 4, action: 'DEVICE_PING_VERIFIED', details: 'ESP32 Terminal Room C-102 (MAC: 24:0A:C4:00:00:01) RSSI: -32 dBm', user_email: 'system', timestamp: new Date(Date.now() - 3600000).toISOString() },
-  { id: 5, action: 'RFID_CARD_ASSIGNED', details: 'Card 240AC401 issued to Harshal Suhas Vidhate (Roll 18)', user_email: 'admin@tapid.edu', timestamp: new Date(Date.now() - 7200000).toISOString() },
-  { id: 6, action: 'TIMETABLE_SLOT_ACCESSED', details: 'Schedule for Section G accessed by faculty Ashish Trivedi', user_email: 'ashish.trivedi@tapid.edu', timestamp: new Date(Date.now() - 14400000).toISOString() },
-  { id: 7, action: 'DEVICE_KEY_ROTATED', details: 'HMAC SHA-256 rotating token updated for reader TAPID-RDR-01', user_email: 'system', timestamp: new Date(Date.now() - 28800000).toISOString() },
-  { id: 8, action: 'STUDENT_ROSTER_SYNCED', details: 'Section G 58 students verified with database', user_email: 'admin@tapid.edu', timestamp: new Date(Date.now() - 86400000).toISOString() },
-];
-
 function AuditLogs() {
-  const [logs, setLogs] = useState(DEFAULT_AUDIT_LOGS);
+  const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [error, setError] = useState(null);
 
   const fetchLogs = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await api.get('/logs/audit');
-      if (Array.isArray(response.data) && response.data.length > 0) {
+      if (Array.isArray(response.data)) {
         setLogs(response.data);
-      } else {
-        setLogs(DEFAULT_AUDIT_LOGS);
       }
     } catch (err) {
-      setLogs(DEFAULT_AUDIT_LOGS);
+      console.error('Failed to load audit logs', err);
+      setError(err.response?.data?.message || 'Failed to load audit logs from server.');
     } finally {
       setLoading(false);
     }

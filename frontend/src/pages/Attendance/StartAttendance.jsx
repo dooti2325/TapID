@@ -32,8 +32,11 @@ const SEMESTERS = ['Semester 5 - Fall 2026', 'Semester 6 - Spring 2027'];
 
 function StartAttendance() {
   const [timetable, setTimetable] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   // Form State
@@ -47,19 +50,29 @@ function StartAttendance() {
   });
 
   useEffect(() => {
-    const fetchTimetable = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get('/timetable');
-        if (Array.isArray(response.data)) {
-          setTimetable(response.data);
+        const [ttRes, subRes, clsRes] = await Promise.allSettled([
+          api.get('/timetable'),
+          api.get('/subjects'),
+          api.get('/classrooms')
+        ]);
+        if (ttRes.status === 'fulfilled' && Array.isArray(ttRes.value.data)) {
+          setTimetable(ttRes.value.data);
+        }
+        if (subRes.status === 'fulfilled' && Array.isArray(subRes.value.data)) {
+          setSubjects(subRes.value.data);
+        }
+        if (clsRes.status === 'fulfilled' && Array.isArray(clsRes.value.data)) {
+          setClassrooms(clsRes.value.data);
         }
       } catch (err) {
-        console.error('Failed to fetch timetable', err);
+        console.error('Failed to fetch attendance options', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchTimetable();
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
@@ -79,47 +92,58 @@ function StartAttendance() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     setSubmitting(true);
     try {
+      const selectedSubject = subjects.find(s => s.name === formData.subject || s.code === formData.subject || formData.subject.includes(s.code));
+      const cleanRoom = formData.room.replace('Room', '').trim();
+      const selectedClassroom = classrooms.find(c => c.room_number === formData.room || c.room_number === cleanRoom);
       const matching = timetable.find(
-        (t) => t.subject_name?.includes(formData.subject.split(':')[0]) || t.room_number?.includes(formData.room)
+        (t) => t.subject_name?.includes(formData.subject.split(':')[0]) || t.room_number?.includes(cleanRoom)
       );
       
-      const payload = matching
-        ? {
-            timetable_id: matching.id,
-            subject_id: matching.subject_id,
-            classroom_id: matching.classroom_id,
-          }
-        : {
-            subject_name: formData.subject,
-            section_name: formData.section,
-            room_number: formData.room,
-            duration: formData.duration,
-          };
+      const payload = {
+        timetable_id: matching?.id || null,
+        subject_id: selectedSubject?.id || matching?.subject_id || null,
+        classroom_id: selectedClassroom?.id || matching?.classroom_id || null,
+        subject_name: formData.subject,
+        section_name: formData.section,
+        room_number: formData.room,
+        duration: formData.duration,
+      };
 
       const response = await api.post('/session/start', payload);
-      const sId = response.data?.session_id || Date.now();
-      navigate(`/attendance/live?sessionId=${sId}`);
+      if (response.data && response.data.session_id) {
+        navigate(`/attendance/live?sessionId=${response.data.session_id}`);
+      } else {
+        setError('Server did not return a valid session ID. Please try again.');
+      }
     } catch (err) {
-      const fallbackId = 'SES-' + Math.floor(100000 + Math.random() * 900000);
-      navigate(`/attendance/live?sessionId=${fallbackId}`);
+      console.error('Failed to start session', err);
+      const msg = err.response?.data?.message || err.message || 'Failed to start session. Verify faculty status and device connection.';
+      setError(msg);
     } finally {
       setSubmitting(false);
     }
   };
 
   const startQuickSession = async (entry) => {
+    setError(null);
     try {
       const response = await api.post('/session/start', {
         timetable_id: entry.id,
         subject_id: entry.subject_id,
         classroom_id: entry.classroom_id,
       });
-      navigate(`/attendance/live?sessionId=${response.data.session_id}`);
+      if (response.data && response.data.session_id) {
+        navigate(`/attendance/live?sessionId=${response.data.session_id}`);
+      } else {
+        setError('Failed to start quick session.');
+      }
     } catch (err) {
-      const fallbackId = 'SES-' + Math.floor(100000 + Math.random() * 900000);
-      navigate(`/attendance/live?sessionId=${fallbackId}`);
+      console.error('Failed to start quick session', err);
+      const msg = err.response?.data?.message || err.message || 'Failed to start quick session.';
+      setError(msg);
     }
   };
 
@@ -154,6 +178,13 @@ function StartAttendance() {
           <h2>Lecture & Batch Configuration</h2>
           <span className="required-note">* Synchronized with department timetable</span>
         </div>
+
+        {error && (
+          <div style={{ margin: '16px 24px 0', padding: '12px 16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', color: '#f87171', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
+            <Info size={18} />
+            <span>{error}</span>
+          </div>
+        )}
 
         <form onSubmit={handleFormSubmit} className="start-form-body">
           <div className="form-grid-2col">

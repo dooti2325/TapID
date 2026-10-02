@@ -4,6 +4,8 @@ const studentController = require('../controllers/student.controller');
 const auth = require('../middleware/auth.middleware');
 
 router.get('/', auth, studentController.getAllStudents);
+router.get('/my/attendance', auth, studentController.getStudentAttendance);
+router.get('/:id/attendance', auth, studentController.getStudentAttendance);
 router.post('/', auth, studentController.addStudent);
 router.put('/:id', auth, studentController.updateStudent);
 router.delete('/:id', auth, studentController.deleteStudent);

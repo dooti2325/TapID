@@ -72,6 +72,15 @@ jobs:
         working-directory: ./frontend
         run: npx vitest run
 
+      - name: Verify Frontend Production Build
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Compile and Test ESP32 Firmware Offline Queue
+        run: |
+          g++ -std=c++11 -I firmware/esp32 tests/firmware/test_offline_queue.cpp firmware/esp32/offline_queue.cpp -o test_offline_queue
+          ./test_offline_queue
+
       - name: Build Docker Images
         run: |
           docker build -t tapid-backend:latest -f deployment/docker/backend.Dockerfile .

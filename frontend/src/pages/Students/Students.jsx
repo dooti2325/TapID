@@ -15,68 +15,6 @@ import {
 } from 'lucide-react';
 import './Students.css';
 
-// Real Student Roster - Section G (Roll No 1 to 58)
-const REAL_SECTION_G_STUDENTS = [
-  { id: 1, roll_no: 1, enrollment_number: 'GHRUA23011060140', name: 'Shantanu Yashwant Raut', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '04:A2:8B:1A', status: 'Registered' },
-  { id: 2, roll_no: 2, enrollment_number: 'GHRUA23011060170', name: 'DIVYANSH MANUKANT GADEKAR', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '14:F2:3C:99', status: 'Registered' },
-  { id: 3, roll_no: 3, enrollment_number: 'GHRUA23011060205', name: 'VEDANT MANISH BAVARIA', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '3A:BC:D1:42', status: 'Registered' },
-  { id: 4, roll_no: 4, enrollment_number: 'GHRUA23011060250', name: 'SAMIKSHA PRABHAKAR MOHITKAR', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '88:E1:90:3F', status: 'Registered' },
-  { id: 5, roll_no: 5, enrollment_number: 'GHRUA23011060258', name: 'SANSKAR LAXMAN GADDEWAR', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '24:0A:C4:01', status: 'Registered' },
-  { id: 6, roll_no: 6, enrollment_number: 'GHRUA23011060273', name: 'SHREYA ANIL MAHETKAR', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '77:19:D4:5E', status: 'Registered' },
-  { id: 7, roll_no: 7, enrollment_number: 'GHRUA23011060275', name: 'SHRUTI TULSHIRAM KAWALE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: 'B2:10:98:AA', status: 'Registered' },
-  { id: 8, roll_no: 8, enrollment_number: 'GHRUA23011060283', name: 'SUYASH SUNILRAO HANUMANTE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '66:C3:41:88', status: 'Registered' },
-  { id: 9, roll_no: 9, enrollment_number: 'GHRUA23011060289', name: 'TRUPTI DHIRAJ SEWARE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '55:B4:72:19', status: 'Registered' },
-  { id: 10, roll_no: 10, enrollment_number: 'GHRUA23011060297', name: 'VEDANT GOPAL MANKAR', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '99:D1:43:21', status: 'Registered' },
-  { id: 11, roll_no: 11, enrollment_number: 'GHRUA23011060298', name: 'VEDANT MOHAN WANKHEDE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '12:A3:E5:87', status: 'Registered' },
-  { id: 12, roll_no: 12, enrollment_number: 'GHRUA23011060300', name: 'VEDANT SUNIL DURGE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '44:F6:71:02', status: 'Registered' },
-  { id: 13, roll_no: 13, enrollment_number: 'GHRUA23011060309', name: 'YASH NAGESHWAR KARME', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '33:88:99:A1', status: 'Registered' },
-  { id: 14, roll_no: 14, enrollment_number: 'GHRUA23011060317', name: 'ADITYA BHASKAR DARNE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '71:22:90:BA', status: 'Registered' },
-  { id: 15, roll_no: 15, enrollment_number: 'GHRUA23011060322', name: 'ANURAG ATUL JOSHI', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '82:33:44:CD', status: 'Registered' },
-  { id: 16, roll_no: 16, enrollment_number: 'GHRUA23011060336', name: 'AYUSH RAJESH KALAMBE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '19:44:55:EF', status: 'Registered' },
-  { id: 17, roll_no: 17, enrollment_number: 'GHRUA23011060348', name: 'Dootiballav Gouriprasanna Saha', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '24:0A:C4:00', status: 'Registered' },
-  { id: 18, roll_no: 18, enrollment_number: 'GHRUA23011060359', name: 'HARSHAL SUHAS VIDHATE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '24:0A:C4:02', status: 'Registered' },
-  { id: 19, roll_no: 19, enrollment_number: 'GHRUA23011060360', name: 'HARSHAL RAMESH VIJAYWAR', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '91:55:66:77', status: 'Registered' },
-  { id: 20, roll_no: 20, enrollment_number: 'GHRUA23011060389', name: 'KASTURI VIVEK AWACHAT', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: 'A5:66:77:88', status: 'Registered' },
-  { id: 21, roll_no: 21, enrollment_number: 'GHRUA23011060393', name: 'KRITIKA JITENDRA PANDEY', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: 'B6:77:88:99', status: 'Registered' },
-  { id: 22, roll_no: 22, enrollment_number: 'GHRUA23011060396', name: 'KUNAL SUDEEP JAIN', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: 'C7:88:99:AA', status: 'Registered' },
-  { id: 23, roll_no: 23, enrollment_number: 'GHRUA23011060418', name: 'Nikhil Parmeshwar Netam', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: 'D8:99:AA:BB', status: 'Registered' },
-  { id: 24, roll_no: 24, enrollment_number: 'GHRUA23011060454', name: 'PRASAD PRASHANT DEO', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: 'E9:AA:BB:CC', status: 'Registered' },
-  { id: 25, roll_no: 25, enrollment_number: 'GHRUA23011060455', name: 'PRASHIT PRABHAT HOKAM', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: 'FA:BB:CC:DD', status: 'Registered' },
-  { id: 26, roll_no: 26, enrollment_number: 'GHRUA23011060457', name: 'KUNALI AMOL PATHRABE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '0B:CC:DD:EE', status: 'Registered' },
-  { id: 27, roll_no: 27, enrollment_number: 'GHRUA23011060462', name: 'Madhur Sudhir Madankar', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '1C:DD:EE:FF', status: 'Registered' },
-  { id: 28, roll_no: 28, enrollment_number: 'GHRUA23011060467', name: 'PRATHMESH RAMESH AMLE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '2D:EE:FF:00', status: 'Registered' },
-  { id: 29, roll_no: 29, enrollment_number: 'GHRUA23011060471', name: 'PRIYANSHU DINESH AMBHORE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '3E:FF:00:11', status: 'Registered' },
-  { id: 30, roll_no: 30, enrollment_number: 'GHRUA23011060500', name: 'VEDANT SACHIDANAND WANDHARE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '4F:00:11:22', status: 'Registered' },
-  { id: 31, roll_no: 31, enrollment_number: 'GHRUA23011060571', name: 'DIVYANSH SALIL VERMA', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '50:11:22:33', status: 'Registered' },
-  { id: 32, roll_no: 32, enrollment_number: 'GHRUA23011060592', name: 'PRIYANSHU SWARUPKUMAR KATRE', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '61:22:33:44', status: 'Registered' },
-  { id: 33, roll_no: 33, enrollment_number: 'GHRUA23011060606', name: 'TRISHA NARENDRA TURKAR', branch: 'Computer Science', section_name: 'Batch G1', rfid_uid: '72:33:44:55', status: 'Registered' },
-  { id: 34, roll_no: 34, enrollment_number: 'GHRUA23011060614', name: 'KSHITIJ JOHNEY DUSHING', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '83:44:55:66', status: 'Registered' },
-  { id: 35, roll_no: 35, enrollment_number: 'GHRUA23011060687', name: 'VEDANT GOPALRAO BIRGADE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '94:55:66:77', status: 'Registered' },
-  { id: 36, roll_no: 36, enrollment_number: 'GHRUA23011060688', name: 'YASH RAJESH TAMHANKAR', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'A5:66:77:88', status: 'Registered' },
-  { id: 37, roll_no: 37, enrollment_number: 'GHRUA23011060713', name: 'PRINCY KAMLESH TABHANE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'B6:77:88:99', status: 'Registered' },
-  { id: 38, roll_no: 38, enrollment_number: 'GHRUA23011060725', name: 'Om Yuwaraj Chandekar', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'C7:88:99:AA', status: 'Registered' },
-  { id: 39, roll_no: 39, enrollment_number: 'GHRUA23011060780', name: 'Aniket Gajanan Balbudhe', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'D8:99:AA:BB', status: 'Registered' },
-  { id: 40, roll_no: 40, enrollment_number: 'GHRUA23011060793', name: 'RUTUJA RAKESH BHUSARI', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'E9:AA:BB:CC', status: 'Registered' },
-  { id: 41, roll_no: 41, enrollment_number: 'GHRUA23011060816', name: 'Prajkta Narendra Wankhede', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'FA:BB:CC:DD', status: 'Registered' },
-  { id: 42, roll_no: 42, enrollment_number: 'GHRUA23011060819', name: 'SARTHAK AKHILESH DUBEY', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '0B:CC:DD:EE', status: 'Registered' },
-  { id: 43, roll_no: 43, enrollment_number: 'GHRUA23011060837', name: 'KRISHNA SANTOSH MORE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '1C:DD:EE:FF', status: 'Registered' },
-  { id: 44, roll_no: 44, enrollment_number: 'GHRUA23011060840', name: 'SAMPADA DAULATHRAMSINGH BUNDEL', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '2D:EE:FF:00', status: 'Registered' },
-  { id: 45, roll_no: 45, enrollment_number: 'GHRUA23011060866', name: 'AVINASH RAJU MUDE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '3E:FF:00:11', status: 'Registered' },
-  { id: 46, roll_no: 46, enrollment_number: 'GHRUA23011060868', name: 'KAUSTUBH KISHOR SAURKAR', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '4F:00:11:22', status: 'Registered' },
-  { id: 47, roll_no: 47, enrollment_number: 'GHRUA23011060870', name: 'KRUTEE WASUDEO SHENDE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '50:11:22:33', status: 'Registered' },
-  { id: 48, roll_no: 48, enrollment_number: 'GHRUA23011060872', name: 'KUNAL RAJU JIWTODE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '61:22:33:44', status: 'Registered' },
-  { id: 49, roll_no: 49, enrollment_number: 'GHRUA23011060873', name: 'PRATIK LAKHANLAL GHORMARE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '72:33:44:55', status: 'Registered' },
-  { id: 50, roll_no: 50, enrollment_number: 'GHRUA23011060889', name: 'HARSHAL SURENDRA DOIFODE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '83:44:55:66', status: 'Registered' },
-  { id: 51, roll_no: 51, enrollment_number: 'GHRUA23011060893', name: 'ANJALI RAMESH REWATKAR', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '94:55:66:77', status: 'Registered' },
-  { id: 52, roll_no: 52, enrollment_number: 'GHRUA23011060894', name: 'PRACHI SANJAY DHOTE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'A5:66:77:88', status: 'Registered' },
-  { id: 53, roll_no: 53, enrollment_number: 'GHRUA23011060907', name: 'PUSHPAK RAJKUMAR IKHAR', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'B6:77:88:99', status: 'Registered' },
-  { id: 54, roll_no: 54, enrollment_number: 'GHRUA23011060914', name: 'TRUPTI PRAVIN ZILPE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'C7:88:99:AA', status: 'Registered' },
-  { id: 55, roll_no: 55, enrollment_number: 'GHRUA23011060922', name: 'YASH DHANARAJ HATWAR', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'D8:99:AA:BB', status: 'Registered' },
-  { id: 56, roll_no: 56, enrollment_number: 'GHRUA23011060939', name: 'SAKSHI RAJENDRA OZA', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'E9:AA:BB:CC', status: 'Registered' },
-  { id: 57, roll_no: 57, enrollment_number: 'GHRUA23011060972', name: 'VEDANT RAJESH WANDHARE', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: 'FA:BB:CC:DD', status: 'Registered' },
-  { id: 58, roll_no: 58, enrollment_number: 'GHRUA23011060981', name: 'KARAN SHIVPRASAD SHAHU', branch: 'Computer Science', section_name: 'Batch G2', rfid_uid: '0B:CC:DD:EE', status: 'Registered' },
-];
-
 const EMPTY_FORM = { name: '', enrollment_number: '', email: '', section_id: '', rfid_uid: '', branch: 'Computer Science' };
 
 const Students = () => {
@@ -93,21 +31,24 @@ const Students = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  const [fetchError, setFetchError] = useState('');
+
   useEffect(() => {
     fetchStudents();
     fetchSections();
   }, []);
 
   const fetchStudents = async () => {
+    setLoading(true);
+    setFetchError('');
     try {
       const res = await api.get('/students');
-      if (Array.isArray(res.data) && res.data.length > 0) {
+      if (Array.isArray(res.data)) {
         setStudents(res.data);
-      } else {
-        setStudents(REAL_SECTION_G_STUDENTS);
       }
-    } catch {
-      setStudents(REAL_SECTION_G_STUDENTS);
+    } catch (err) {
+      console.error('Failed to fetch students', err);
+      setFetchError(err.response?.data?.message || 'Failed to load student roster from server.');
     } finally {
       setLoading(false);
     }
@@ -168,18 +109,8 @@ const Students = () => {
       await fetchStudents();
       closeModal();
     } catch (err) {
-      if (editingId) {
-        setStudents(prev => prev.map(s => s.id === editingId ? { ...s, ...formData } : s));
-      } else {
-        const newStu = {
-          id: Date.now(),
-          roll_no: students.length + 1,
-          ...formData,
-          status: formData.rfid_uid ? 'Registered' : 'Pending Card'
-        };
-        setStudents(prev => [newStu, ...prev]);
-      }
-      closeModal();
+      console.error('Failed to save student', err);
+      setError(err.response?.data?.message || 'Failed to save student. Please check input values.');
     } finally {
       setSubmitting(false);
     }
@@ -191,7 +122,8 @@ const Students = () => {
       await api.delete(`/students/${id}`);
       await fetchStudents();
     } catch (err) {
-      setStudents(prev => prev.filter(s => s.id !== id));
+      console.error('Failed to delete student', err);
+      alert(err.response?.data?.message || 'Failed to delete student.');
     }
   };
 
@@ -221,6 +153,12 @@ const Students = () => {
           <span>Add Student</span>
         </button>
       </div>
+
+      {fetchError && (
+        <div className="form-error-alert" style={{ marginBottom: '1rem', padding: '0.75rem 1rem', background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: '8px', color: '#b91c1c' }}>
+          {fetchError}
+        </div>
+      )}
 
       {/* Main Table Card */}
       <div className="students-table-card">
@@ -434,12 +372,21 @@ const Students = () => {
                 <div className="form-group">
                   <label>Practical Batch</label>
                   <select
-                    value={formData.section_name || 'Batch G1'}
-                    onChange={(e) => setFormData({ ...formData, section_name: e.target.value })}
+                    value={formData.section_id || ''}
+                    onChange={(e) => {
+                      const sec = sections.find(s => String(s.id) === e.target.value);
+                      setFormData({ 
+                        ...formData, 
+                        section_id: e.target.value,
+                        section_name: sec ? sec.name : ''
+                      });
+                    }}
                     className="modal-select"
                   >
-                    <option value="Batch G1">Batch G1 (Roll 1 to 33)</option>
-                    <option value="Batch G2">Batch G2 (Roll 34 to 58)</option>
+                    <option value="">Select Practical Batch</option>
+                    {sections.map(sec => (
+                      <option key={sec.id} value={sec.id}>{sec.name}</option>
+                    ))}
                   </select>
                 </div>
               </div>

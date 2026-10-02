@@ -12,7 +12,7 @@ def main():
         prompt = "Explain reinforcement learning to me with a robotics example in 2 sentences."
         print(f"\nSending prompt: '{prompt}'")
         
-        response = service.generate_response(prompt=prompt)
+        response = service.generate_response(prompt=prompt, max_tokens=50)
         
         print("\n--- Nemotron Response ---")
         print(response)

@@ -1,22 +1,17 @@
 const db = require('../config/database');
 
-const DEFAULT_SECTIONS = [
-    { id: 1, name: 'Section G', branch: 'Computer Science', semester: 5, student_count: 58 },
-    { id: 2, name: 'G1 (Roll 1-33)', branch: 'Computer Science', semester: 5, student_count: 33 },
-    { id: 3, name: 'G2 (Roll 34+)', branch: 'Computer Science', semester: 5, student_count: 25 },
-    { id: 4, name: 'CS-Core', branch: 'Computer Science', semester: 5, student_count: 58 },
-];
-let inMemorySections = [...DEFAULT_SECTIONS];
-
 exports.getAllSections = async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM sections ORDER BY branch, semester, name');
-        if (Array.isArray(rows) && rows.length > 0) {
-            return res.json(rows);
-        }
-        res.json(inMemorySections);
+        const [rows] = await db.query(`
+            SELECT s.*, COUNT(st.id) AS student_count
+            FROM sections s
+            LEFT JOIN students st ON st.section_id = s.id
+            GROUP BY s.id
+            ORDER BY s.branch, s.semester, s.name
+        `);
+        res.json(rows);
     } catch (err) {
-        res.json(inMemorySections);
+        res.status(500).json({ message: 'Error fetching sections', error: err.message });
     }
 };
 
@@ -30,17 +25,12 @@ exports.addSection = async (req, res) => {
             'INSERT INTO sections (name, branch, semester) VALUES (?, ?, ?)',
             [name, branch, Number(semester)]
         );
-        const newSec = { id: result.insertId, name, branch, semester: Number(semester), student_count: 0 };
-        inMemorySections.push(newSec);
-        res.status(201).json(newSec);
+        res.status(201).json({ id: result.insertId, name, branch, semester: Number(semester), student_count: 0 });
     } catch (err) {
         if (err.code === 'ER_DUP_ENTRY') {
             return res.status(409).json({ message: 'Section already exists' });
         }
-        const maxId = inMemorySections.reduce((max, s) => Math.max(max, Number(s.id) || 0), 0);
-        const newSec = { id: maxId + 1, name, branch, semester: Number(semester), student_count: 0 };
-        inMemorySections.push(newSec);
-        res.status(201).json(newSec);
+        res.status(500).json({ message: 'Error adding section', error: err.message });
     }
 };
 
@@ -52,22 +42,10 @@ exports.updateSection = async (req, res) => {
             'UPDATE sections SET name=?, branch=?, semester=? WHERE id=?',
             [name, branch, Number(semester), id]
         );
-        const sec = inMemorySections.find(s => String(s.id) === String(id));
-        if (sec) {
-            if (name) sec.name = name;
-            if (branch) sec.branch = branch;
-            if (semester) sec.semester = Number(semester);
-        }
-        if (result && result.affectedRows === 0 && !sec) return res.status(404).json({ message: 'Section not found' });
+        if (result && result.affectedRows === 0) return res.status(404).json({ message: 'Section not found' });
         res.json({ message: 'Section updated successfully' });
     } catch (err) {
-        const sec = inMemorySections.find(s => String(s.id) === String(id));
-        if (sec) {
-            if (name) sec.name = name;
-            if (branch) sec.branch = branch;
-            if (semester) sec.semester = Number(semester);
-        }
-        res.json({ message: 'Section updated successfully' });
+        res.status(500).json({ message: 'Error updating section', error: err.message });
     }
 };
 
@@ -75,11 +53,9 @@ exports.deleteSection = async (req, res) => {
     const { id } = req.params;
     try {
         const [result] = await db.query('DELETE FROM sections WHERE id=?', [id]);
-        inMemorySections = inMemorySections.filter(s => String(s.id) !== String(id));
         if (result && result.affectedRows === 0) return res.status(404).json({ message: 'Section not found' });
         res.json({ message: 'Section deleted successfully' });
     } catch (err) {
-        inMemorySections = inMemorySections.filter(s => String(s.id) !== String(id));
-        res.json({ message: 'Section deleted successfully' });
+        res.status(500).json({ message: 'Error deleting section', error: err.message });
     }
 };

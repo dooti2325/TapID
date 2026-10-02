@@ -22,7 +22,8 @@ describe('Session API', () => {
   it('POST /api/session/start — faculty starts a session', async () => {
     db.execute
       .mockResolvedValueOnce([[{ id: 5 }]])           // faculty lookup by user_id
-      .mockResolvedValueOnce([{ insertId: 99 }]);      // insert session
+      .mockResolvedValueOnce([{ affectedRows: 0 }])   // auto-close previous active sessions
+      .mockResolvedValueOnce([{ insertId: 99 }]);     // insert session
 
     const res = await request(app)
       .post('/api/session/start')
@@ -89,5 +90,34 @@ describe('Session API', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toBeNull();
+  });
+
+  it('GET /api/session/:id — returns session details', async () => {
+    db.execute.mockResolvedValueOnce([[{
+      id: 99,
+      subject_name: 'Compiler Design',
+      subject_code: 'CD',
+      room_number: 'C-102',
+      status: 'active',
+      enrolled_count: 58
+    }]]);
+
+    const res = await request(app)
+      .get('/api/session/99')
+      .set('Authorization', `Bearer ${facultyToken}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('id', 99);
+    expect(res.body.subject_name).toBe('Compiler Design');
+  });
+
+  it('GET /api/session/:id — returns 404 when session not found', async () => {
+    db.execute.mockResolvedValueOnce([[]]);
+
+    const res = await request(app)
+      .get('/api/session/999')
+      .set('Authorization', `Bearer ${facultyToken}`);
+
+    expect(res.statusCode).toBe(404);
   });
 });

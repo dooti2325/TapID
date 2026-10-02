@@ -55,21 +55,23 @@ const Sidebar = () => {
           </NavLink>
         )}
 
-        {/* ─── Faculty Only Dashboard ─── */}
-        {user?.role === 'faculty' && (
+        {/* ─── Faculty / Student Dashboard ─── */}
+        {(user?.role === 'faculty' || user?.role === 'student') && (
           <NavLink to="/dashboard" className={navItem}>
             <LayoutDashboard size={18} />
-            <span>Dashboard</span>
+            <span>{user?.role === 'student' ? 'My Attendance' : 'Dashboard'}</span>
           </NavLink>
         )}
 
         {/* ─── Shared ─── */}
         <div className="nav-section-label">Attendance</div>
 
-        <NavLink to="/attendance" className={navItem}>
-          <ClipboardList size={18} />
-          <span>Sessions</span>
-        </NavLink>
+        {user?.role !== 'student' && (
+          <NavLink to="/attendance" className={navItem}>
+            <ClipboardList size={18} />
+            <span>Sessions</span>
+          </NavLink>
+        )}
 
         <NavLink to="/reports" className={navItem}>
           <BookOpen size={18} />

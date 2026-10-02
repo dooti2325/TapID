@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS tapid;
+CREATE DATABASE IF NOT EXISTS tapid CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE tapid;
 
 CREATE TABLE IF NOT EXISTS users (
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS students (
     section_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
-    FOREIGN KEY (section_id) REFERENCES sections(id)
+    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS rfid_cards (
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS devices (
     mac_address VARCHAR(50) UNIQUE NOT NULL,
     classroom_id INT,
     status ENUM('online', 'offline', 'revoked') DEFAULT 'offline',
-    FOREIGN KEY (classroom_id) REFERENCES classrooms(id)
+    FOREIGN KEY (classroom_id) REFERENCES classrooms(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS timetable (

@@ -6,8 +6,8 @@ const db = require('../config/database');
 const logger = require('../config/logger');
 
 // GET /api/analytics/summary
-// Endpoint to return key metrics for the Admin Dashboard
-router.get('/summary', verifyToken, verifyRole('admin'), async (req, res) => {
+// Endpoint to return key metrics for the Admin and Faculty Dashboard
+router.get('/summary', verifyToken, verifyRole(['admin', 'faculty']), async (req, res) => {
   try {
     const [studentsResult] = await db.execute('SELECT COUNT(*) as total FROM students');
     const totalStudents = studentsResult[0].total;

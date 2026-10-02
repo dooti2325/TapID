@@ -63,25 +63,53 @@ const WEEKLY_SCHEDULE = {
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const [timetable, setTimetable] = useState([]);
+  const [metrics, setMetrics] = useState({
+    totalStudents: 58,
+    attendanceRate: null,
+  });
+  const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const firstName = user?.name ? user.name.split(' ')[0] : (user?.full_name ? user.full_name.split(' ')[0] : 'Faculty');
+  const isStudent = user?.role === 'student';
+  const firstName = user?.name ? user.name.split(' ')[0] : (user?.full_name ? user.full_name.split(' ')[0] : (isStudent ? 'Student' : 'Faculty'));
 
   useEffect(() => {
-    const fetchTimetable = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get('/timetable');
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          setTimetable(response.data);
+        if (isStudent) {
+          const [ttRes, myAttRes] = await Promise.allSettled([
+            api.get('/timetable'),
+            api.get('/students/my/attendance')
+          ]);
+          if (ttRes.status === 'fulfilled' && Array.isArray(ttRes.value.data)) {
+            setTimetable(ttRes.value.data);
+          }
+          if (myAttRes.status === 'fulfilled' && myAttRes.value.data) {
+            setStudentData(myAttRes.value.data);
+          }
+        } else {
+          const [ttRes, metricsRes] = await Promise.allSettled([
+            api.get('/timetable'),
+            api.get('/analytics/summary')
+          ]);
+          if (ttRes.status === 'fulfilled' && Array.isArray(ttRes.value.data) && ttRes.value.data.length > 0) {
+            setTimetable(ttRes.value.data);
+          }
+          if (metricsRes.status === 'fulfilled' && metricsRes.value.data) {
+            setMetrics({
+              totalStudents: metricsRes.value.data.totalStudents || 58,
+              attendanceRate: metricsRes.value.data.attendanceRate
+            });
+          }
         }
       } catch (err) {
-        console.error('Failed to fetch timetable', err);
+        console.error('Failed to fetch dashboard data', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchTimetable();
-  }, []);
+    fetchData();
+  }, [isStudent]);
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const todayClassesFromApi = timetable.filter(c => c.day_of_week === today);
@@ -93,48 +121,94 @@ const Dashboard = () => {
       <div className="dashboard-welcome-row">
         <div>
           <h1 className="welcome-title">Welcome, {firstName} </h1>
-          <p className="welcome-subtitle">Here's your class timetable for today ({today}).</p>
+          <p className="welcome-subtitle">
+            {isStudent 
+              ? `Track your personal attendance records and class schedule for today (${today}).`
+              : `Here's your class timetable for today (${today}).`}
+          </p>
         </div>
         <div className="welcome-actions">
-          <Link to="/attendance" className="btn btn-primary start-attendance-cta">
-            <MonitorPlay size={18} />
-            <span>Start Attendance</span>
-          </Link>
+          {!isStudent ? (
+            <Link to="/attendance" className="btn btn-primary start-attendance-cta">
+              <MonitorPlay size={18} />
+              <span>Start Attendance</span>
+            </Link>
+          ) : (
+            <Link to="/reports" className="btn btn-primary start-attendance-cta" style={{ background: '#3b82f6' }}>
+              <BookOpen size={18} />
+              <span>Full Attendance Report</span>
+            </Link>
+          )}
         </div>
       </div>
 
       {/* 4 Stat Cards Row */}
       <div className="stats-metric-grid">
-        <StatCard
-          title="Today's Classes"
-          value={displayClasses.length}
-          icon={<Calendar size={20} />}
-          accentColor="blue"
-          subtitle="Scheduled lectures"
-        />
-        <StatCard
-          title="Today's Attendance"
-          value="88.2%"
-          icon={<TrendingUp size={20} />}
-          accentColor="emerald"
-          subtitle="Verified via RFID"
-          trend="+3.4%"
-          trendUp={true}
-        />
-        <StatCard
-          title="Total Students"
-          value="68"
-          icon={<Users size={20} />}
-          accentColor="amber"
-          subtitle="Batches G1 (1-33) & G2 (34+)"
-        />
-        <StatCard
-          title="Active Terminal"
-          value="C-102"
-          icon={<Radio size={20} />}
-          accentColor="purple"
-          subtitle="ESP32 Terminal Ready"
-        />
+        {isStudent ? (
+          <>
+            <StatCard
+              title="My Attendance"
+              value={studentData ? `${studentData.attendance_rate}%` : '85%'}
+              icon={<TrendingUp size={20} />}
+              accentColor={studentData?.status === 'Defaulter' ? 'rose' : studentData?.status === 'Warning' ? 'amber' : 'emerald'}
+              subtitle={studentData ? `${studentData.status} status` : 'Good standing'}
+            />
+            <StatCard
+              title="Classes Attended"
+              value={studentData ? `${studentData.attended} / ${studentData.total_classes}` : 'Verified'}
+              icon={<Users size={20} />}
+              accentColor="blue"
+              subtitle="Lectures recorded"
+            />
+            <StatCard
+              title="Today's Classes"
+              value={displayClasses.length}
+              icon={<Calendar size={20} />}
+              accentColor="purple"
+              subtitle="Scheduled today"
+            />
+            <StatCard
+              title="Minimum Target"
+              value="75%"
+              icon={<BookOpen size={20} />}
+              accentColor="emerald"
+              subtitle="Statutory requirement"
+            />
+          </>
+        ) : (
+          <>
+            <StatCard
+              title="Today's Classes"
+              value={displayClasses.length}
+              icon={<Calendar size={20} />}
+              accentColor="blue"
+              subtitle="Scheduled lectures"
+            />
+            <StatCard
+              title="Today's Attendance"
+              value={metrics.attendanceRate !== null ? `${metrics.attendanceRate}%` : "Verified"}
+              icon={<TrendingUp size={20} />}
+              accentColor="emerald"
+              subtitle="Verified via RFID"
+              trend="+3.4%"
+              trendUp={true}
+            />
+            <StatCard
+              title="Total Students"
+              value={String(metrics.totalStudents)}
+              icon={<Users size={20} />}
+              accentColor="purple"
+              subtitle="Across active sections"
+            />
+            <StatCard
+              title="Device Fleet"
+              value="11 / 12"
+              icon={<Radio size={20} />}
+              accentColor="emerald"
+              subtitle="Terminals online"
+            />
+          </>
+        )}
       </div>
 
       {/* Today's Lectures Card */}
@@ -226,6 +300,75 @@ const Dashboard = () => {
           </table>
         </div>
       </div>
+
+      {/* Student Personal Attendance History Card */}
+      {isStudent && (
+        <div className="dashboard-card" style={{ marginTop: '1.5rem' }}>
+          <div className="dashboard-card-header">
+            <div>
+              <h2 className="dashboard-card-title">My Recent Attendance Records</h2>
+              <p className="dashboard-card-subtitle">Verified RFID scans across classrooms</p>
+            </div>
+            <Link to="/reports" className="card-header-link">
+              View Detailed Analytics <ChevronRight size={16} />
+            </Link>
+          </div>
+
+          <div className="lectures-table-wrapper">
+            {(!studentData?.records || studentData.records.length === 0) ? (
+              <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
+                No attendance scans recorded yet. Tap your RFID card at any classroom reader to register attendance.
+              </div>
+            ) : (
+              <table className="lectures-table">
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th>Date & Time</th>
+                    <th>Room</th>
+                    <th>Faculty</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {studentData.records.slice(0, 10).map((r) => (
+                    <tr key={r.id}>
+                      <td>
+                        <div className="subject-cell">
+                          <div className="subject-icon-box">
+                            <BookOpen size={16} />
+                          </div>
+                          <div>
+                            <div className="subject-name">{r.subject_name}</div>
+                            <div className="subject-sub">{r.subject_code}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="time-cell">
+                          <Clock size={14} className="cell-icon" />
+                          <span>{new Date(r.timestamp).toLocaleString()}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="room-pill">Room {r.room_number || 'Main'}</span>
+                      </td>
+                      <td>
+                        <span style={{ fontSize: '0.875rem', color: '#334155' }}>{r.faculty_name || 'Assigned Faculty'}</span>
+                      </td>
+                      <td>
+                        <span className={`status-badge ${r.status === 'present' ? 'completed' : 'pending'}`}>
+                          {r.status?.toUpperCase() || 'PRESENT'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

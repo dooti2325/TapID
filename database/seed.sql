@@ -22,6 +22,16 @@ role = VALUES(role);
 
 -- 2. Faculty Directory
 INSERT INTO faculty (user_id, name, phone, department)
+SELECT id, 'System Administrator', '+91 98765 43210', 'Administration'
+FROM users WHERE email = 'admin@tapid.edu'
+ON DUPLICATE KEY UPDATE name = VALUES(name), phone = VALUES(phone), department = VALUES(department);
+
+INSERT INTO faculty (user_id, name, phone, department)
+SELECT id, 'Prof. Demo Faculty', '+91 98765 43220', 'Computer Science & Engineering'
+FROM users WHERE email = 'faculty@tapid.edu'
+ON DUPLICATE KEY UPDATE name = VALUES(name), phone = VALUES(phone), department = VALUES(department);
+
+INSERT INTO faculty (user_id, name, phone, department)
 SELECT id, 'Ashish Trivedi (AT)', '+91 98765 43221', 'Computer Science & Engineering'
 FROM users WHERE email = 'ashish.trivedi@tapid.edu'
 ON DUPLICATE KEY UPDATE name = VALUES(name), phone = VALUES(phone), department = VALUES(department);
