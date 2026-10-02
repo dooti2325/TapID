@@ -101,11 +101,15 @@ jobs:
           docker build -t tapid-frontend:latest -f deployment/docker/frontend.Dockerfile .
 
       - name: Push to Docker Hub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.DOCKER_USERNAME != ''
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run: |
+          if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_TOKEN" ]; then
+            echo "Docker Hub credentials not configured. Skipping image push."
+            exit 0
+          fi
           echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
           docker tag tapid-backend:latest $DOCKER_USERNAME/tapid-backend:latest
           docker tag tapid-frontend:latest $DOCKER_USERNAME/tapid-frontend:latest
