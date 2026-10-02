@@ -39,22 +39,63 @@ async function run() {
 
         const rootDir = path.join(__dirname, '..');
         
+        console.log('🧹 Preparing clean database tapid...');
+        await conn.query('DROP DATABASE IF EXISTS tapid');
+        await conn.query('CREATE DATABASE tapid CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        await conn.query('USE tapid');
+
         console.log('📄 Executing schema.sql...');
         const schema = fs.readFileSync(path.join(rootDir, 'database/schema.sql'), 'utf8');
         await conn.query(schema);
 
         console.log('📄 Executing indexes.sql...');
-        const indexes = fs.readFileSync(path.join(rootDir, 'database/indexes.sql'), 'utf8');
-        await conn.query(indexes);
+        try {
+            const indexes = fs.readFileSync(path.join(rootDir, 'database/indexes.sql'), 'utf8');
+            const statements = indexes.split(';').map(s => s.trim()).filter(Boolean);
+            for (const stmt of statements) {
+                try {
+                    await conn.query(stmt);
+                } catch (idxErr) {
+                    if (!idxErr.message.includes('Duplicate key name') && !idxErr.message.includes('already exists')) {
+                        console.log('Index note:', idxErr.message);
+                    }
+                }
+            }
+        } catch (idxErr) {
+            console.log('ℹ️ Indexes notice:', idxErr.message);
+        }
 
         console.log('📄 Executing seed.sql...');
         const seed = fs.readFileSync(path.join(rootDir, 'database/seed.sql'), 'utf8');
         await conn.query(seed);
 
-        console.log('📄 Executing triggers.sql...');
+        console.log('📄 Executing triggers...');
         try {
-            const triggers = fs.readFileSync(path.join(rootDir, 'database/triggers.sql'), 'utf8');
-            await conn.query(triggers);
+            await conn.query('DROP TRIGGER IF EXISTS after_session_start');
+            await conn.query(`
+                CREATE TRIGGER after_session_start
+                AFTER INSERT ON attendance_sessions
+                FOR EACH ROW
+                BEGIN
+                    UPDATE devices 
+                    SET status = 'online' 
+                    WHERE classroom_id = NEW.classroom_id AND status != 'revoked';
+                END
+            `);
+            await conn.query('DROP TRIGGER IF EXISTS after_session_end');
+            await conn.query(`
+                CREATE TRIGGER after_session_end
+                AFTER UPDATE ON attendance_sessions
+                FOR EACH ROW
+                BEGIN
+                    IF NEW.status = 'completed' AND OLD.status = 'active' THEN
+                        UPDATE devices 
+                        SET status = 'offline' 
+                        WHERE classroom_id = NEW.classroom_id AND status != 'revoked';
+                    END IF;
+                END
+            `);
+            console.log('⚡ Triggers configured successfully!');
         } catch (trigErr) {
             console.log('ℹ️ Triggers skipped (cloud DB permissions):', trigErr.message);
         }

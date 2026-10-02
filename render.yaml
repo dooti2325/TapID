@@ -13,16 +13,16 @@ services:
       - key: PORT
         value: 3000
       - key: DB_HOST
-        sync: false
+        value: mysql-33b99771-dootisaha-2325.j.aivencloud.com
       - key: DB_PORT
-        value: "3306"
+        value: "12183"
       - key: DB_USER
-        sync: false
+        value: avnadmin
       - key: DB_PASS
         sync: false
       - key: DB_NAME
-        sync: false
+        value: tapid
       - key: JWT_SECRET
         generateValue: true
       - key: DEVICE_API_KEY
-        generateValue: true
+        value: tapid-esp32-device-key-2026
