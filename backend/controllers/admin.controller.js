@@ -6,12 +6,12 @@ exports.getDashboardStats = async (req, res) => {
         const [[{ total_teachers }]] = await db.query("SELECT COUNT(*) as total_teachers FROM users WHERE role = 'faculty'");
         const [[{ total_classrooms }]] = await db.query('SELECT COUNT(*) as total_classrooms FROM classrooms');
         const [[{ total_subjects }]] = await db.query('SELECT COUNT(*) as total_subjects FROM subjects');
-        const [[{ active_devices }]] = await db.query('SELECT COUNT(*) as active_devices FROM devices WHERE status = "online"');
-        const [[{ active_sessions }]] = await db.query('SELECT COUNT(*) as active_sessions FROM attendance_sessions WHERE status = "active"');
+        const [[{ active_devices }]] = await db.query("SELECT COUNT(*) as active_devices FROM devices WHERE status = 'online'");
+        const [[{ active_sessions }]] = await db.query("SELECT COUNT(*) as active_sessions FROM attendance_sessions WHERE status = 'active'");
         const [[{ attendance_today }]] = await db.query('SELECT COUNT(*) as attendance_today FROM attendance WHERE DATE(timestamp) = CURDATE()');
-        const [[{ revoked_cards }]] = await db.query('SELECT COUNT(*) as revoked_cards FROM rfid_cards WHERE status = "revoked"');
+        const [[{ revoked_cards }]] = await db.query("SELECT COUNT(*) as revoked_cards FROM rfid_cards WHERE status = 'revoked'");
         const [[{ unassigned_cards }]] = await db.query('SELECT COUNT(*) as unassigned_cards FROM rfid_cards WHERE student_id IS NULL');
-        const [[{ offline_devices }]] = await db.query('SELECT COUNT(*) as offline_devices FROM devices WHERE status = "offline"');
+        const [[{ offline_devices }]] = await db.query("SELECT COUNT(*) as offline_devices FROM devices WHERE status = 'offline'");
 
         const [recent_sessions] = await db.query(`
             SELECT

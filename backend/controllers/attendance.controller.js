@@ -155,7 +155,7 @@ exports.bulkRecordAttendance = async (req, res) => {
                 const parsedTime = record.timestamp && !isNaN(new Date(record.timestamp).getTime())
                     ? new Date(record.timestamp)
                     : new Date();
-                const [cards] = await db.execute('SELECT id, student_id, status FROM rfid_cards WHERE uid = ? AND status = "active"', [record.rfid_uid]);
+                const [cards] = await db.execute("SELECT id, student_id, status FROM rfid_cards WHERE uid = ? AND status = 'active'", [record.rfid_uid]);
                 if (cards.length > 0) {
                     await db.execute('INSERT INTO attendance (session_id, student_id, rfid_card_id, timestamp) VALUES (?, ?, ?, ?)', 
                         [session_id, cards[0].student_id, cards[0].id, parsedTime]);
