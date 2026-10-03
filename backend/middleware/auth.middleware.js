@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
         req.user = verified;
         next();
     } catch (err) {
-        const status = err.message.includes('JWT_SECRET') ? 500 : 400;
+        const status = err.message.includes('JWT_SECRET') ? 500 : 401;
         res.status(status).json({ message: status === 500 ? err.message : 'Invalid Token' });
     }
 };
