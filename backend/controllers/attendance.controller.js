@@ -34,7 +34,7 @@ exports.recordAttendance = async (req, res) => {
 
         // 3. Find student by RFID (normalize with and without colons/spaces)
         const [cards] = await db.execute(
-            'SELECT id, student_id, status FROM rfid_cards WHERE uid = ? OR uid = ? OR REPLACE(uid, ":", "") = ?',
+            "SELECT id, student_id, status FROM rfid_cards WHERE uid = ? OR uid = ? OR REPLACE(uid, ':', '') = ?",
             [cleanUid, colonUid, uncolonUid]
         );
         if (cards.length === 0) {
