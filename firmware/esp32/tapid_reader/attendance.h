@@ -29,7 +29,7 @@ private:
     LedIndicator _led;
     ApiClient _api;
     OfflineQueue _queue;
-    OtaManager _ota;
+    OTAManager _ota;
 
     // Session State Tracking
     bool _sessionActive;

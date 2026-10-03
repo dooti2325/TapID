@@ -21,4 +21,8 @@ private:
     bool _initialized;
 };
 
+// Typedef alias for alternative casing
+typedef OTAManager OtaManager;
+
 #endif // OTA_MANAGER_H
+
