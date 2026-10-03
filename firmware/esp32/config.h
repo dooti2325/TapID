@@ -25,8 +25,8 @@
 #define PIN_BUZZER              25    // Buzzer pin (Active / Passive tone)
 
 // --- Inputs & Controls ---
-#define PIN_CONFIG_BUTTON       4     // Pushbutton for AP Config Mode (3s hold) & Factory Reset (10s hold)
-#define PIN_BOOT_BUTTON         0     // Built-in ESP32 BOOT button (also supported for AP setup)
+#define ENABLE_CONFIG_BUTTON    false // Set to true only if a physical button is wired to GPIO 4
+#define PIN_CONFIG_BUTTON       4     // Pushbutton for AP Config Mode (3s hold)
 
 // =============================================================================
 // System & Timing Parameters

@@ -62,25 +62,12 @@ void AttendanceController::begin() {
 }
 
 void AttendanceController::checkButton() {
-    // Read either external config button or built-in ESP32 BOOT button
-    bool pressed = (digitalRead(PIN_CONFIG_BUTTON) == LOW || digitalRead(PIN_BOOT_BUTTON) == LOW);
+#if ENABLE_CONFIG_BUTTON
+    bool pressed = (digitalRead(PIN_CONFIG_BUTTON) == LOW);
 
     if (pressed && !_buttonPressed) {
         _buttonPressed = true;
         _buttonPressStart = millis();
-        _buzzer.beep(2000, 50);
-    } else if (pressed && _buttonPressed) {
-        unsigned long duration = millis() - _buttonPressStart;
-
-        // Long press >= 10 seconds: Factory Reset
-        if (duration >= 10000) {
-            Serial.println("[BUTTON] 10s Long Press detected -> Factory Reset!");
-            _buzzer.beep(3000, 300); delay(100);
-            _buzzer.beep(3000, 300);
-            _wifi.factoryReset();
-            delay(500);
-            ESP.restart();
-        }
     } else if (!pressed && _buttonPressed) {
         unsigned long duration = millis() - _buttonPressStart;
         _buttonPressed = false;
@@ -88,12 +75,12 @@ void AttendanceController::checkButton() {
         // Press between 3 and 10 seconds: Launch Wi-Fi AP Config Portal
         if (duration >= 3000 && duration < 10000) {
             Serial.println("[BUTTON] 3s Hold detected -> Starting Wi-Fi AP Setup Portal...");
-            _buzzer.beep(1500, 100); delay(80);
             _buzzer.beep(2200, 150);
             _wifi.startConfigPortal();
             _led.setConfigPortalActive(true);
         }
     }
+#endif
 }
 
 void AttendanceController::performHeartbeat() {

@@ -57,6 +57,29 @@ static int extractJsonInt(const String& json, const String& key) {
     return json.substring(start, end).toInt();
 }
 
+// Helper: Safely begin HTTP without placing heavy WiFiClientSecure on the stack
+static bool beginConnection(HTTPClient& http, WiFiClient& client, WiFiClientSecure*& pSecure, const String& url) {
+    if (url.startsWith("https://")) {
+        pSecure = new WiFiClientSecure();
+        if (pSecure) {
+            pSecure->setInsecure();
+            return http.begin(*pSecure, url);
+        }
+        return false;
+    } else {
+        return http.begin(client, url);
+    }
+}
+
+// Helper: Safely clean up HTTP connection and any heap-allocated secure client
+static void endConnection(HTTPClient& http, WiFiClientSecure*& pSecure) {
+    http.end();
+    if (pSecure) {
+        delete pSecure;
+        pSecure = nullptr;
+    }
+}
+
 AttendanceResponse ApiClient::parseResponse(int httpCode, const String& responseBody) {
     AttendanceResponse res;
     res.httpCode = httpCode;
@@ -98,13 +121,14 @@ AttendanceResponse ApiClient::recordAttendance(const String& rfidUid, const Stri
 
     HTTPClient http;
     WiFiClient client;
-    WiFiClientSecure secureClient;
+    WiFiClientSecure* pSecure = nullptr;
 
-    if (endpoint.startsWith("https://")) {
-        secureClient.setInsecure();
-        http.begin(secureClient, endpoint);
-    } else {
-        http.begin(client, endpoint);
+    if (!beginConnection(http, client, pSecure, endpoint)) {
+        res.httpCode = -1;
+        res.status = STATUS_NETWORK_ERROR;
+        res.message = "Failed to initiate HTTP client";
+        endConnection(http, pSecure);
+        return res;
     }
 
     http.addHeader("Content-Type", "application/json");
@@ -137,7 +161,7 @@ AttendanceResponse ApiClient::recordAttendance(const String& rfidUid, const Stri
         res.message = http.errorToString(httpCode);
     }
 
-    http.end();
+    endConnection(http, pSecure);
     return res;
 }
 
@@ -147,13 +171,14 @@ AttendanceResponse ApiClient::bulkRecordAttendance(const String& macAddress, con
 
     HTTPClient http;
     WiFiClient client;
-    WiFiClientSecure secureClient;
+    WiFiClientSecure* pSecure = nullptr;
 
-    if (endpoint.startsWith("https://")) {
-        secureClient.setInsecure();
-        http.begin(secureClient, endpoint);
-    } else {
-        http.begin(client, endpoint);
+    if (!beginConnection(http, client, pSecure, endpoint)) {
+        res.httpCode = -1;
+        res.status = STATUS_NETWORK_ERROR;
+        res.message = "Failed to initiate bulk HTTP client";
+        endConnection(http, pSecure);
+        return res;
     }
 
     http.addHeader("Content-Type", "application/json");
@@ -180,7 +205,7 @@ AttendanceResponse ApiClient::bulkRecordAttendance(const String& macAddress, con
         res.message = http.errorToString(httpCode);
     }
 
-    http.end();
+    endConnection(http, pSecure);
     return res;
 }
 
@@ -196,13 +221,11 @@ HeartbeatResponse ApiClient::sendHeartbeat(const String& macAddress) {
 
     HTTPClient http;
     WiFiClient client;
-    WiFiClientSecure secureClient;
+    WiFiClientSecure* pSecure = nullptr;
 
-    if (endpoint.startsWith("https://")) {
-        secureClient.setInsecure();
-        http.begin(secureClient, endpoint);
-    } else {
-        http.begin(client, endpoint);
+    if (!beginConnection(http, client, pSecure, endpoint)) {
+        endConnection(http, pSecure);
+        return res;
     }
 
     http.addHeader("Content-Type", "application/json");
@@ -234,7 +257,7 @@ HeartbeatResponse ApiClient::sendHeartbeat(const String& macAddress) {
         Serial.printf("[API] Heartbeat failed (Code %d: %s)\n", httpCode, http.errorToString(httpCode).c_str());
     }
 
-    http.end();
+    endConnection(http, pSecure);
     return res;
 }
 
@@ -243,13 +266,11 @@ bool ApiClient::updateDeviceStatus(const String& macAddress, const String& statu
 
     HTTPClient http;
     WiFiClient client;
-    WiFiClientSecure secureClient;
+    WiFiClientSecure* pSecure = nullptr;
 
-    if (endpoint.startsWith("https://")) {
-        secureClient.setInsecure();
-        http.begin(secureClient, endpoint);
-    } else {
-        http.begin(client, endpoint);
+    if (!beginConnection(http, client, pSecure, endpoint)) {
+        endConnection(http, pSecure);
+        return false;
     }
 
     http.addHeader("Content-Type", "application/json");
@@ -262,26 +283,27 @@ bool ApiClient::updateDeviceStatus(const String& macAddress, const String& statu
     String payload = "{\"mac_address\":\"" + macAddress + "\",\"status\":\"" + status + "\"}";
     int httpCode = http.POST(payload);
     bool ok = (httpCode >= 200 && httpCode < 300);
-    http.end();
+
+    endConnection(http, pSecure);
     return ok;
 }
 
 bool ApiClient::checkHealth() {
     String endpoint = _baseUrl + "/health";
+
     HTTPClient http;
     WiFiClient client;
-    WiFiClientSecure secureClient;
+    WiFiClientSecure* pSecure = nullptr;
 
-    if (endpoint.startsWith("https://")) {
-        secureClient.setInsecure();
-        http.begin(secureClient, endpoint);
-    } else {
-        http.begin(client, endpoint);
+    if (!beginConnection(http, client, pSecure, endpoint)) {
+        endConnection(http, pSecure);
+        return false;
     }
 
     http.setTimeout(HTTP_TIMEOUT_MS);
     int code = http.GET();
     bool ok = (code == 200);
-    http.end();
+
+    endConnection(http, pSecure);
     return ok;
 }
