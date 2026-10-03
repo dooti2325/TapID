@@ -1,7 +1,11 @@
 # TapID Cloud Deployment & Hosting Guide
 **Production Release Guide** • **Platform Version:** 1.0.0
 
-This guide provides end-to-end instructions for deploying TapID to production in the cloud with zero hassle.
+> [!NOTE]
+> **Live Production Endpoints:**
+> - **Frontend Web Portal (Vercel):** [https://tap-id-one.vercel.app](https://tap-id-one.vercel.app)
+> - **Backend API Server (Render):** [https://tapid-14ao.onrender.com](https://tapid-14ao.onrender.com)
+> - **Managed Cloud Database (Aiven):** `mysql-33b99771-dootisaha-2325.j.aivencloud.com:12183`
 
 ---
 
