@@ -23,8 +23,9 @@ void AttendanceController::begin() {
     _buzzer.init();
     _led.init();
 
+#if ENABLE_CONFIG_BUTTON
     pinMode(PIN_CONFIG_BUTTON, INPUT_PULLUP);
-    pinMode(PIN_BOOT_BUTTON, INPUT_PULLUP);
+#endif
 
     // Startup visual sequence and power-up chime
     _led.showBoot();
