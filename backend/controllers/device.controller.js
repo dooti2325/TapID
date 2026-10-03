@@ -92,3 +92,76 @@ exports.assignClassroom = async (req, res) => {
         res.status(500).json({ message: 'Error assigning classroom', error: err.message });
     }
 };
+
+exports.heartbeat = async (req, res) => {
+    const { mac_address } = req.body;
+    if (!mac_address) {
+        return res.status(400).json({ message: 'mac_address is required' });
+    }
+
+    try {
+        const [devices] = await db.query(`
+            SELECT d.id, d.mac_address, d.classroom_id, d.status,
+                   c.room_number, c.building
+            FROM devices d
+            LEFT JOIN classrooms c ON d.classroom_id = c.id
+            WHERE d.mac_address = ?
+        `, [mac_address]);
+
+        if (devices.length === 0) {
+            return res.status(404).json({ message: 'Device not registered' });
+        }
+
+        const device = devices[0];
+        if (device.status === 'revoked') {
+            return res.status(403).json({ message: 'Device is revoked and unauthorized' });
+        }
+
+        // Keep device marked as online
+        if (device.status !== 'online') {
+            await db.query("UPDATE devices SET status = 'online' WHERE id = ?", [device.id]);
+        }
+
+        // Query active session for this classroom
+        let activeSession = null;
+        if (device.classroom_id) {
+            const [sessions] = await db.query(`
+                SELECT s.id, s.start_time, sub.name AS subject_name, sub.code AS subject_code,
+                       f.name AS faculty_name, sec.id AS section_id, sec.name AS section_name
+                FROM attendance_sessions s
+                JOIN subjects sub ON s.subject_id = sub.id
+                JOIN faculty f ON s.faculty_id = f.id
+                LEFT JOIN timetable t ON s.timetable_id = t.id
+                LEFT JOIN sections sec ON t.section_id = sec.id
+                WHERE s.classroom_id = ? AND s.status = 'active'
+                ORDER BY s.id DESC LIMIT 1
+            `, [device.classroom_id]);
+
+            if (sessions.length > 0) {
+                const s = sessions[0];
+                activeSession = {
+                    session_id: s.id,
+                    subject: s.subject_name,
+                    subject_code: s.subject_code,
+                    faculty: s.faculty_name,
+                    section: s.section_name || 'All Sections',
+                    section_id: s.section_id || null,
+                    start_time: s.start_time
+                };
+            }
+        }
+
+        res.json({
+            success: true,
+            status: 'online',
+            device_id: device.id,
+            classroom_id: device.classroom_id,
+            room_number: device.room_number || 'Unassigned',
+            building: device.building || '',
+            active_session: activeSession
+        });
+    } catch (err) {
+        res.status(500).json({ message: 'Error processing heartbeat', error: err.message });
+    }
+};
+

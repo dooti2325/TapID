@@ -1,226 +1,97 @@
-# TapID ESP32 Firmware Guide
+# TapID Enterprise ESP32 Firmware Guide
 
 Production-grade, modular C++ firmware for the **TapID** IoT Smart RFID Attendance Terminal powered by the **ESP32** microcontroller and the **MFRC522 (RC522)** 13.56 MHz RFID/NFC reader.
 
 ---
 
-## Quick Reference: What, Where, When, and How
+## Quick Reference: Hardware & Pin Configuration
 
-| Question | Detail |
-|:---|:---|
-| **WHAT is this?** | Modular ESP32 firmware that reads MIFARE RFID cards, communicates with the TapID REST API via Wi-Fi, provides acoustic/visual feedback, and buffers taps offline if the network drops. |
-| **WHERE is it located?** | Source code in `firmware/esp32/` (PlatformIO) and `firmware/esp32/tapid_reader/` (Arduino IDE). Configuration in `config.h` and credentials in `secrets.h`. |
-| **WHEN does it execute?** | Operates in an infinite non-blocking event loop upon device power-up: continuously checks RF fields for cards, monitors Wi-Fi connection, flushes offline queues when network returns, and syncs time via NTP. |
-| **HOW do I use it?** | Wire the hardware, configure `secrets.h` with your Wi-Fi SSID and backend URL, flash using **Arduino IDE** or **PlatformIO**, and monitor output at **115200 baud**. |
+| Component | Pin Function | ESP32 GPIO | Description |
+|:---|:---|:---|:---|
+| **RC522 SDA / SS** | SPI Chip Select | **GPIO 5** *(or 21)* | MFRC522 Slave Select |
+| **RC522 RST** | Reset | **GPIO 22** | Hardware reset |
+| **RC522 SCK** | SPI Clock | **GPIO 18** | SPI Clock |
+| **RC522 MISO** | SPI MISO | **GPIO 19** | Master In, Slave Out |
+| **RC522 MOSI** | SPI MOSI | **GPIO 23** | Master Out, Slave In |
+| **RC522 3.3V** | Power (VCC) | **3V3 Rail** | **NEVER CONNECT TO 5V!** |
+| **Wi-Fi Green LED** | Indicator | **GPIO 13** | **Solid ON when Wi-Fi is connected** |
+| **Wi-Fi Red LED** | Indicator | **GPIO 14** | **Solid ON when disconnected / blinking when connecting** |
+| **Attendance Green LED** | Indicator | **GPIO 26** | **Turns ON for 3 seconds on valid attendance marked** |
+| **Attendance Red LED** | Indicator | **GPIO 27** | **Turns ON for 3 seconds on invalid/wrong section; Strobes on Proxy** |
+| **Buzzer** | Acoustic Tone | **GPIO 25** | Active or Passive Buzzer (melodies & warning siren) |
+| **Config / Reset Button** | Control Input | **GPIO 4** *(or BOOT 0)*| **Hold 3s**: Wi-Fi AP Setup Portal; **Hold 10s**: Factory Reset |
 
 ---
 
-## 1. What: System Overview & Hardware Specifications
+## Audio & Visual Indicator State Matrix
 
-### Bill of Materials (BOM)
-
-| Component | Specification | Quantity | Notes |
-|:---|:---|:---|:---|
-| **ESP32 Development Board** | ESP32-WROOM-32 / DevKit v1 | 1 | 30 or 38-pin version with Wi-Fi & Bluetooth |
-| **RFID Reader Module** | MFRC522 (RC522) 13.56 MHz | 1 | SPI interface, **must be powered with 3.3V** |
-| **RFID Cards / Keyfobs** | MIFARE Classic 1K (S50) | Any | Supports 4-byte or 7-byte UID cards |
-| **Acoustic Buzzer** | Active or Passive 3.3V/5V Buzzer | 1 | Connected to GPIO 25 |
-| **Green Status LED** | 3mm or 5mm Green LED | 1 | Success / Online indicator (GPIO 26) |
-| **Red Status LED** | 3mm or 5mm Red LED | 1 | Error / Offline indicator (GPIO 27) |
-| **Current Resistors** | 220Ω or 330Ω (1/4W) | 2 | Current-limiting resistors for LEDs |
-| **Jumper Wires & Breadboard** | Male-to-Female / Male-to-Male | ~15 | Half or full breadboard for prototyping |
-
----
-
-## 2. Where: Wiring & Pinout Reference
-
-> [!CAUTION]
-> **VCC of the RC522 RFID reader MUST be connected to 3.3V.** Connecting RC522 to 5V will permanently burn out the MFRC522 chip!
-
-### MFRC522 to ESP32 Pin Connections (SPI)
-
-| RC522 Pin | ESP32 GPIO | Pin Function | Description |
-|:---|:---|:---|:---|
-| **VCC** | **3V3** | Power | 3.3V Power Rail (DO NOT USE 5V) |
-| **RST** | **GPIO 22** | Reset | Hard reset pin for reader chip |
-| **GND** | **GND** | Ground | Common system ground |
-| **MISO** | **GPIO 19** | SPI MISO | Master In, Slave Out |
-| **MOSI** | **GPIO 23** | SPI MOSI | Master Out, Slave In |
-| **SCK** | **GPIO 18** | SPI Clock | Serial SPI Clock line |
-| **SDA / SS**| **GPIO 21** | SPI Chip Select | Slave Select (CS) |
-| **IRQ** | *Unconnected* | Interrupt | Not required (firmware uses polled SPI) |
-
-### Indicator & Acoustic Feedback Wiring
-
-| Component | Pin / Terminal | ESP32 GPIO | Wiring Notes |
-|:---|:---|:---|:---|
-| **Green LED** | Anode (+) | **GPIO 26** | Connect through 220Ω resistor; Cathode (-) to GND |
-| **Red LED** | Anode (+) | **GPIO 27** | Connect through 220Ω resistor; Cathode (-) to GND |
-| **Buzzer** | Positive (+) | **GPIO 25** | Positive leg to GPIO 25; Negative leg to GND |
-
----
-
-## 3. When: State Machine & Acoustic Feedback Matrix
-
-The terminal operates across defined states with immediate audio-visual feedback:
-
-| When This Occurs | Green LED | Red LED | Buzzer Melody | System Action |
+| System Event | Wi-Fi LEDs | Attendance LEDs | Buzzer Acoustic Pattern | Behavior / Logic |
 |:---|:---|:---|:---|:---|
-| **Device Boots** | Alternating | Alternating | C6-E6-G6 Chime (1046Hz, 1318Hz, 1568Hz) | Hardware peripherals, SPI bus, and queue initialized. |
-| **Wi-Fi Connected** | Solid ON | OFF | 880Hz → 1320Hz ascending chirp | Terminal acquired IP and synchronized NTP time. |
-| **Card Tap Detected** | - | - | 2000Hz (60ms) tick | Card entered RF field; UID hex parsed. |
-| **Attendance Success** | Flash (400ms) | OFF | A6-E7 Success Chime (1760Hz, 2637Hz) | Server confirmed attendance (`200 OK`). |
-| **Duplicate Card Tap** | Flash (2x) | Flash (2x) | Double Warning Tone (1200Hz, 1200Hz) | Attendance already recorded for session (`409 Conflict`). |
-| **No Active Session** | OFF | Flash (600ms) | Low Error Tone (440Hz, 400ms) | Classroom has no active lecture running (`400 Bad Request`). |
-| **Invalid Card / Device** | OFF | Flash (600ms) | Low Error Tone (440Hz, 400ms) | Card unknown or device revoked (`403/404`). |
-| **Wi-Fi Dropped / Offline** | OFF | Double Flash | Dual Chirp (880Hz, 880Hz) | Scan stored in offline FIFO ring buffer with timestamp. |
-| **Bulk Flush Complete** | Solid ON | OFF | High Beep (2400Hz, 80ms) | All buffered scans successfully transmitted to server. |
+| **Device Power-Up** | Wave test | Wave test | **C6-E6-G6** Chime (1046Hz, 1318Hz, 1568Hz) | Self-test of all peripherals and SPI bus. |
+| **Wi-Fi Connected** | **Green ON**, Red OFF | Ready (OFF) | **880Hz → 1320Hz** Rising chime | Acquired IP, synced NTP UTC clock, online in DB. |
+| **Wi-Fi Disconnected** | Green OFF, **Red ON** | Unaffected | **1320Hz → 660Hz** Falling tone | Automatically switches to offline buffering queue. |
+| **Attendance Started by Faculty**| Current Wi-Fi state | Ready (OFF) | **C6-E6-A6 Melodic Chime** (1046Hz, 1318Hz, 1760Hz)| Terminal becomes **ACTIVE** for student scans! |
+| **Attendance Ended / Timed Out** | Current Wi-Fi state | Ready (OFF) | **E6 → A5** Low notification | Terminal returns to **STANDBY** mode. |
+| **Correct Section Student** | Current Wi-Fi state | **Green ON for 3 seconds** | **A6-E7** Success Beep (1760Hz, 2637Hz) | Attendance marked `PRESENT` in database. |
+| **Wrong Section Student** | Current Wi-Fi state | **Red ON for 3 seconds** | **550Hz → 400Hz** Double low tone | Rejected & logged as `ATTENDANCE_WRONG_SECTION`. |
+| **Duplicate Card Tap** | Current Wi-Fi state | **Red ON for 3 seconds** | **1200Hz - 1200Hz** Double click tone | Not counted twice; logged as `ATTENDANCE_DUPLICATE`. |
+| **Unknown / Unassigned Card** | Current Wi-Fi state | **Red ON for 3 seconds** | **440Hz** Low rejection tone | Card not registered; logged in security audit log. |
+| **Proxy Detected (< 3s)** | Current Wi-Fi state | **Red FAST STROBE for 3s**| **Urgent Siren Warble** (3x 2800Hz / 1600Hz) | Two different IDs scanned within 3 seconds! |
+| **Offline Buffering Tap** | Green OFF, Red ON | Both ON for 3s | **880Hz - 880Hz** Double blip | Stored in local circular buffer, auto-synced when online. |
+| **Wi-Fi Setup Portal Active** | **Alternating Blink** | OFF | Ascending setup beep | SoftAP `TapID-Setup-XXXX` active at `192.168.4.1`. |
+
+> [!NOTE]
+> **3-Second Auto-Off**: Both the Attendance Green and Red LEDs automatically turn off after exactly 3 seconds (`3000 ms`), indicating that the terminal is clear and ready for the next student to tap.
 
 ---
 
-## 4. How: Step-by-Step Configuration & Flashing
+## Smart Features
 
-### Step 1: Configure Credentials
+### 1. Wi-Fi Configuration Mode (SoftAP & Captive Portal)
+- To connect the terminal to any Wi-Fi network without modifying code:
+  1. Press and hold the **Config Button** (GPIO 4 or built-in BOOT button GPIO 0) for **3 seconds**.
+  2. The terminal creates a Wi-Fi hotspot named `TapID-Setup-XXXX` (Password: `tapid1234`).
+  3. Connect using your phone or laptop and open `http://192.168.4.1`.
+  4. Enter your local Wi-Fi SSID, Password, TapID Server URL, and Device Key.
+  5. Click **Save & Connect**. The ESP32 saves credentials to non-volatile flash memory (NVS) and automatically reboots into normal mode.
+- **Factory Reset**: Hold the button for **10 seconds** to wipe saved NVS settings and restore defaults from `secrets.h`.
 
-Open `firmware/esp32/secrets.h` (or copy from `secrets.example.h`):
+### 2. Anti-Proxy Detection Engine
+- Students attempting to scan multiple cards back-to-back will trigger the Anti-Proxy detection engine:
+  - If a different card UID is tapped within **3 seconds** of a previous card, the firmware flags the transaction as a proxy attempt.
+  - The buzzer emits an urgent alternating alarm siren and the red attendance LED rapidly strobes.
+  - An `ATTENDANCE_PROXY_DETECTED` security incident is automatically logged to the TapID audit log with student identity, card UIDs, and timestamps.
 
-```c
-#ifndef SECRETS_H
-#define SECRETS_H
+### 3. Automatic Lecture & Section Validation
+- Terminals remain in **Standby** mode until faculty starts an attendance session from the TapID web dashboard.
+- Periodic **heartbeat queries** detect when a lecture starts, playing the faculty start chime.
+- The server cross-references the student's enrolled section against the scheduled lecture timetable:
+  - If a student from another section attempts to scan, attendance is denied with a wrong-section error tone and red indicator.
 
-// Wi-Fi Credentials
-#define WIFI_SSID       "YOUR_WIFI_NAME"
-#define WIFI_PASSWORD   "YOUR_WIFI_PASSWORD"
-
-// TapID Backend API Base URL (Use your computer's local IP on the Wi-Fi network)
-#define API_BASE_URL    "http://192.168.1.100:3000/api"
-
-// Hardware MAC Address Override
-// Set to "24:0A:C4:00:00:01" to match Classroom 101 seed terminal,
-// or leave empty "" to use the ESP32's native factory MAC.
-#define DEVICE_MAC      "24:0A:C4:00:00:01"
-
-// Device Authentication Token / API Key
-// Must match DEVICE_API_KEY in backend .env. Sent as "X-Device-Key" header.
-#define DEVICE_API_KEY  "your-device-api-key-matching-backend-env"
-
-#endif // SECRETS_H
-```
-
----
-
-### Step 2: Flash the Firmware
-
-#### Method A: Using Arduino IDE (Beginner Friendly)
-
-1. **Install ESP32 Core**:
-   - In Arduino IDE, navigate to **File > Preferences**.
-   - Paste into *Additional Boards Manager URLs*:  
-     `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
-   - Go to **Tools > Board > Boards Manager**, search for `esp32`, and install **esp32 by Espressif Systems**.
-2. **Install Libraries**:
-   - Go to **Sketch > Include Library > Manage Libraries**.
-   - Search and install:
-     - `MFRC522` by GithubCommunity (v1.4.11 or newer)
-     - `ArduinoJson` by Benoit Blanchon (v7.0.4 or newer)
-3. **Open the Sketch**:
-   - Open [tapid_reader.ino](file:///d:/TapID/firmware/esp32/tapid_reader/tapid_reader.ino).
-4. **Select Board & Port**:
-   - Board: `DOIT ESP32 DEVKIT V1`
-   - Port: Select your ESP32 COM port (e.g. `COM3` on Windows).
-5. **Upload & Monitor**:
-   - Click **Upload** (arrow icon).
-   - Open **Serial Monitor** at **115200 baud** to view real-time diagnostics.
-
-#### Method B: Using PlatformIO (VS Code)
-
-1. Open Visual Studio Code and ensure the **PlatformIO IDE** extension is installed.
-2. Open the `firmware/` directory. PlatformIO automatically downloads toolchains and libraries specified in `platformio.ini`.
-3. Connect your ESP32 via USB.
-4. Click the PlatformIO **Upload** button in the bottom status bar (or run `pio run -t upload`).
-5. Open the Serial Monitor with `pio device monitor -b 115200`.
+### 4. Fail-Safe Offline Buffering & Automatic Bulk Sync
+- If campus Wi-Fi or internet connection drops:
+  - Scans are recorded with synchronized NTP UTC timestamps into a circular FIFO queue (up to 50 records).
+  - When connection is restored, the terminal automatically transmits bulk sync batches via `POST /api/attendance/bulk-record` without losing attendance data.
 
 ---
 
-### Step 3: Run the Firmware C++ Unit Tests
+## Flashing Instructions
 
-The offline queue, FIFO ring buffer, capacity overflow handling, and JSON serialization are verified with automated unit tests:
+### Method A: Arduino IDE
+1. Open [firmware/esp32/tapid_reader/tapid_reader.ino](file:///d:/TapID/firmware/esp32/tapid_reader/tapid_reader.ino).
+2. Install required libraries via Library Manager:
+   - `MFRC522` by GithubCommunity (v1.4.11+)
+   - `ArduinoJson` by Benoit Blanchon (v7.0.4+)
+3. Select board: `DOIT ESP32 DEVKIT V1` and your USB COM port.
+4. Click **Upload** and monitor at **115200 baud**.
 
-```bash
-# Run automated test from project root
-npm run test:firmware
-```
-
-Output:
-```text
-Running TapID Firmware Offline Queue Unit Tests...
-[PASS] test_initial_state
-[PASS] test_fifo_ordering
-[PASS] test_capacity_and_overflow
-[PASS] test_peek_and_clear
-[PASS] test_json_serialization
-All firmware unit tests PASSED successfully!
-```
-
----
-
-## 5. Backend REST Contract
-
-The terminal interacts with three endpoints on the TapID API. All requests include the `X-Device-Key: <DEVICE_API_KEY>` header for hardware authentication when configured on the backend.
-
-### 1. Device Heartbeat / Status (`POST /api/devices/status`)
-Sent automatically upon successful Wi-Fi connection and re-connection:
-```json
-{
-  "mac_address": "24:0A:C4:00:00:01",
-  "status": "online"
-}
-```
-**Responses**:
-- `200 OK`: `{"message":"Device status updated"}`
-- `401 Unauthorized`: Missing or invalid `X-Device-Key`
-- `403 Forbidden`: Attempted to modify status of a revoked device
-
-### 2. Live Card Tap (`POST /api/attendance/record`)
-```json
-{
-  "rfid_uid": "A1B2C3D4",
-  "mac_address": "24:0A:C4:00:00:01"
-}
-```
-**Responses**:
-- `200 OK`: `{"success":true,"message":"Attendance recorded","student_name":"John Doe"}`
-- `401 Unauthorized`: Missing or invalid `X-Device-Key`
-- `409 Conflict`: `{"success":false,"message":"Attendance already recorded"}`
-- `400 Bad Request`: `{"message":"No active session in this classroom"}`
-- `403 Forbidden`: `{"message":"Device revoked"}` or `{"message":"Card not active"}`
-- `404 Not Found`: `{"message":"Device not registered"}` or `{"message":"Card not found"}`
-
-### 3. Bulk Offline Sync (`POST /api/attendance/bulk-record`)
-Flushed automatically from the local ring buffer when Wi-Fi reconnects (batches of up to 20 records, server maximum 50):
-```json
-{
-  "mac_address": "24:0A:C4:00:00:01",
-  "records": [
-    { "rfid_uid": "A1B2C3D4", "timestamp": "2026-09-08T10:15:00Z" },
-    { "rfid_uid": "E5F6G7H8", "timestamp": "2026-09-08T10:15:04Z" }
-  ]
-}
-```
-**Responses**:
-- `200 OK`: `{"success":true,"added":2,"errors":0}`
-- `401 Unauthorized`: Missing or invalid `X-Device-Key`
-- `400 Bad Request`: Batch size exceeds limit of 50 records or invalid records array
-
-
----
-
-## 6. Troubleshooting Guide
-
-| Issue | Root Cause | Solution |
-|:---|:---|:---|
-| Serial prints: `WARNING: Communication with MFRC522 failed` | SPI wiring error or incorrect voltage | Verify RC522 VCC is in **3.3V** (not 5V). Check SCK (GPIO 18), MOSI (GPIO 23), MISO (GPIO 19), SS/SDA (GPIO 21). |
-| `WiFi connection timeout. Entering offline mode.` | Wrong credentials or 5GHz network | ESP32 only supports **2.4 GHz Wi-Fi**. Check SSID and password in `secrets.h`. |
-| Server returns `400 No active session` | Lecture has not been started | A faculty member must log into the web portal and click **Start Session** for the classroom. |
-| Server returns `404 Card not registered` | Card UID not mapped in database | An administrator must enroll the student and assign the card UID in the web portal under **Students**. |
-| Server returns `403 Device revoked` | Device marked revoked in database | Check terminal MAC address and set status to active/online in **Admin > Devices**. |
+### Method B: PlatformIO (VS Code)
+1. Open the project root or `firmware/` directory in VS Code with PlatformIO installed.
+2. Build and flash:
+   ```bash
+   pio run -t upload
+   ```
+3. Open serial monitor:
+   ```bash
+   pio device monitor -b 115200
+   ```

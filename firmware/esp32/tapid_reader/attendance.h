@@ -10,6 +10,7 @@
 #include "led.h"
 #include "api_client.h"
 #include "offline_queue.h"
+#include "ota_manager.h"
 
 class AttendanceController {
 public:
@@ -28,9 +29,30 @@ private:
     LedIndicator _led;
     ApiClient _api;
     OfflineQueue _queue;
+    OtaManager _ota;
 
+    // Session State Tracking
+    bool _sessionActive;
+    int _activeSessionId;
+    String _currentSubject;
+    String _currentFaculty;
+    String _currentSection;
+    unsigned long _lastHeartbeat;
+
+    // Anti-Proxy Detection State
+    String _lastTappedUid;
+    unsigned long _lastTapTime;
+
+    // Offline & Connection State
     unsigned long _lastQueueFlushAttempt;
     bool _wasOnline;
+
+    // Button Handling
+    unsigned long _buttonPressStart;
+    bool _buttonPressed;
+
+    void checkButton();
+    void performHeartbeat();
     void provideFeedback(const AttendanceResponse& res);
 };
 

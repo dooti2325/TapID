@@ -8,6 +8,7 @@ const deviceAuth = require('../middleware/deviceAuth.middleware');
 router.get('/', auth, ctrl.getAllDevices);
 router.post('/', auth, role('admin'), ctrl.addDevice);
 router.post('/status', deviceAuth, ctrl.updateDeviceStatus);
+router.post('/heartbeat', deviceAuth, ctrl.heartbeat);
 router.put('/:id/classroom', auth, role('admin'), ctrl.assignClassroom);
 router.delete('/:id', auth, role('admin'), ctrl.deleteDevice);
 

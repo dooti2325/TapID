@@ -1,6 +1,6 @@
 #include "api_client.h"
 
-ApiClient::ApiClient() : _baseUrl(API_BASE_URL) {}
+ApiClient::ApiClient() : _baseUrl(API_BASE_URL), _apiKey(DEVICE_API_KEY) {}
 
 void ApiClient::setBaseUrl(const String& baseUrl) {
     _baseUrl = baseUrl;
@@ -11,6 +11,15 @@ void ApiClient::setBaseUrl(const String& baseUrl) {
 
 String ApiClient::getBaseUrl() const {
     return _baseUrl;
+}
+
+void ApiClient::setApiKey(const String& apiKey) {
+    _apiKey = apiKey;
+    _apiKey.trim();
+}
+
+String ApiClient::getApiKey() const {
+    return _apiKey;
 }
 
 // Lightweight JSON helper to extract string value by key
@@ -53,14 +62,22 @@ AttendanceResponse ApiClient::parseResponse(int httpCode, const String& response
     res.httpCode = httpCode;
     res.message = extractJsonString(responseBody, "message");
     res.studentName = extractJsonString(responseBody, "student_name");
+    res.studentSection = extractJsonString(responseBody, "student_section");
+    res.expectedSection = extractJsonString(responseBody, "expected_section");
     res.bulkAdded = extractJsonInt(responseBody, "added");
     res.bulkErrors = extractJsonInt(responseBody, "errors");
 
+    String statusStr = extractJsonString(responseBody, "status");
+
     if (httpCode >= 200 && httpCode < 300) {
         res.status = STATUS_SUCCESS;
-    } else if (httpCode == 409) {
+    } else if (httpCode == 422 || statusStr == "wrong_section") {
+        res.status = STATUS_WRONG_SECTION;
+    } else if (httpCode == 429 || statusStr == "proxy_detected") {
+        res.status = STATUS_PROXY_DETECTED;
+    } else if (httpCode == 409 || statusStr == "duplicate") {
         res.status = STATUS_DUPLICATE;
-    } else if (httpCode == 400) {
+    } else if (httpCode == 400 || statusStr == "no_session") {
         res.status = STATUS_NO_SESSION;
     } else if (httpCode == 403) {
         res.status = STATUS_DEVICE_INVALID;
@@ -75,40 +92,52 @@ AttendanceResponse ApiClient::parseResponse(int httpCode, const String& response
     return res;
 }
 
-AttendanceResponse ApiClient::recordAttendance(const String& rfidUid, const String& macAddress) {
+AttendanceResponse ApiClient::recordAttendance(const String& rfidUid, const String& macAddress, bool isProxy) {
     AttendanceResponse res;
     String endpoint = _baseUrl + ENDPOINT_ATTENDANCE_RECORD;
 
-    _http.begin(_wifiClient, endpoint);
-    _http.addHeader("Content-Type", "application/json");
-    _http.setTimeout(HTTP_TIMEOUT_MS);
+    HTTPClient http;
+    WiFiClient client;
+    WiFiClientSecure secureClient;
 
-    String apiKey = String(DEVICE_API_KEY);
-    apiKey.trim();
-    if (apiKey.length() > 0) {
-        _http.addHeader("X-Device-Key", apiKey);
+    if (endpoint.startsWith("https://")) {
+        secureClient.setInsecure();
+        http.begin(secureClient, endpoint);
+    } else {
+        http.begin(client, endpoint);
     }
 
-    String payload = "{\"rfid_uid\":\"" + rfidUid + "\",\"mac_address\":\"" + macAddress + "\"}";
+    http.addHeader("Content-Type", "application/json");
+    http.setTimeout(HTTP_TIMEOUT_MS);
+
+    if (_apiKey.length() > 0) {
+        http.addHeader("X-Device-Key", _apiKey);
+    }
+
+    String payload = "{\"rfid_uid\":\"" + rfidUid + "\",\"mac_address\":\"" + macAddress + "\"";
+    if (isProxy) {
+        payload += ",\"is_proxy\":true";
+    }
+    payload += "}";
 
     Serial.printf("[API] POST %s\n", endpoint.c_str());
     Serial.printf("[API] Payload: %s\n", payload.c_str());
 
-    int httpCode = _http.POST(payload);
+    int httpCode = http.POST(payload);
     String responseBody = "";
 
     if (httpCode > 0) {
-        responseBody = _http.getString();
+        responseBody = http.getString();
         Serial.printf("[API] Response Code %d: %s\n", httpCode, responseBody.c_str());
         res = parseResponse(httpCode, responseBody);
     } else {
-        Serial.printf("[API] HTTP POST failed, error: %s\n", _http.errorToString(httpCode).c_str());
+        Serial.printf("[API] HTTP POST failed, error: %s\n", http.errorToString(httpCode).c_str());
         res.httpCode = httpCode;
         res.status = STATUS_NETWORK_ERROR;
-        res.message = _http.errorToString(httpCode);
+        res.message = http.errorToString(httpCode);
     }
 
-    _http.end();
+    http.end();
     return res;
 }
 
@@ -116,76 +145,143 @@ AttendanceResponse ApiClient::bulkRecordAttendance(const String& macAddress, con
     AttendanceResponse res;
     String endpoint = _baseUrl + ENDPOINT_ATTENDANCE_BULK_RECORD;
 
-    _http.begin(_wifiClient, endpoint);
-    _http.addHeader("Content-Type", "application/json");
-    _http.setTimeout(HTTP_TIMEOUT_MS * 2);
+    HTTPClient http;
+    WiFiClient client;
+    WiFiClientSecure secureClient;
 
-    String apiKey = String(DEVICE_API_KEY);
-    apiKey.trim();
-    if (apiKey.length() > 0) {
-        _http.addHeader("X-Device-Key", apiKey);
+    if (endpoint.startsWith("https://")) {
+        secureClient.setInsecure();
+        http.begin(secureClient, endpoint);
+    } else {
+        http.begin(client, endpoint);
+    }
+
+    http.addHeader("Content-Type", "application/json");
+    http.setTimeout(HTTP_TIMEOUT_MS * 2);
+
+    if (_apiKey.length() > 0) {
+        http.addHeader("X-Device-Key", _apiKey);
     }
 
     String payload = "{\"mac_address\":\"" + macAddress + "\",\"records\":" + recordsJsonArray + "}";
 
     Serial.printf("[API] Bulk POST %s\n", endpoint.c_str());
-    Serial.printf("[API] Bulk Payload: %s\n", payload.c_str());
-
-    int httpCode = _http.POST(payload);
+    int httpCode = http.POST(payload);
     String responseBody = "";
 
     if (httpCode > 0) {
-        responseBody = _http.getString();
+        responseBody = http.getString();
         Serial.printf("[API] Bulk Response Code %d: %s\n", httpCode, responseBody.c_str());
         res = parseResponse(httpCode, responseBody);
     } else {
-        Serial.printf("[API] Bulk POST failed, error: %s\n", _http.errorToString(httpCode).c_str());
+        Serial.printf("[API] Bulk POST failed: %s\n", http.errorToString(httpCode).c_str());
         res.httpCode = httpCode;
         res.status = STATUS_NETWORK_ERROR;
-        res.message = _http.errorToString(httpCode);
+        res.message = http.errorToString(httpCode);
     }
 
-    _http.end();
+    http.end();
+    return res;
+}
+
+HeartbeatResponse ApiClient::sendHeartbeat(const String& macAddress) {
+    HeartbeatResponse res;
+    res.success = false;
+    res.isOnline = false;
+    res.hasActiveSession = false;
+    res.sessionId = 0;
+    res.sectionId = 0;
+
+    String endpoint = _baseUrl + ENDPOINT_DEVICE_HEARTBEAT;
+
+    HTTPClient http;
+    WiFiClient client;
+    WiFiClientSecure secureClient;
+
+    if (endpoint.startsWith("https://")) {
+        secureClient.setInsecure();
+        http.begin(secureClient, endpoint);
+    } else {
+        http.begin(client, endpoint);
+    }
+
+    http.addHeader("Content-Type", "application/json");
+    http.setTimeout(HTTP_TIMEOUT_MS);
+
+    if (_apiKey.length() > 0) {
+        http.addHeader("X-Device-Key", _apiKey);
+    }
+
+    String payload = "{\"mac_address\":\"" + macAddress + "\"}";
+    int httpCode = http.POST(payload);
+
+    if (httpCode >= 200 && httpCode < 300) {
+        String body = http.getString();
+        res.success = true;
+        res.isOnline = (extractJsonString(body, "status") == "online");
+        res.roomNumber = extractJsonString(body, "room_number");
+
+        // Check if active_session is present
+        if (body.indexOf("\"active_session\":null") == -1 && body.indexOf("\"active_session\": null") == -1) {
+            res.hasActiveSession = true;
+            res.sessionId = extractJsonInt(body, "session_id");
+            res.subjectName = extractJsonString(body, "subject");
+            res.facultyName = extractJsonString(body, "faculty");
+            res.sectionName = extractJsonString(body, "section");
+            res.sectionId = extractJsonInt(body, "section_id");
+        }
+    } else {
+        Serial.printf("[API] Heartbeat failed (Code %d: %s)\n", httpCode, http.errorToString(httpCode).c_str());
+    }
+
+    http.end();
     return res;
 }
 
 bool ApiClient::updateDeviceStatus(const String& macAddress, const String& status) {
     String endpoint = _baseUrl + ENDPOINT_DEVICE_STATUS;
 
-    _http.begin(_wifiClient, endpoint);
-    _http.addHeader("Content-Type", "application/json");
-    _http.setTimeout(HTTP_TIMEOUT_MS);
+    HTTPClient http;
+    WiFiClient client;
+    WiFiClientSecure secureClient;
 
-    String apiKey = String(DEVICE_API_KEY);
-    apiKey.trim();
-    if (apiKey.length() > 0) {
-        _http.addHeader("X-Device-Key", apiKey);
+    if (endpoint.startsWith("https://")) {
+        secureClient.setInsecure();
+        http.begin(secureClient, endpoint);
+    } else {
+        http.begin(client, endpoint);
+    }
+
+    http.addHeader("Content-Type", "application/json");
+    http.setTimeout(HTTP_TIMEOUT_MS);
+
+    if (_apiKey.length() > 0) {
+        http.addHeader("X-Device-Key", _apiKey);
     }
 
     String payload = "{\"mac_address\":\"" + macAddress + "\",\"status\":\"" + status + "\"}";
-    Serial.printf("[API] Reporting status '%s' for MAC: %s\n", status.c_str(), macAddress.c_str());
-
-    int httpCode = _http.POST(payload);
-    bool success = (httpCode >= 200 && httpCode < 300);
-
-    if (httpCode > 0) {
-        Serial.printf("[API] Device status update response %d: %s\n", httpCode, _http.getString().c_str());
-    } else {
-        Serial.printf("[API] Device status update failed: %s\n", _http.errorToString(httpCode).c_str());
-    }
-
-    _http.end();
-    return success;
+    int httpCode = http.POST(payload);
+    bool ok = (httpCode >= 200 && httpCode < 300);
+    http.end();
+    return ok;
 }
 
 bool ApiClient::checkHealth() {
     String endpoint = _baseUrl + "/health";
-    _http.begin(_wifiClient, endpoint);
-    _http.setTimeout(HTTP_TIMEOUT_MS);
+    HTTPClient http;
+    WiFiClient client;
+    WiFiClientSecure secureClient;
 
-    int code = _http.GET();
+    if (endpoint.startsWith("https://")) {
+        secureClient.setInsecure();
+        http.begin(secureClient, endpoint);
+    } else {
+        http.begin(client, endpoint);
+    }
+
+    http.setTimeout(HTTP_TIMEOUT_MS);
+    int code = http.GET();
     bool ok = (code == 200);
-    _http.end();
+    http.end();
     return ok;
 }
-
