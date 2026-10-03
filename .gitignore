@@ -16,6 +16,9 @@ backend/logs/*
 !backend/logs/.gitkeep
 backend/uploads/*
 !backend/uploads/.gitkeep
+backups/*.sql
+backups/*.sql.gz
+!backups/tapid_backup_2026-10-01T07-27-50-270Z.sql.gz
 
 # Build and binary artifacts
 *.exe
