@@ -1,17 +1,16 @@
 services:
   - type: web
-    name: tapid-app
+    name: tapid-api
     env: node
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: SERVE_STATIC
-        value: "true"
-      - key: PORT
-        value: 3000
+        value: "false"
       - key: DB_HOST
         value: mysql-33b99771-dootisaha-2325.j.aivencloud.com
       - key: DB_PORT
@@ -26,3 +25,5 @@ services:
         generateValue: true
       - key: DEVICE_API_KEY
         value: tapid-esp32-device-key-2026
+      - key: CORS_ORIGIN
+        value: "*"

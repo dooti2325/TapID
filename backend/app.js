@@ -30,6 +30,7 @@ app.use(cors({
       origin.includes('localhost') ||
       origin.includes('vercel.app') ||
       origin.includes('onrender.com') ||
+      process.env.CORS_ORIGIN === '*' ||
       (process.env.CORS_ORIGIN && process.env.CORS_ORIGIN.split(',').some(o => o.trim() === origin))
     ) {
       return callback(null, true);

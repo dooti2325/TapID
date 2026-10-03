@@ -8,11 +8,9 @@ void Buzzer::init() {
 }
 
 void Buzzer::beep(unsigned int frequency, unsigned long durationMs) {
-    if (frequency < 1000) frequency = 2600;
-    tone(_pin, frequency);
+    tone(_pin, frequency, durationMs);
     delay(durationMs);
     noTone(_pin);
-    digitalWrite(_pin, LOW);
 }
 
 void Buzzer::stop() {
@@ -20,90 +18,84 @@ void Buzzer::stop() {
     digitalWrite(_pin, LOW);
 }
 
-// Power-Up Chime: High resonant triad (C7 - E7 - G7)
 void Buzzer::playBoot() {
-    tone(_pin, 2093); delay(90); noTone(_pin); delay(25);
-    tone(_pin, 2637); delay(90); noTone(_pin); delay(25);
-    tone(_pin, 3136); delay(140); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 1046, 80); delay(100);  // C6
+    tone(_pin, 1318, 80); delay(100);  // E6
+    tone(_pin, 1568, 120); delay(150); // G6
+    noTone(_pin);
 }
 
-// Tap Detected: Crisp, high-frequency click
 void Buzzer::playTap() {
-    tone(_pin, 2800); delay(45); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 2400, 35);
+    delay(40);
+    noTone(_pin);
 }
 
-// Wi-Fi Connected: Loud ascending high fanfare
 void Buzzer::playWiFiConnected() {
-    tone(_pin, 2400); delay(100); noTone(_pin); delay(25);
-    tone(_pin, 3200); delay(180); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 880, 80); delay(90);    // A5
+    tone(_pin, 1320, 140); delay(150);  // E6
+    noTone(_pin);
 }
 
-// Wi-Fi Lost: Loud falling high alarm tone
 void Buzzer::playWiFiLost() {
-    tone(_pin, 3000); delay(120); noTone(_pin); delay(25);
-    tone(_pin, 2200); delay(220); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 1320, 100); delay(120);
+    tone(_pin, 660, 200); delay(220);
+    noTone(_pin);
 }
 
-// Lecture Started by Faculty: High melodic chime that rings through the room
+// Chime when faculty starts attendance from the website
 void Buzzer::playSessionStarted() {
-    tone(_pin, 2093); delay(100); noTone(_pin); delay(25);
-    tone(_pin, 2637); delay(100); noTone(_pin); delay(25);
-    tone(_pin, 3520); delay(220); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 1046, 90); delay(110);  // C6
+    tone(_pin, 1318, 90); delay(110);  // E6
+    tone(_pin, 1760, 180); delay(200); // A6
+    noTone(_pin);
 }
 
-// Lecture Concluded / Ended
 void Buzzer::playSessionEnded() {
-    tone(_pin, 2794); delay(120); noTone(_pin); delay(25);
-    tone(_pin, 2093); delay(240); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 1318, 100); delay(120);
+    tone(_pin, 880, 200); delay(220);
+    noTone(_pin);
 }
 
-// Valid Attendance Marked: High, joyful, loud success beep (E7 - A7)
+// Valid attendance marked: Clear pleasant high-tone chime
 void Buzzer::playAttendanceSuccess() {
-    tone(_pin, 2637); delay(110); noTone(_pin); delay(25);
-    tone(_pin, 3520); delay(200); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 1760, 100); delay(110); // A6
+    tone(_pin, 2637, 180); delay(200); // E7
+    noTone(_pin);
 }
 
-// Duplicate Card Tap: Loud high double-click
+// Duplicate card tap: Quick double-beep
 void Buzzer::playAttendanceDuplicate() {
-    tone(_pin, 2500); delay(90); noTone(_pin); delay(40);
-    tone(_pin, 2500); delay(90); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 1200, 90); delay(110);
+    tone(_pin, 1200, 90); delay(110);
+    noTone(_pin);
 }
 
-// Wrong Section Student: High distinct double warning tone
+// Wrong section student: Double low-pitch warning
 void Buzzer::playAttendanceWrongSection() {
-    tone(_pin, 2400); delay(130); noTone(_pin); delay(40);
-    tone(_pin, 2000); delay(250); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 550, 140); delay(160);
+    tone(_pin, 400, 220); delay(240);
+    noTone(_pin);
 }
 
-// Unknown Card / Unregistered Error: Piercing high rejection buzz
+// Unknown card / invalid error
 void Buzzer::playAttendanceError() {
-    tone(_pin, 2400); delay(150); noTone(_pin); delay(30);
-    tone(_pin, 2100); delay(260); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 440, 300); delay(320); // Low A4
+    noTone(_pin);
 }
 
-// Proxy Detected: Maximum loudness urgent alternating siren (3200Hz <-> 2400Hz)
+// Special urgent proxy detection warning pattern (rapid alternating siren beeps)
 void Buzzer::playProxyWarning() {
-    for (int i = 0; i < 4; i++) {
-        tone(_pin, 3200); delay(75); noTone(_pin); delay(15);
-        tone(_pin, 2400); delay(75); noTone(_pin); delay(15);
+    for (int i = 0; i < 3; i++) {
+        tone(_pin, 2800, 70); delay(80);
+        tone(_pin, 1600, 70); delay(80);
     }
-    tone(_pin, 3200); delay(220); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 2800, 150); delay(160);
+    noTone(_pin);
 }
 
-// Offline Buffered Tap: High double blip
 void Buzzer::playOfflineBuffered() {
-    tone(_pin, 2700); delay(90); noTone(_pin); delay(30);
-    tone(_pin, 2700); delay(90); noTone(_pin);
-    digitalWrite(_pin, LOW);
+    tone(_pin, 880, 80); delay(100);
+    tone(_pin, 880, 80); delay(100);
+    noTone(_pin);
 }

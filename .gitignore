@@ -7,11 +7,8 @@ node_modules/
 .env
 .env.local
 .env.*.local
-firmware/esp32/secrets.h
-firmware/esp32/tapid_reader/secrets.h
-!firmware/esp32/secrets.example.h
-!firmware/esp32/tapid_reader/secrets.example.h
-
+**/secrets.h
+!**/secrets.example.h
 
 # Logs and runtime data
 *.log

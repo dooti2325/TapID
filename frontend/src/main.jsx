@@ -9,7 +9,7 @@ import { AuthProvider } from './context/AuthContext'
 
 // Set global base URL for API requests. In production (Vercel), 
 // this will point to the Render backend url via the VITE_API_URL environment variable.
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3000' : '');
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
