@@ -1,14 +1,20 @@
 #include <Arduino.h>
-#include <SPI.h>
+#include <HTTPClient.h>
 #include <MFRC522.h>
+#include <SPI.h>
 #include <WiFiManager.h>
 
+// Backend API Configuration
+const char *BACKEND_URL =
+    "http://tapid-14ao.onrender.com/api/attendance/record";
+const char *DEVICE_API_KEY = "tapid-esp32-device-key-2026";
+
 // Pin Definitions for ESP32
-#define RST_PIN         22 
-#define SS_PIN          5  
-#define GREEN_LED_PIN   32
-#define RED_LED_PIN     33
-#define BUZZER_PIN      25
+#define RST_PIN 22
+#define SS_PIN 5
+#define GREEN_LED_PIN 32
+#define RED_LED_PIN 33
+#define BUZZER_PIN 25
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
@@ -17,31 +23,59 @@ String lastTapUID = "";
 const unsigned long TAP_COOLDOWN = 3000; // 3 seconds
 
 // Mock function results for backend checks
-enum TapResult {
-  CORRECT_SECTION,
-  WRONG_SECTION,
-  UNKNOWN
-};
+enum TapResult { CORRECT_SECTION, WRONG_SECTION, UNKNOWN };
 
-TapResult checkStudent(String uid);
+TapResult checkStudent(String uid, bool isProxy = false);
 
-// Mock function for backend check / local DB
-TapResult checkStudent(String uid) {
-  // TODO: Implement actual backend/local DB check
-  // For demonstration:
-  if (uid == "4471FD06") return CORRECT_SECTION;
-  if (uid == "DEADBEEF") return WRONG_SECTION;
-  return UNKNOWN;
+// Authenticate and record attendance via Node.js Backend connected to Aiven
+TapResult checkStudent(String uid, bool isProxy) {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("Error: WiFi not connected");
+    return UNKNOWN;
+  }
+
+  HTTPClient http;
+  http.begin(BACKEND_URL);
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("X-Device-Key", DEVICE_API_KEY);
+
+  String macAddress = WiFi.macAddress();
+  String jsonBody =
+      "{\"uid\":\"" + uid + "\", \"mac_address\":\"" + macAddress + "\"";
+  if (isProxy) {
+    jsonBody += ", \"is_proxy\": true";
+  }
+  jsonBody += "}";
+
+  Serial.println("Sending to backend: " + jsonBody);
+
+  int httpResponseCode = http.POST(jsonBody);
+  String payload = http.getString();
+  http.end();
+
+  Serial.print("Backend Response [");
+  Serial.print(httpResponseCode);
+  Serial.print("]: ");
+  Serial.println(payload);
+
+  if (isProxy)
+    return UNKNOWN; // Proxy indication is handled separately
+
+  if (httpResponseCode >= 200 && httpResponseCode < 300) {
+    if (payload.indexOf("\"status\":\"wrong_section\"") > 0 ||
+        payload.indexOf("wrong_section") > 0) {
+      return WRONG_SECTION;
+    }
+    return CORRECT_SECTION;
+  } else if (httpResponseCode == 400 && payload.indexOf("wrong_section") > 0) {
+    return WRONG_SECTION;
+  } else {
+    return UNKNOWN;
+  }
 }
 
 // Indicator State Machine variables
-enum IndicatorState {
-  IDLE,
-  CORRECT,
-  WRONG,
-  UNKNOWN_STATE,
-  PROXY
-};
+enum IndicatorState { IDLE, CORRECT, WRONG, UNKNOWN_STATE, PROXY };
 
 void setIndicatorState(IndicatorState newState);
 
@@ -52,7 +86,7 @@ unsigned long stateStartTime = 0;
 void setIndicatorState(IndicatorState newState) {
   currentState = newState;
   stateStartTime = millis();
-  
+
   // Turn off all initially
   digitalWrite(GREEN_LED_PIN, LOW);
   digitalWrite(RED_LED_PIN, LOW);
@@ -61,11 +95,12 @@ void setIndicatorState(IndicatorState newState) {
 
 // Non-blocking indicator handling
 void handleIndicators() {
-  if (currentState == IDLE) return;
+  if (currentState == IDLE)
+    return;
 
   unsigned long now = millis();
   unsigned long elapsed = now - stateStartTime;
-  
+
   // All states reset after 3 seconds
   if (elapsed >= 3000) {
     setIndicatorState(IDLE);
@@ -73,60 +108,60 @@ void handleIndicators() {
   }
 
   switch (currentState) {
-    case CORRECT:
-      // Green LED blink (or stay on) + 1 beep
-      // Blink green and beep for first 200ms
-      digitalWrite(GREEN_LED_PIN, HIGH);
-      if (elapsed < 200) {
-        digitalWrite(BUZZER_PIN, HIGH);
-      } else {
-        digitalWrite(BUZZER_PIN, LOW);
-      }
-      break;
+  case CORRECT:
+    // Green LED blink (or stay on) + 1 beep
+    // Blink green and beep for first 200ms
+    digitalWrite(GREEN_LED_PIN, HIGH);
+    if (elapsed < 200) {
+      digitalWrite(BUZZER_PIN, HIGH);
+    } else {
+      digitalWrite(BUZZER_PIN, LOW);
+    }
+    break;
 
-    case WRONG:
-      // Red LED blink + 3 beeps (each beep 150ms on, 150ms off)
-      if (elapsed < 900) {
-        int cycle = elapsed / 150;
-        if (cycle % 2 == 0) { // On state for blink and beep
-          digitalWrite(RED_LED_PIN, HIGH);
-          digitalWrite(BUZZER_PIN, HIGH);
-        } else { // Off state
-          digitalWrite(RED_LED_PIN, LOW);
-          digitalWrite(BUZZER_PIN, LOW);
-        }
-      } else {
-        // Red LED stays on to indicate invalid until 3s
-        digitalWrite(RED_LED_PIN, HIGH);
-        digitalWrite(BUZZER_PIN, LOW);
-      }
-      break;
-
-    case UNKNOWN_STATE:
-      // Red LED on + Error beep (1s long beep)
-      digitalWrite(RED_LED_PIN, HIGH);
-      if (elapsed < 1000) {
-        digitalWrite(BUZZER_PIN, HIGH);
-      } else {
-        digitalWrite(BUZZER_PIN, LOW);
-      }
-      break;
-
-    case PROXY:
-      // Special warning pattern: Rapid blink both LEDs and fast beep
-      if ((elapsed / 100) % 2 == 0) {
-        digitalWrite(GREEN_LED_PIN, HIGH);
+  case WRONG:
+    // Red LED blink + 3 beeps (each beep 150ms on, 150ms off)
+    if (elapsed < 900) {
+      int cycle = elapsed / 150;
+      if (cycle % 2 == 0) { // On state for blink and beep
         digitalWrite(RED_LED_PIN, HIGH);
         digitalWrite(BUZZER_PIN, HIGH);
-      } else {
-        digitalWrite(GREEN_LED_PIN, LOW);
+      } else { // Off state
         digitalWrite(RED_LED_PIN, LOW);
         digitalWrite(BUZZER_PIN, LOW);
       }
-      break;
-      
-    case IDLE:
-      break;
+    } else {
+      // Red LED stays on to indicate invalid until 3s
+      digitalWrite(RED_LED_PIN, HIGH);
+      digitalWrite(BUZZER_PIN, LOW);
+    }
+    break;
+
+  case UNKNOWN_STATE:
+    // Red LED on + Error beep (1s long beep)
+    digitalWrite(RED_LED_PIN, HIGH);
+    if (elapsed < 1000) {
+      digitalWrite(BUZZER_PIN, HIGH);
+    } else {
+      digitalWrite(BUZZER_PIN, LOW);
+    }
+    break;
+
+  case PROXY:
+    // Special warning pattern: Rapid blink both LEDs and fast beep
+    if ((elapsed / 100) % 2 == 0) {
+      digitalWrite(GREEN_LED_PIN, HIGH);
+      digitalWrite(RED_LED_PIN, HIGH);
+      digitalWrite(BUZZER_PIN, HIGH);
+    } else {
+      digitalWrite(GREEN_LED_PIN, LOW);
+      digitalWrite(RED_LED_PIN, LOW);
+      digitalWrite(BUZZER_PIN, LOW);
+    }
+    break;
+
+  case IDLE:
+    break;
   }
 }
 
@@ -149,17 +184,18 @@ void setup() {
   pinMode(GREEN_LED_PIN, OUTPUT);
   pinMode(RED_LED_PIN, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
-  
+
   // Ensure everything is off initially
   digitalWrite(GREEN_LED_PIN, LOW);
   digitalWrite(RED_LED_PIN, LOW);
   digitalWrite(BUZZER_PIN, LOW);
 
   Serial.println("TapID Firmware Initialized.");
-  
+
   Serial.println("Starting WiFi connection...");
   WiFiManager wifiManager;
-  // If no known WiFi credentials exist, it starts an Access Point named "TapID_Setup"
+  // If no known WiFi credentials exist, it starts an Access Point named
+  // "TapID_Setup"
   if (!wifiManager.autoConnect("TapID_Setup")) {
     Serial.println("Failed to connect to WiFi and hit timeout. Restarting...");
     delay(3000);
@@ -191,13 +227,19 @@ void loop() {
   if (now - lastTapTime <= TAP_COOLDOWN) {
     if (currentUID == lastTapUID) {
       Serial.println("Duplicate tap. Ignored.");
-      mfrc522.PICC_HaltA(); // Halt PICC so it doesn't trigger repeatedly in one tap
-      return; 
+      mfrc522.PICC_HaltA(); // Halt PICC so it doesn't trigger repeatedly in one
+                            // tap
+      return;
     } else {
-      Serial.println("WARNING: Proxy detected! Two different IDs tapped within 3s.");
+      Serial.println(
+          "WARNING: Proxy detected! Two different IDs tapped within 3s.");
       setIndicatorState(PROXY);
       lastTapTime = now;
       lastTapUID = currentUID;
+
+      // Log proxy attempt to backend
+      checkStudent(currentUID, true);
+
       mfrc522.PICC_HaltA();
       return;
     }
@@ -214,19 +256,19 @@ void loop() {
   TapResult result = checkStudent(currentUID);
 
   switch (result) {
-    case CORRECT_SECTION:
-      Serial.println("Status: Correct Section - Present.");
-      setIndicatorState(CORRECT);
-      break;
-    case WRONG_SECTION:
-      Serial.println("Status: Wrong Section - Invalid.");
-      setIndicatorState(WRONG);
-      break;
-    case UNKNOWN:
-      Serial.println("Status: Unknown/Unassigned ID. Logging attempt.");
-      // TODO: Log attempt to backend
-      setIndicatorState(UNKNOWN_STATE);
-      break;
+  case CORRECT_SECTION:
+    Serial.println("Status: Correct Section - Present.");
+    setIndicatorState(CORRECT);
+    break;
+  case WRONG_SECTION:
+    Serial.println("Status: Wrong Section - Invalid.");
+    setIndicatorState(WRONG);
+    break;
+  case UNKNOWN:
+    Serial.println("Status: Unknown/Unassigned ID. Logging attempt.");
+    // TODO: Log attempt to backend
+    setIndicatorState(UNKNOWN_STATE);
+    break;
   }
 
   // Halt PICC to stop reading the same card if held on reader

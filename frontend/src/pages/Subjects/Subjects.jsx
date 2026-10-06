@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Library, Book, Plus, X, Edit, Trash2 } from 'lucide-react';
 import api from '../../services/api';
+import { AuthContext } from '../../context/AuthContext';
 import './Subjects.css';
 
 const Subjects = () => {
+  const { user } = useContext(AuthContext);
+  const isAdmin = user?.role === 'admin';
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -89,10 +92,12 @@ const Subjects = () => {
           </h1>
           <p className="text-gray-400 mt-2">Manage academic subjects and curriculum</p>
         </div>
-        <button onClick={openAddModal} className="add-subject-btn glass-panel">
-          <Plus size={18} />
-          <span>Add Subject</span>
-        </button>
+        {isAdmin && (
+          <button onClick={openAddModal} className="add-subject-btn glass-panel">
+            <Plus size={18} />
+            <span>Add Subject</span>
+          </button>
+        )}
       </div>
 
       {error && (
@@ -109,20 +114,22 @@ const Subjects = () => {
         <div className="subjects-grid">
           {subjects.map((subject) => (
             <div key={subject.id} className="subject-card glass-panel group relative">
-              <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={() => openEditModal(subject)} 
-                  className="p-2 bg-gray-800/80 rounded-lg text-blue-400 hover:bg-gray-700 transition-colors"
-                >
-                  <Edit size={16} />
-                </button>
-                <button 
-                  onClick={() => handleDelete(subject.id)} 
-                  className="p-2 bg-gray-800/80 rounded-lg text-red-400 hover:bg-gray-700 transition-colors"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+              {isAdmin && (
+                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button 
+                    onClick={() => openEditModal(subject)} 
+                    className="p-2 bg-gray-800/80 rounded-lg text-blue-400 hover:bg-gray-700 transition-colors"
+                  >
+                    <Edit size={16} />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(subject.id)} 
+                    className="p-2 bg-gray-800/80 rounded-lg text-red-400 hover:bg-gray-700 transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              )}
 
               <div className="subject-icon-wrapper">
                 <Book size={28} className="text-orange-400 group-hover:scale-110 transition-transform" />

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import api from '../../services/api';
+import { AuthContext } from '../../context/AuthContext';
 import { 
   Search, 
   Plus, 
@@ -18,6 +19,8 @@ import './Students.css';
 const EMPTY_FORM = { name: '', enrollment_number: '', email: '', section_id: '', rfid_uid: '', branch: 'Computer Science' };
 
 const Students = () => {
+  const { user } = useContext(AuthContext);
+  const isAdmin = user?.role === 'admin';
   const [students, setStudents] = useState([]);
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -148,10 +151,12 @@ const Students = () => {
             Department of Computer Science &middot; 58 Official Enrolled Students (Batch G1 & G2)
           </p>
         </div>
-        <button onClick={openAddModal} className="btn-add-student">
-          <Plus size={18} />
-          <span>Add Student</span>
-        </button>
+        {isAdmin && (
+          <button onClick={openAddModal} className="btn-add-student">
+            <Plus size={18} />
+            <span>Add Student</span>
+          </button>
+        )}
       </div>
 
       {fetchError && (
@@ -207,7 +212,7 @@ const Students = () => {
                 <th>Department</th>
                 <th>NFC UID</th>
                 <th>Status</th>
-                <th className="text-right">Actions</th>
+                {isAdmin && <th className="text-right">Actions</th>}
               </tr>
             </thead>
             <tbody>
@@ -253,24 +258,26 @@ const Students = () => {
                         <span className="status-badge pending">Pending Card</span>
                       )}
                     </td>
-                    <td className="text-right">
-                      <div className="table-actions-group">
-                        <button
-                          onClick={() => openEditModal(s)}
-                          className="action-icon-btn edit"
-                          title="Edit Student"
-                        >
-                          <Edit2 size={15} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(s.id, s.name)}
-                          className="action-icon-btn delete"
-                          title="Delete Student"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </td>
+                    {isAdmin && (
+                      <td className="text-right">
+                        <div className="table-actions-group">
+                          <button
+                            onClick={() => openEditModal(s)}
+                            className="action-icon-btn edit"
+                            title="Edit Student"
+                          >
+                            <Edit2 size={15} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(s.id, s.name)}
+                            className="action-icon-btn delete"
+                            title="Delete Student"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
