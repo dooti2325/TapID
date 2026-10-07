@@ -33,6 +33,16 @@ exports.startSession = async (req, res) => {
             return res.status(400).json({ message: 'Valid subject and classroom are required to start a session' });
         }
 
+        // --- Check device status ---
+        const [devices] = await db.execute('SELECT status FROM devices WHERE classroom_id = ?', [classroom_id]);
+        if (devices.length === 0) {
+            return res.status(400).json({ message: 'No device assigned. Device not connected.' });
+        }
+        if (devices[0].status !== 'online') {
+            return res.status(400).json({ message: 'Device not connected. Ensure hardware terminal is powered on and online.' });
+        }
+        // ---------------------------
+
         // Auto-close any previous dangling active sessions in this classroom or by this faculty
         await db.execute(
             'UPDATE attendance_sessions SET status = ?, end_time = NOW() WHERE (faculty_id = ? OR classroom_id = ?) AND status = ?',

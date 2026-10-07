@@ -3,10 +3,11 @@
 #include <MFRC522.h>
 #include <SPI.h>
 #include <WiFiManager.h>
+#include <WiFiClientSecure.h>
 
 // Backend API Configuration
 const char *BACKEND_URL =
-    "http://tapid-14ao.onrender.com/api/attendance/record";
+    "https://tapid-14ao.onrender.com/api/attendance/record";
 const char *DEVICE_API_KEY = "tapid-esp32-device-key-2026";
 
 // Pin Definitions for ESP32
@@ -34,14 +35,20 @@ TapResult checkStudent(String uid, bool isProxy) {
     return UNKNOWN;
   }
 
+  // Use WiFiClientSecure to handle HTTPS for Render
+  WiFiClientSecure client;
+  client.setInsecure(); // Ignore SSL certificate validation for simplicity
+
   HTTPClient http;
-  http.begin(BACKEND_URL);
+  // Follow redirects just in case
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  http.begin(client, BACKEND_URL);
   http.addHeader("Content-Type", "application/json");
   http.addHeader("X-Device-Key", DEVICE_API_KEY);
 
   String macAddress = WiFi.macAddress();
   String jsonBody =
-      "{\"uid\":\"" + uid + "\", \"mac_address\":\"" + macAddress + "\"";
+      "{\"rfid_uid\":\"" + uid + "\", \"mac_address\":\"" + macAddress + "\"";
   if (isProxy) {
     jsonBody += ", \"is_proxy\": true";
   }

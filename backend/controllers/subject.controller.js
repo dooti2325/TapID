@@ -61,6 +61,9 @@ exports.deleteSubject = async (req, res) => {
         }
         res.json({ message: 'Subject deleted successfully' });
     } catch (err) {
+        if (err.code === 'ER_ROW_IS_REFERENCED_2') {
+            return res.status(409).json({ message: 'Cannot delete subject. It is currently assigned in the timetable or sessions.' });
+        }
         res.status(500).json({ message: 'Error deleting subject', error: err.message });
     }
 };

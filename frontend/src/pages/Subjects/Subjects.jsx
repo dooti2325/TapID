@@ -116,14 +116,14 @@ const Subjects = () => {
             <div key={subject.id} className="subject-card glass-panel group relative">
               {isAdmin && (
                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button 
-                    onClick={() => openEditModal(subject)} 
+                  <button
+                    onClick={() => openEditModal(subject)}
                     className="p-2 bg-gray-800/80 rounded-lg text-blue-400 hover:bg-gray-700 transition-colors"
                   >
                     <Edit size={16} />
                   </button>
-                  <button 
-                    onClick={() => handleDelete(subject.id)} 
+                  <button
+                    onClick={() => handleDelete(subject.id)}
                     className="p-2 bg-gray-800/80 rounded-lg text-red-400 hover:bg-gray-700 transition-colors"
                   >
                     <Trash2 size={16} />
@@ -134,11 +134,11 @@ const Subjects = () => {
               <div className="subject-icon-wrapper">
                 <Book size={28} className="text-orange-400 group-hover:scale-110 transition-transform" />
               </div>
-              
+
               <div className="subject-content">
-                <h3 className="text-xl font-bold text-gray-100">{subject.name}</h3>
+                <h3 className="text-xl font-bold text-black">{subject.name}</h3>
                 <span className="subject-code">{subject.code}</span>
-                
+
                 <div className="subject-description">
                   Semester: {subject.semester}
                 </div>
@@ -147,7 +147,7 @@ const Subjects = () => {
           ))}
 
           {subjects.length === 0 && (
-            <div className="col-span-full glass-panel p-8 text-center text-gray-400">
+            <div className="col-span-full glass-panel p-8 text-center text-black-400">
               No subjects found in the curriculum.
             </div>
           )}
@@ -161,49 +161,49 @@ const Subjects = () => {
             <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-white">
               <X size={20} />
             </button>
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2 className="text-2xl font-bold text-black mb-6">
               {editingId ? 'Edit Subject' : 'Add Subject'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Subject Code</label>
-                <input 
-                  type="text" 
-                  name="code" 
-                  value={formData.code} 
+                <label className="block text-sm font-medium text-black-400 mb-1">Subject Code</label>
+                <input
+                  type="text"
+                  name="code"
+                  value={formData.code}
                   onChange={handleInputChange}
-                  className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-orange-400 outline-none transition-colors"
+                  className="w-full bg-white-900/50 border border-gray-700 rounded-lg p-3 text-black focus:border-orange-400 outline-none transition-colors"
                   placeholder="e.g. CS101"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Subject Name</label>
-                <input 
-                  type="text" 
-                  name="name" 
-                  value={formData.name} 
+                <label className="block text-sm font-medium text-black-400 mb-1">Subject Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-orange-400 outline-none transition-colors"
+                  className="w-full bg-white-900/50 border border-gray-700 rounded-lg p-3 text-black focus:border-orange-400 outline-none transition-colors"
                   placeholder="e.g. Introduction to Programming"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Semester</label>
-                <input 
-                  type="number" 
-                  name="semester" 
-                  value={formData.semester} 
+                <label className="block text-sm font-medium text-black-400 mb-1">Semester</label>
+                <input
+                  type="number"
+                  name="semester"
+                  value={formData.semester}
                   onChange={handleInputChange}
-                  className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-orange-400 outline-none transition-colors"
+                  className="w-full bg-white-900/50 border border-gray-700 rounded-lg p-3 text-black focus:border-orange-400 outline-none transition-colors"
                   placeholder="1-8"
                   min="1" max="8"
                   required
                 />
               </div>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={submitting}
                 className="w-full py-3 mt-4 bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-bold rounded-lg transition-all"
               >

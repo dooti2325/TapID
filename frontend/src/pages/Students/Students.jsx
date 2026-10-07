@@ -26,6 +26,8 @@ const Students = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [sectionFilter, setSectionFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [departmentFilter, setDepartmentFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
   const [showModal, setShowModal] = useState(false);
@@ -135,8 +137,21 @@ const Students = () => {
       .toLowerCase()
       .includes(search.toLowerCase());
     const matchesSection = sectionFilter === 'All' || s.section_name === sectionFilter;
-    return matchesSearch && matchesSection;
+    
+    const isRegistered = Boolean(s.rfid_uid);
+    const matchesStatus = statusFilter === 'All' 
+      ? true 
+      : statusFilter === 'Registered' 
+        ? isRegistered 
+        : !isRegistered;
+        
+    const sBranch = s.branch || 'Computer Science';
+    const matchesDepartment = departmentFilter === 'All' || sBranch === departmentFilter;
+
+    return matchesSearch && matchesSection && matchesStatus && matchesDepartment;
   });
+
+  const uniqueDepartments = ['All', ...new Set(students.map(s => s.branch || 'Computer Science'))];
 
   const totalPages = Math.ceil(filtered.length / pageSize) || 1;
   const paginatedStudents = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
@@ -183,20 +198,55 @@ const Students = () => {
             />
           </div>
 
-          <div className="section-filter-wrapper">
-            <Filter size={15} className="filter-icon" />
-            <select
-              value={sectionFilter}
-              onChange={(e) => {
-                setSectionFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="section-filter-select"
-            >
-              <option value="All">All Batches (G1 & G2)</option>
-              <option value="Batch G1">Batch G1 (Roll 1 to 33)</option>
-              <option value="Batch G2">Batch G2 (Roll 34 to 58)</option>
-            </select>
+          <div className="filters-group" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div className="section-filter-wrapper">
+              <Filter size={15} className="filter-icon" />
+              <select
+                value={sectionFilter}
+                onChange={(e) => {
+                  setSectionFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="section-filter-select"
+              >
+                <option value="All">All Batches</option>
+                {sections.map(sec => (
+                  <option key={sec.id} value={sec.name}>{sec.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="section-filter-wrapper">
+              <Filter size={15} className="filter-icon" />
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="section-filter-select"
+              >
+                <option value="All">All Statuses</option>
+                <option value="Registered">Registered (NFC)</option>
+                <option value="Pending">Pending Card</option>
+              </select>
+            </div>
+
+            <div className="section-filter-wrapper">
+              <Filter size={15} className="filter-icon" />
+              <select
+                value={departmentFilter}
+                onChange={(e) => {
+                  setDepartmentFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="section-filter-select"
+              >
+                {uniqueDepartments.map(dept => (
+                  <option key={dept} value={dept}>{dept === 'All' ? 'All Departments' : dept}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 

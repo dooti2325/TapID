@@ -10,7 +10,7 @@
   gap: 0.75rem;
   padding: 0.75rem 1.25rem;
   border-radius: 8px;
-  color: #fff;
+  color: #ff6600;
   font-weight: 500;
   background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), rgba(251, 113, 133, 0.2));
   border: 1px solid rgba(251, 146, 60, 0.3);
@@ -19,7 +19,7 @@
 }
 
 .add-subject-btn:hover {
-  background: linear-gradient(135deg, rgba(251, 146, 60, 0.3), rgba(251, 113, 133, 0.3));
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.486), rgba(251, 113, 133, 0.3));
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(251, 146, 60, 0.2);
 }
@@ -58,11 +58,12 @@
 .subject-content {
   display: flex;
   flex-direction: column;
+  color: rgb(0, 0, 0);
 }
 
 .subject-code {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.329);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-family: monospace;

@@ -6,7 +6,7 @@ import './Settings.css';
 
 const Settings = () => {
   const { user } = useContext(AuthContext);
-  
+
   const [notifications, setNotifications] = useState(true);
   const [emailAlerts, setEmailAlerts] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
@@ -35,7 +35,7 @@ const Settings = () => {
     localStorage.setItem('tapid_settings', JSON.stringify({
       notifications, emailAlerts, darkMode, twoFactor
     }));
-    
+
     const btn = document.getElementById('save-btn');
     if (btn) {
       btn.innerHTML = '<span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Saved!</span>';
@@ -80,16 +80,16 @@ const Settings = () => {
       <div className="settings-grid">
         {/* Appearance Settings */}
         <div className="settings-card glass-panel">
-          <div className="settings-card-header border-b border-gray-700/50 pb-4 mb-6 flex items-center gap-3">
+          <div className="settings-card-header border-b border-black pb-4 mb-6 flex items-center gap-3">
             <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
               <Sun size={24} />
             </div>
-            <h2 className="text-xl font-semibold text-gray-100">Appearance</h2>
+            <h2 className="text-xl font-semibold text-black-100">Appearance</h2>
           </div>
-          
+
           <div className="setting-row">
             <div className="setting-info">
-              <h3 className="text-gray-200 font-medium">Dark Mode</h3>
+              <h3 className="text-black-200 font-medium">Dark Mode</h3>
               <p className="text-sm text-gray-400">Use dark theme across the application</p>
             </div>
             <label className="toggle-switch">
@@ -101,16 +101,16 @@ const Settings = () => {
 
         {/* Notification Settings */}
         <div className="settings-card glass-panel">
-          <div className="settings-card-header border-b border-gray-700/50 pb-4 mb-6 flex items-center gap-3">
+          <div className="settings-card-header border-b border-black pb-4 mb-6 flex items-center gap-3">
             <div className="p-2 bg-pink-500/10 rounded-lg text-pink-400">
               <Bell size={24} />
             </div>
-            <h2 className="text-xl font-semibold text-gray-100">Notifications</h2>
+            <h2 className="text-xl font-semibold text-black-100">Notifications</h2>
           </div>
-          
+
           <div className="setting-row">
             <div className="setting-info">
-              <h3 className="text-gray-200 font-medium">Push Notifications</h3>
+              <h3 className="text-black-200 font-medium">Push Notifications</h3>
               <p className="text-sm text-gray-400">Receive alerts in your browser</p>
             </div>
             <label className="toggle-switch">
@@ -121,7 +121,7 @@ const Settings = () => {
 
           <div className="setting-row">
             <div className="setting-info">
-              <h3 className="text-gray-200 font-medium">Email Alerts</h3>
+              <h3 className="text-black-200 font-medium">Email Alerts</h3>
               <p className="text-sm text-gray-400">Receive daily summary reports</p>
             </div>
             <label className="toggle-switch">
@@ -134,18 +134,18 @@ const Settings = () => {
         {/* Security Settings - Admin Only */}
         {user?.role === 'admin' && (
           <div className="settings-card glass-panel col-span-full">
-            <div className="settings-card-header border-b border-gray-700/50 pb-4 mb-6 flex items-center gap-3">
+            <div className="settings-card-header border-b border-black pb-4 mb-6 flex items-center gap-3">
               <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
                 <Shield size={24} />
               </div>
-              <h2 className="text-xl font-semibold text-gray-100">Security & Access</h2>
+              <h2 className="text-xl font-semibold text-black-100">Security & Access</h2>
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-8">
               <div className="setting-row">
                 <div className="setting-info">
-                  <h3 className="text-gray-200 font-medium flex items-center gap-2">
-                    <Smartphone size={16} className="text-gray-400" />
+                  <h3 className="text-black-200 font-medium flex items-center gap-2">
+                    <Smartphone size={16} className="text-black" />
                     Two-Factor Authentication
                   </h3>
                   <p className="text-sm text-gray-400">Require an extra step during login</p>
@@ -155,29 +155,29 @@ const Settings = () => {
                   <span className="slider"></span>
                 </label>
               </div>
-              
+
               <div className="setting-row">
                 <div className="setting-info">
-                  <h3 className="text-gray-200 font-medium flex items-center gap-2">
-                    <Key size={16} className="text-gray-400" />
+                  <h3 className="text-black font-medium flex items-center gap-2">
+                    <Key size={16} className="text-black" />
                     Change Password
                   </h3>
                   <p className="text-sm text-gray-400">Update your account password</p>
                 </div>
-                <button onClick={() => setShowPasswordModal(true)} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-sm font-medium rounded-lg transition-colors border border-gray-700">
+                <button onClick={() => setShowPasswordModal(true)} className="px-4 py-2 bg-blue hover:bg-black text-blue-400 text-sm font-medium rounded-lg transition-colors border border-blue-500/20">
                   Update
                 </button>
               </div>
-              
+
               <div className="setting-row">
                 <div className="setting-info">
-                  <h3 className="text-gray-200 font-medium flex items-center gap-2">
-                    <UserCheck size={16} className="text-gray-400" />
+                  <h3 className="text-black font-medium flex items-center gap-2">
+                    <UserCheck size={16} className="text-black" />
                     Active Sessions
                   </h3>
                   <p className="text-sm text-gray-400">Manage devices currently logged in</p>
                 </div>
-                <button onClick={() => setShowSessionsModal(true)} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-sm font-medium rounded-lg transition-colors border border-gray-700">
+                <button onClick={() => setShowSessionsModal(true)} className="px-4 py-2 bg-blue hover:bg-black text-blue-400 text-sm font-medium rounded-lg transition-colors border border-blue-500/20">
                   View
                 </button>
               </div>
@@ -197,21 +197,21 @@ const Settings = () => {
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-1">Current Password</label>
-                <input 
-                  type="password" value={passwordData.currentPassword} onChange={e => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                <input
+                  type="password" value={passwordData.currentPassword} onChange={e => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                   className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-emerald-400 outline-none transition-colors"
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-1">New Password</label>
-                <input 
-                  type="password" value={passwordData.newPassword} onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})}
+                <input
+                  type="password" value={passwordData.newPassword} onChange={e => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                   className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-emerald-400 outline-none transition-colors"
                   required
                 />
               </div>
-              <button 
+              <button
                 type="submit" disabled={passwordLoading}
                 className="w-full py-3 mt-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-all"
               >
@@ -229,27 +229,17 @@ const Settings = () => {
             <button onClick={() => setShowSessionsModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white">
               <X size={20} />
             </button>
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-black mb-6 flex items-center gap-2">
               <UserCheck className="text-emerald-400" /> Active Sessions
             </h2>
             <div className="space-y-4">
-              <div className="p-4 bg-gray-900/50 rounded-lg border border-emerald-500/30">
+              <div className="p-4 bg-white rounded-lg border border-emerald-500/30">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="text-white font-medium">Windows 11 • Chrome</h4>
+                    <h4 className="text-black font-medium">Windows 11 • Chrome</h4>
                     <p className="text-sm text-gray-400 mt-1">IP: 192.168.1.5</p>
-                    <p className="text-xs text-emerald-400 mt-2 flex items-center gap-1"><Check size={12}/> Current Session</p>
+                    <p className="text-xs text-emerald-400 mt-2 flex items-center gap-1"><Check size={12} /> Current Session</p>
                   </div>
-                </div>
-              </div>
-              <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="text-white font-medium">iPhone 14 • Safari</h4>
-                    <p className="text-sm text-gray-400 mt-1">IP: 10.0.0.12</p>
-                    <p className="text-xs text-gray-500 mt-2">Last active: 2 hours ago</p>
-                  </div>
-                  <button className="text-sm text-red-400 hover:text-red-300">Revoke</button>
                 </div>
               </div>
             </div>

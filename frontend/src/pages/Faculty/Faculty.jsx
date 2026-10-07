@@ -41,12 +41,12 @@ const Faculty = () => {
   };
 
   const openEditModal = (faculty) => {
-    setFormData({ 
-      name: faculty.name, 
-      department: faculty.department, 
-      email: faculty.email, 
-      phone: faculty.phone || '', 
-      address: faculty.address || '' 
+    setFormData({
+      name: faculty.name,
+      department: faculty.department,
+      email: faculty.email,
+      phone: faculty.phone || '',
+      address: faculty.address || ''
     });
     setEditingId(faculty.id);
     setShowModal(true);
@@ -128,23 +128,23 @@ const Faculty = () => {
                   <button onClick={() => handleDelete(faculty.id)} className="action-btn text-red-400 hover:bg-red-400/10"><Trash2 size={16} /></button>
                 </div>
               </div>
-              
+
               <div className="faculty-info">
-                <h3 className="text-xl font-bold text-gray-100">{faculty.name}</h3>
+                <h3 className="text-xl font-bold text-black">{faculty.name}</h3>
                 <p className="text-purple-400 text-sm mb-4">{faculty.department}</p>
-                
+
                 <div className="contact-details">
                   <div className="contact-item">
-                    <Mail size={14} className="text-gray-400" />
-                    <span className="text-gray-300">{faculty.email}</span>
+                    <Mail size={14} className="text-purple-400" />
+                    <span className="text-black">{faculty.email}</span>
                   </div>
                   <div className="contact-item">
-                    <Phone size={14} className="text-gray-400" />
-                    <span className="text-gray-300">{faculty.phone || 'N/A'}</span>
+                    <Phone size={14} className="text-purple-400" />
+                    <span className="text-black">{faculty.phone || 'N/A'}</span>
                   </div>
                   <div className="contact-item">
                     <Building2 size={14} className="text-gray-400" />
-                    <span className="text-gray-300">Department of {faculty.department}</span>
+                    <span className="text-black">Department of {faculty.department}</span>
                   </div>
                 </div>
               </div>
@@ -166,45 +166,45 @@ const Faculty = () => {
             <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-white">
               <X size={20} />
             </button>
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2 className="text-2xl font-bold text-black mb-6">
               {editingId ? 'Edit Faculty' : 'Add Faculty'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Name</label>
-                <input 
+                <label className="block text-sm font-medium text-black-400 mb-1">Name</label>
+                <input
                   type="text" name="name" value={formData.name} onChange={handleInputChange}
-                  className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-purple-400 outline-none transition-colors"
+                  className="w-full bg-white-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-purple-400 outline-none transition-colors"
                   placeholder="e.g. Dr. Rajesh Kumar" required
                 />
               </div>
               {!editingId && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Email</label>
-                  <input 
+                  <label className="block text-sm font-medium text-black-400 mb-1">Email</label>
+                  <input
                     type="email" name="email" value={formData.email} onChange={handleInputChange}
-                    className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-purple-400 outline-none transition-colors"
+                    className="w-full bg-white-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-purple-400 outline-none transition-colors"
                     placeholder="e.g. faculty@tapid.edu" required
                   />
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Department</label>
-                <input 
+                <label className="block text-sm font-medium text-black-400 mb-1">Department</label>
+                <input
                   type="text" name="department" value={formData.department} onChange={handleInputChange}
-                  className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-purple-400 outline-none transition-colors"
+                  className="w-full bg-white-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-purple-400 outline-none transition-colors"
                   placeholder="e.g. Computer Science" required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Phone</label>
-                <input 
+                <label className="block text-sm font-medium text-black-400 mb-1">Phone</label>
+                <input
                   type="tel" name="phone" value={formData.phone} onChange={handleInputChange}
-                  className="w-full bg-gray-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-purple-400 outline-none transition-colors"
+                  className="w-full bg-white-900/50 border border-gray-700 rounded-lg p-3 text-white focus:border-purple-400 outline-none transition-colors"
                   placeholder="e.g. 0987654321"
                 />
               </div>
-              <button 
+              <button
                 type="submit" disabled={submitting}
                 className="w-full py-3 mt-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold rounded-lg transition-all"
               >

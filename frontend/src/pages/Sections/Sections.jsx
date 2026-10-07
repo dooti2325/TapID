@@ -107,7 +107,7 @@ const Sections = () => {
                 <tbody>
                   {branchSections.map((s) => (
                     <tr key={s.id}>
-                      <td style={{ fontWeight: 700, color: '#a5b4fc' }}>{s.name}</td>
+                      <td style={{ fontWeight: 700, color: '#748bfdff' }}>{s.name}</td>
                       <td>Semester {s.semester}</td>
                       <td className="font-mono" style={{ color: '#94a3b8', fontSize: '0.8rem' }}>#{s.id}</td>
                       <td style={{ textAlign: 'right', paddingRight: '1.5rem' }}>

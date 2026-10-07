@@ -34,6 +34,7 @@ function StartAttendance() {
   const [timetable, setTimetable] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [classrooms, setClassrooms] = useState([]);
+  const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -52,10 +53,11 @@ function StartAttendance() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [ttRes, subRes, clsRes] = await Promise.allSettled([
+        const [ttRes, subRes, clsRes, devRes] = await Promise.allSettled([
           api.get('/timetable'),
           api.get('/subjects'),
-          api.get('/classrooms')
+          api.get('/classrooms'),
+          api.get('/devices')
         ]);
         if (ttRes.status === 'fulfilled' && Array.isArray(ttRes.value.data)) {
           setTimetable(ttRes.value.data);
@@ -65,6 +67,9 @@ function StartAttendance() {
         }
         if (clsRes.status === 'fulfilled' && Array.isArray(clsRes.value.data)) {
           setClassrooms(clsRes.value.data);
+        }
+        if (devRes.status === 'fulfilled' && Array.isArray(devRes.value.data)) {
+          setDevices(devRes.value.data);
         }
       } catch (err) {
         console.error('Failed to fetch attendance options', err);
@@ -147,6 +152,11 @@ function StartAttendance() {
     }
   };
 
+  // Find selected classroom and its assigned device
+  const currentCleanRoom = formData.room.replace('Room', '').trim();
+  const currentClassroom = classrooms.find(c => c.room_number === formData.room || c.room_number === currentCleanRoom);
+  const activeDevice = devices.find(d => d.classroom_id === currentClassroom?.id);
+
   return (
     <div className="attendance-page animate-fade-in">
       {/* Header */}
@@ -158,19 +168,51 @@ function StartAttendance() {
       </div>
 
       {/* IoT Device Online Info Banner */}
-      <div className="iot-notice-card">
-        <div className="iot-notice-icon">
-          <Wifi size={20} />
-        </div>
-        <div className="iot-notice-content">
-          <div className="iot-notice-title">
-            IoT Terminal Connected &middot; <span>Room C-102 Terminal Online</span>
+      {activeDevice ? (
+        activeDevice.status === 'online' ? (
+          <div className="iot-notice-card">
+            <div className="iot-notice-icon">
+              <Wifi size={20} />
+            </div>
+            <div className="iot-notice-content">
+              <div className="iot-notice-title">
+                IoT Terminal Connected &middot; <span>Room {currentCleanRoom} Terminal Online</span>
+              </div>
+              <p className="iot-notice-desc">
+                ESP32 Terminal <strong>({activeDevice.device_id})</strong> is online with active Wi-Fi and synchronized with Room {currentCleanRoom}. Student taps will verify immediately.
+              </p>
+            </div>
           </div>
-          <p className="iot-notice-desc">
-            ESP32 Terminal <strong>(TAPID-RDR-01)</strong> is online with active Wi-Fi and synchronized with Room C-102. Student taps will verify immediately.
-          </p>
+        ) : (
+          <div className="iot-notice-card" style={{ background: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+            <div className="iot-notice-icon" style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#f87171' }}>
+              <Wifi size={20} />
+            </div>
+            <div className="iot-notice-content">
+              <div className="iot-notice-title" style={{ color: '#f87171' }}>
+                IoT Terminal Offline &middot; <span>Room {currentCleanRoom} Terminal Offline</span>
+              </div>
+              <p className="iot-notice-desc" style={{ color: '#fca5a5' }}>
+                ESP32 Terminal <strong>({activeDevice.device_id})</strong> is assigned to Room {currentCleanRoom} but is currently offline. Please ensure the device is powered on and connected to Wi-Fi.
+              </p>
+            </div>
+          </div>
+        )
+      ) : (
+        <div className="iot-notice-card" style={{ background: 'rgba(156, 163, 175, 0.1)', borderColor: 'rgba(156, 163, 175, 0.3)' }}>
+          <div className="iot-notice-icon" style={{ background: 'rgba(156, 163, 175, 0.2)', color: '#9ca3af' }}>
+            <Info size={20} />
+          </div>
+          <div className="iot-notice-content">
+            <div className="iot-notice-title" style={{ color: '#9ca3af' }}>
+              No Device Assigned &middot; <span>Room {currentCleanRoom}</span>
+            </div>
+            <p className="iot-notice-desc" style={{ color: '#d1d5db' }}>
+              There is no RFID terminal assigned to Room {currentCleanRoom}. Please contact the system administrator to install and assign a device for attendance tracking.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Form Card */}
       <div className="start-form-card">
@@ -290,11 +332,16 @@ function StartAttendance() {
           <div className="start-form-actions">
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !activeDevice || activeDevice.status !== 'online'}
               className="btn-launch-attendance"
+              style={{ opacity: (!activeDevice || activeDevice.status !== 'online') ? 0.5 : 1, cursor: (!activeDevice || activeDevice.status !== 'online') ? 'not-allowed' : 'pointer' }}
             >
               <Play size={18} fill="currentColor" />
-              <span>{submitting ? 'Launching Session...' : 'Start Attendance Session'}</span>
+              <span>
+                {submitting ? 'Launching Session...' : 
+                 (!activeDevice ? 'No Device Assigned' : 
+                 (activeDevice.status !== 'online' ? 'Device Offline' : 'Start Attendance Session'))}
+              </span>
             </button>
           </div>
         </form>

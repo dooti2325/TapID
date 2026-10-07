@@ -14,7 +14,7 @@
   padding: 0.375rem 1rem;
   border-radius: 9999px;
   border: 1px solid var(--border-color);
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-secondary);
   font-size: 0.8rem;
   font-weight: 600;
@@ -40,8 +40,8 @@
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 700;
-  background: rgba(99, 102, 241, 0.12);
-  color: #a5b4fc;
+  background: rgba(25, 28, 196, 0.178);
+  color: #002aff;
   border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
@@ -51,7 +51,7 @@
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: rgba(16, 185, 129, 0.12);
-  color: #6ee7b7;
+  background: rgba(0, 255, 136, 0.12);
+  color: #1d4100;
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
