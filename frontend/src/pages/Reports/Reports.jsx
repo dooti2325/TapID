@@ -135,7 +135,7 @@ function Reports() {
       const tableData = reportsData.studentSummaries.map(s => [
         s.roll_no,
         s.name,
-        s.section_name || 'CS-Core',
+        s.section_name || 'Section G',
         String(s.total_classes),
         String(s.attended),
         `${s.percentage}%`,
@@ -362,7 +362,7 @@ function Reports() {
                         <span className="font-medium text-slate-800">{r.name}</span>
                       </td>
                       <td>
-                        <span className="text-secondary">{r.section_name || 'CS-Core'}</span>
+                        <span className="text-secondary">{r.section_name || 'Section G'}</span>
                       </td>
                       <td>{r.total_classes}</td>
                       <td className="font-semibold">{r.attended}</td>

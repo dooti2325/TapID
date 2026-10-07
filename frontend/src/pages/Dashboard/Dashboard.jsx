@@ -18,45 +18,45 @@ import './Dashboard.css';
 
 const WEEKLY_SCHEDULE = {
   Monday: [
-    { id: 101, subject_code: 'CD', subject_name: 'Compiler Design', teacher: 'Chetram Thakur (CT)', time: '08:05 AM - 09:00 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'completed' },
-    { id: 102, subject_code: 'CSS', subject_name: 'Computer System Security', teacher: 'Ashish Trivedi (AT)', time: '09:00 AM - 09:55 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'completed' },
-    { id: 103, subject_code: 'ES-AI', subject_name: 'Ethical & Social Implication of AI', teacher: 'Dr. Sumalata Bhandari (SB)', time: '10:15 AM - 11:10 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'active' },
-    { id: 104, subject_code: 'SPORTS', subject_name: 'Sports & Athletics', teacher: 'Sports Dept', time: '11:10 AM - 12:05 PM', room_number: 'Ground', section_name: 'CS-Core', status: 'pending' },
-    { id: 105, subject_code: 'PROJECT', subject_name: 'Capstone Project Lab', teacher: 'Faculty Guides', time: '12:10 PM - 02:00 PM', room_number: 'C-102', section_name: 'CS-Core', status: 'pending' }
+    { id: 101, subject_code: 'CD', subject_name: 'Compiler Design', teacher: 'Chetram Thakur (CT)', time: '08:05 AM - 09:00 AM', room_number: 'C-102', section_name: 'Section G', status: 'completed' },
+    { id: 102, subject_code: 'CSS', subject_name: 'Computer System Security', teacher: 'Ashish Trivedi (AT)', time: '09:00 AM - 09:55 AM', room_number: 'C-102', section_name: 'Section G', status: 'completed' },
+    { id: 103, subject_code: 'ES-AI', subject_name: 'Ethical & Social Implication of AI', teacher: 'Dr. Sumalata Bhandari (SB)', time: '10:15 AM - 11:10 AM', room_number: 'C-102', section_name: 'Section G', status: 'active' },
+    { id: 104, subject_code: 'SPORTS', subject_name: 'Sports & Athletics', teacher: 'Sports Dept', time: '11:10 AM - 12:05 PM', room_number: 'Ground', section_name: 'Section G', status: 'pending' },
+    { id: 105, subject_code: 'PROJECT', subject_name: 'Capstone Project Lab', teacher: 'Faculty Guides', time: '12:10 PM - 02:00 PM', room_number: 'C-102', section_name: 'Section G', status: 'pending' }
   ],
   Tuesday: [
-    { id: 201, subject_code: 'CSS', subject_name: 'Computer System Security', teacher: 'Ashish Trivedi (AT)', time: '08:05 AM - 09:00 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'completed' },
-    { id: 202, subject_code: 'DEV', subject_name: 'DevOps: Software Dev & IT Ops', teacher: 'Dr. Trupti Meshram (TM)', time: '09:00 AM - 09:55 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'active' },
-    { id: 203, subject_code: 'CD', subject_name: 'Compiler Design', teacher: 'Chetram Thakur (CT)', time: '10:15 AM - 11:10 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'pending' },
-    { id: 204, subject_code: 'ES-AI', subject_name: 'Ethical & Social Implication of AI', teacher: 'Dr. Sumalata Bhandari (SB)', time: '11:10 AM - 12:05 PM', room_number: 'C-102', section_name: 'CS-Core', status: 'pending' },
-    { id: 205, subject_code: 'PROJECT', subject_name: 'Capstone Project Lab', teacher: 'Faculty Guides', time: '12:10 PM - 02:00 PM', room_number: 'C-102', section_name: 'CS-Core', status: 'pending' }
+    { id: 201, subject_code: 'CSS', subject_name: 'Computer System Security', teacher: 'Ashish Trivedi (AT)', time: '08:05 AM - 09:00 AM', room_number: 'C-102', section_name: 'Section G', status: 'completed' },
+    { id: 202, subject_code: 'DEV', subject_name: 'DevOps: Software Dev & IT Ops', teacher: 'Dr. Trupti Meshram (TM)', time: '09:00 AM - 09:55 AM', room_number: 'C-102', section_name: 'Section G', status: 'active' },
+    { id: 203, subject_code: 'CD', subject_name: 'Compiler Design', teacher: 'Chetram Thakur (CT)', time: '10:15 AM - 11:10 AM', room_number: 'C-102', section_name: 'Section G', status: 'pending' },
+    { id: 204, subject_code: 'ES-AI', subject_name: 'Ethical & Social Implication of AI', teacher: 'Dr. Sumalata Bhandari (SB)', time: '11:10 AM - 12:05 PM', room_number: 'C-102', section_name: 'Section G', status: 'pending' },
+    { id: 205, subject_code: 'PROJECT', subject_name: 'Capstone Project Lab', teacher: 'Faculty Guides', time: '12:10 PM - 02:00 PM', room_number: 'C-102', section_name: 'Section G', status: 'pending' }
   ],
   Wednesday: [
-    { id: 301, subject_code: 'ES-AI', subject_name: 'Ethical & Social Implication of AI', teacher: 'Dr. Sumalata Bhandari (SB)', time: '08:05 AM - 09:00 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'completed' },
-    { id: 302, subject_code: 'AIML', subject_name: 'Artificial Intelligence & Machine Learning', teacher: 'Amol Dhankar (AD)', time: '09:00 AM - 09:55 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'completed' },
-    { id: 303, subject_code: 'DEV', subject_name: 'DevOps: Software Dev & IT Ops', teacher: 'Dr. Trupti Meshram (TM)', time: '10:15 AM - 11:10 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'active' },
-    { id: 304, subject_code: 'CSS', subject_name: 'Computer System Security', teacher: 'Ashish Trivedi (AT)', time: '11:10 AM - 12:05 PM', room_number: 'C-102', section_name: 'CS-Core', status: 'pending' },
-    { id: 305, subject_code: 'PROJECT', subject_name: 'Capstone Project Lab', teacher: 'Faculty Guides', time: '12:10 PM - 02:00 PM', room_number: 'C-102', section_name: 'CS-Core', status: 'pending' }
+    { id: 301, subject_code: 'ES-AI', subject_name: 'Ethical & Social Implication of AI', teacher: 'Dr. Sumalata Bhandari (SB)', time: '08:05 AM - 09:00 AM', room_number: 'C-102', section_name: 'Section G', status: 'completed' },
+    { id: 302, subject_code: 'AIML', subject_name: 'Artificial Intelligence & Machine Learning', teacher: 'Amol Dhankar (AD)', time: '09:00 AM - 09:55 AM', room_number: 'C-102', section_name: 'Section G', status: 'completed' },
+    { id: 303, subject_code: 'DEV', subject_name: 'DevOps: Software Dev & IT Ops', teacher: 'Dr. Trupti Meshram (TM)', time: '10:15 AM - 11:10 AM', room_number: 'C-102', section_name: 'Section G', status: 'active' },
+    { id: 304, subject_code: 'CSS', subject_name: 'Computer System Security', teacher: 'Ashish Trivedi (AT)', time: '11:10 AM - 12:05 PM', room_number: 'C-102', section_name: 'Section G', status: 'pending' },
+    { id: 305, subject_code: 'PROJECT', subject_name: 'Capstone Project Lab', teacher: 'Faculty Guides', time: '12:10 PM - 02:00 PM', room_number: 'C-102', section_name: 'Section G', status: 'pending' }
   ],
   Thursday: [
-    { id: 401, subject_code: 'AIML', subject_name: 'Artificial Intelligence & Machine Learning', teacher: 'Amol Dhankar (AD)', time: '08:05 AM - 09:00 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'completed' },
-    { id: 402, subject_code: 'DEV', subject_name: 'DevOps: Software Dev & IT Ops', teacher: 'Dr. Trupti Meshram (TM)', time: '09:00 AM - 09:55 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'completed' },
-    { id: 403, subject_code: 'AIML', subject_name: 'Artificial Intelligence & Machine Learning', teacher: 'Amol Dhankar (AD)', time: '10:15 AM - 11:10 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'active' },
-    { id: 404, subject_code: 'CD', subject_name: 'Compiler Design', teacher: 'Chetram Thakur (CT)', time: '11:10 AM - 12:05 PM', room_number: 'C-102', section_name: 'CS-Core', status: 'pending' },
+    { id: 401, subject_code: 'AIML', subject_name: 'Artificial Intelligence & Machine Learning', teacher: 'Amol Dhankar (AD)', time: '08:05 AM - 09:00 AM', room_number: 'C-102', section_name: 'Section G', status: 'completed' },
+    { id: 402, subject_code: 'DEV', subject_name: 'DevOps: Software Dev & IT Ops', teacher: 'Dr. Trupti Meshram (TM)', time: '09:00 AM - 09:55 AM', room_number: 'C-102', section_name: 'Section G', status: 'completed' },
+    { id: 403, subject_code: 'AIML', subject_name: 'Artificial Intelligence & Machine Learning', teacher: 'Amol Dhankar (AD)', time: '10:15 AM - 11:10 AM', room_number: 'C-102', section_name: 'Section G', status: 'active' },
+    { id: 404, subject_code: 'CD', subject_name: 'Compiler Design', teacher: 'Chetram Thakur (CT)', time: '11:10 AM - 12:05 PM', room_number: 'C-102', section_name: 'Section G', status: 'pending' },
     { id: 405, subject_code: 'CD-G1', subject_name: 'Compiler Design Practical (G1)', teacher: 'Chetram Thakur (CT)', time: '12:10 PM - 02:00 PM', room_number: 'C-117', section_name: 'G1 (Roll 1-33)', status: 'pending' }
   ],
   Friday: [
-    { id: 501, subject_code: 'DEV', subject_name: 'DevOps: Software Dev & IT Ops', teacher: 'Dr. Trupti Meshram (TM)', time: '08:05 AM - 09:00 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'completed' },
-    { id: 502, subject_code: 'ES-AI', subject_name: 'Ethical & Social Implication of AI', teacher: 'Dr. Sumalata Bhandari (SB)', time: '09:00 AM - 09:55 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'active' },
+    { id: 501, subject_code: 'DEV', subject_name: 'DevOps: Software Dev & IT Ops', teacher: 'Dr. Trupti Meshram (TM)', time: '08:05 AM - 09:00 AM', room_number: 'C-102', section_name: 'Section G', status: 'completed' },
+    { id: 502, subject_code: 'ES-AI', subject_name: 'Ethical & Social Implication of AI', teacher: 'Dr. Sumalata Bhandari (SB)', time: '09:00 AM - 09:55 AM', room_number: 'C-102', section_name: 'Section G', status: 'active' },
     { id: 503, subject_code: 'CD-G2', subject_name: 'Compiler Design Practical (G2)', teacher: 'Prachi Jain (PSJ)', time: '10:15 AM - 12:05 PM', room_number: 'C-102', section_name: 'G2 (Roll 34+)', status: 'pending' },
-    { id: 504, subject_code: 'PROJECT', subject_name: 'Capstone Project Lab', teacher: 'Faculty Guides', time: '12:10 PM - 02:00 PM', room_number: 'C-102', section_name: 'CS-Core', status: 'pending' }
+    { id: 504, subject_code: 'PROJECT', subject_name: 'Capstone Project Lab', teacher: 'Faculty Guides', time: '12:10 PM - 02:00 PM', room_number: 'C-102', section_name: 'Section G', status: 'pending' }
   ],
   Saturday: [
-    { id: 601, subject_code: 'SPORTS', subject_name: 'Sports & Athletics Session I', teacher: 'Sports Dept', time: '08:05 AM - 09:55 AM', room_number: 'Ground', section_name: 'CS-Core', status: 'completed' },
-    { id: 602, subject_code: 'SPORTS', subject_name: 'Sports & Athletics Session II', teacher: 'Sports Dept', time: '10:15 AM - 02:00 PM', room_number: 'Ground', section_name: 'CS-Core', status: 'pending' }
+    { id: 601, subject_code: 'SPORTS', subject_name: 'Sports & Athletics Session I', teacher: 'Sports Dept', time: '08:05 AM - 09:55 AM', room_number: 'Ground', section_name: 'Section G', status: 'completed' },
+    { id: 602, subject_code: 'SPORTS', subject_name: 'Sports & Athletics Session II', teacher: 'Sports Dept', time: '10:15 AM - 02:00 PM', room_number: 'Ground', section_name: 'Section G', status: 'pending' }
   ],
   Sunday: [
-    { id: 701, subject_code: 'CD', subject_name: 'Compiler Design (Review Session)', teacher: 'Chetram Thakur (CT)', time: '10:00 AM - 11:30 AM', room_number: 'C-102', section_name: 'CS-Core', status: 'pending' }
+    { id: 701, subject_code: 'CD', subject_name: 'Compiler Design (Review Session)', teacher: 'Chetram Thakur (CT)', time: '10:00 AM - 11:30 AM', room_number: 'C-102', section_name: 'Section G', status: 'pending' }
   ]
 };
 
@@ -253,7 +253,7 @@ const Dashboard = () => {
                         <div>
                           <div className="subject-name">{subjectText}</div>
                           <div className="subject-sub">
-                            {cls.subject_code || 'CS'} &middot; {teacherText} &middot; {cls.section_name || 'CS-Core'}
+                            {cls.subject_code || 'CS'} &middot; {teacherText} &middot; {cls.section_name || 'Section G'}
                           </div>
                         </div>
                       </div>

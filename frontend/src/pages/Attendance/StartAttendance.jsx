@@ -27,7 +27,7 @@ const OFFICIAL_SUBJECTS = [
 ];
 
 const ROOMS = ['Room C-102', 'Room C-117', 'Sports Ground'];
-const SECTIONS = ['CS-Core (All Students)', 'Batch G1 (Roll 1 to 33)', 'Batch G2 (Roll 34 Onwards)'];
+const SECTIONS = ['Section A', 'Section B', 'Section C', 'Section D', 'Section E', 'Section F', 'Section G', 'Section H', 'Section I', 'Section J', 'Section K', 'Batch G1 (Roll 1 to 33)', 'Batch G2 (Roll 34 Onwards)'];
 const SEMESTERS = ['Semester 5 - Fall 2026', 'Semester 6 - Spring 2027'];
 
 function StartAttendance() {
@@ -43,7 +43,7 @@ function StartAttendance() {
   // Form State
   const [formData, setFormData] = useState({
     subject: OFFICIAL_SUBJECTS[0].name,
-    section: 'CS-Core (All Students)',
+    section: 'Section G',
     room: 'Room C-102',
     duration: '55',
     semester: 'Semester 5 - Fall 2026',
@@ -352,9 +352,9 @@ function StartAttendance() {
         <h3 className="quick-section-title">Or 1-Click Launch from Today's Schedule</h3>
         <div className="quick-grid">
           {(timetable.length > 0 ? timetable.slice(0, 3) : [
-            { id: 1, subject_name: 'Compiler Design (CT)', section_name: 'CS-Core', room_number: 'C-102', start_time: '08:05:00', end_time: '09:00:00' },
-            { id: 2, subject_name: 'Computer System Security (AT)', section_name: 'CS-Core', room_number: 'C-102', start_time: '09:00:00', end_time: '09:55:00' },
-            { id: 3, subject_name: 'Ethical & Social Implication of AI (SB)', section_name: 'CS-Core', room_number: 'C-102', start_time: '10:15:00', end_time: '11:10:00' },
+            { id: 1, subject_name: 'Compiler Design (CT)', section_name: 'Section G', room_number: 'C-102', start_time: '08:05:00', end_time: '09:00:00' },
+            { id: 2, subject_name: 'Computer System Security (AT)', section_name: 'Section G', room_number: 'C-102', start_time: '09:00:00', end_time: '09:55:00' },
+            { id: 3, subject_name: 'Ethical & Social Implication of AI (SB)', section_name: 'Section G', room_number: 'C-102', start_time: '10:15:00', end_time: '11:10:00' },
           ]).map((entry) => (
             <div key={entry.id} className="quick-card">
               <div className="quick-card-info">
