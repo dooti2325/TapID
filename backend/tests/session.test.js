@@ -22,6 +22,7 @@ describe('Session API', () => {
   it('POST /api/session/start — faculty starts a session', async () => {
     db.execute
       .mockResolvedValueOnce([[{ id: 5 }]])           // faculty lookup by user_id
+      .mockResolvedValueOnce([[{ status: 'online' }]])// device status lookup
       .mockResolvedValueOnce([{ affectedRows: 0 }])   // auto-close previous active sessions
       .mockResolvedValueOnce([{ insertId: 99 }]);     // insert session
 
