@@ -79,18 +79,27 @@ exports.recordAttendance = async (req, res) => {
 
         // Section validation: If session belongs to a specific section and student section differs
         if (session.section_id && student.section_id && session.section_id !== student.section_id) {
-            try {
-                await db.execute(
-                    "INSERT INTO audit_logs (action, entity_type, entity_id, details) VALUES ('ATTENDANCE_WRONG_SECTION', 'student', ?, ?)",
-                    [student.id, JSON.stringify({ student_name: student.name, student_section_id: student.section_id, session_section_id: session.section_id, mac_address, session_id })]
-                );
-            } catch (_) {}
-            return res.status(422).json({
-                success: false,
-                status: 'wrong_section',
-                message: 'Student belongs to a different section',
-                student_name: student.name
-            });
+            const [secRows] = await db.execute('SELECT id, name FROM sections WHERE id IN (?, ?)', [session.section_id, student.section_id]);
+            const sessName = secRows.find(r => r.id === session.section_id)?.name || '';
+            const studName = secRows.find(r => r.id === student.section_id)?.name || '';
+            
+            const sessBase = sessName.replace('Section', '').trim().charAt(0);
+            const studBase = studName.replace('Section', '').trim().charAt(0);
+
+            if (sessBase !== studBase) {
+                try {
+                    await db.execute(
+                        "INSERT INTO audit_logs (action, entity_type, entity_id, details) VALUES ('ATTENDANCE_WRONG_SECTION', 'student', ?, ?)",
+                        [student.id, JSON.stringify({ student_name: student.name, student_section_id: student.section_id, session_section_id: session.section_id, mac_address, session_id })]
+                    );
+                } catch (_) {}
+                return res.status(422).json({
+                    success: false,
+                    status: 'wrong_section',
+                    message: `Student belongs to a different section (${studName})`,
+                    student_name: student.name
+                });
+            }
         }
 
         // 4. Record attendance
