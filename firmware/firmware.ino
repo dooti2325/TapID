@@ -235,6 +235,16 @@ void setup() {
   }
 
   Serial.println("\nWiFi connected successfully!");
+  
+  // Happy double-beep to indicate WiFi connected
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(100);
+  digitalWrite(BUZZER_PIN, LOW);
+  delay(100);
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(100);
+  digitalWrite(BUZZER_PIN, LOW);
+  
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
 
