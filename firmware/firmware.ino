@@ -14,9 +14,9 @@ const char *DEVICE_API_KEY = "tapid-esp32-device-key-2026";
 
 // Pin Definitions for ESP32
 #define RST_PIN 22
-#define SS_PIN 5
-#define GREEN_LED_PIN 32
-#define RED_LED_PIN 33
+#define SS_PIN 21
+#define GREEN_LED_PIN 26
+#define RED_LED_PIN 27
 #define BUZZER_PIN 25
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);
