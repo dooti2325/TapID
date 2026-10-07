@@ -101,28 +101,11 @@ exports.updateStudent = async (req, res) => {
 exports.deleteStudent = async (req, res) => {
     const { id } = req.params;
     try {
-        const connection = await db.getConnection();
-        try {
-            await connection.beginTransaction();
-            // Delete attendance records to satisfy foreign key constraint
-            await connection.query('DELETE FROM attendance WHERE student_id = ?', [id]);
-            
-            // Delete the student
-            const [result] = await connection.query('DELETE FROM students WHERE id = ?', [id]);
-            
-            if (result.affectedRows === 0) {
-                await connection.rollback();
-                return res.status(404).json({ message: 'Student not found' });
-            }
-            
-            await connection.commit();
-            res.json({ message: 'Student deleted successfully' });
-        } catch (err) {
-            await connection.rollback();
-            throw err;
-        } finally {
-            connection.release();
+        const [result] = await db.query('DELETE FROM students WHERE id=?', [id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Student not found' });
         }
+        res.json({ message: 'Student deleted successfully' });
     } catch (err) {
         res.status(500).json({ message: 'Error deleting student', error: err.message });
     }
