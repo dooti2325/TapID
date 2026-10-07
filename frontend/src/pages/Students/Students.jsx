@@ -258,6 +258,7 @@ const Students = () => {
                 <th>Sr.</th>
                 <th>Stud Id</th>
                 <th>Student Name</th>
+                <th>Section</th>
                 <th>Batch</th>
                 <th>Department</th>
                 <th>NFC UID</th>
@@ -284,7 +285,10 @@ const Students = () => {
                       </div>
                     </td>
                     <td>
-                      <span className="room-pill font-semibold">{s.section_name || 'Section G'}</span>
+                      <span className="room-pill font-semibold">Section G</span>
+                    </td>
+                    <td>
+                      <span className="room-pill font-semibold">{s.section_name || 'Unassigned'}</span>
                     </td>
                     <td>
                       <span className="dept-pill">{s.branch || 'Computer Science'}</span>
