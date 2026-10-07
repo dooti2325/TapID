@@ -8,6 +8,8 @@
 // Backend API Configuration
 const char *BACKEND_URL =
     "https://tapid-14ao.onrender.com/api/attendance/record";
+const char *HEARTBEAT_URL =
+    "https://tapid-14ao.onrender.com/api/device/heartbeat";
 const char *DEVICE_API_KEY = "tapid-esp32-device-key-2026";
 
 // Pin Definitions for ESP32
@@ -23,10 +25,32 @@ unsigned long lastTapTime = 0;
 String lastTapUID = "";
 const unsigned long TAP_COOLDOWN = 3000; // 3 seconds
 
-// Mock function results for backend checks
 enum TapResult { CORRECT_SECTION, WRONG_SECTION, UNKNOWN };
 
 TapResult checkStudent(String uid, bool isProxy = false);
+
+void sendHeartbeat() {
+  if (WiFi.status() != WL_CONNECTED) return;
+  
+  WiFiClientSecure client;
+  client.setInsecure(); 
+  
+  HTTPClient http;
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  http.begin(client, HEARTBEAT_URL);
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("X-Device-Key", DEVICE_API_KEY);
+  
+  String macAddress = WiFi.macAddress();
+  String jsonBody = "{\"mac_address\":\"" + macAddress + "\"}";
+  
+  Serial.println("Sending Heartbeat to mark device as Online...");
+  int httpResponseCode = http.POST(jsonBody);
+  Serial.print("Heartbeat Response [");
+  Serial.print(httpResponseCode);
+  Serial.println("]");
+  http.end();
+}
 
 // Authenticate and record attendance via Node.js Backend connected to Aiven
 TapResult checkStudent(String uid, bool isProxy) {
@@ -213,6 +237,9 @@ void setup() {
   Serial.println("\nWiFi connected successfully!");
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
+
+  // Notify backend that this hardware is online
+  sendHeartbeat();
 
   Serial.println("Ready for taps...");
 }
