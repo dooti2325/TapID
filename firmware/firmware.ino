@@ -244,9 +244,19 @@ void setup() {
   Serial.println("Ready for taps...");
 }
 
+unsigned long lastHeartbeatTime = 0;
+const unsigned long HEARTBEAT_INTERVAL = 30000; // 30 seconds
+
 void loop() {
   // Always handle non-blocking indicators
   handleIndicators();
+
+  // Periodic heartbeat to keep device online
+  unsigned long now = millis();
+  if (now - lastHeartbeatTime >= HEARTBEAT_INTERVAL) {
+    sendHeartbeat();
+    lastHeartbeatTime = now;
+  }
 
   // Look for new cards
   if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial()) {
@@ -254,7 +264,6 @@ void loop() {
   }
 
   String currentUID = getUIDString();
-  unsigned long now = millis();
 
   // Logic: Two different IDs within 3 seconds -> Proxy detected
   // Logic: Duplicate tap -> Don't mark attendance again

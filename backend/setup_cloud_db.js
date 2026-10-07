@@ -82,19 +82,6 @@ async function run() {
                     WHERE classroom_id = NEW.classroom_id AND status != 'revoked';
                 END
             `);
-            await conn.query('DROP TRIGGER IF EXISTS after_session_end');
-            await conn.query(`
-                CREATE TRIGGER after_session_end
-                AFTER UPDATE ON attendance_sessions
-                FOR EACH ROW
-                BEGIN
-                    IF NEW.status = 'completed' AND OLD.status = 'active' THEN
-                        UPDATE devices 
-                        SET status = 'offline' 
-                        WHERE classroom_id = NEW.classroom_id AND status != 'revoked';
-                    END IF;
-                END
-            `);
             console.log('⚡ Triggers configured successfully!');
         } catch (trigErr) {
             console.log('ℹ️ Triggers skipped (cloud DB permissions):', trigErr.message);
