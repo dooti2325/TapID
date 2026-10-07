@@ -9,7 +9,7 @@
 const char *BACKEND_URL =
     "https://tapid-14ao.onrender.com/api/attendance/record";
 const char *HEARTBEAT_URL =
-    "https://tapid-14ao.onrender.com/api/device/heartbeat";
+    "https://tapid-14ao.onrender.com/api/devices/heartbeat";
 const char *DEVICE_API_KEY = "tapid-esp32-device-key-2026";
 
 // Pin Definitions for ESP32
