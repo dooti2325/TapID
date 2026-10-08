@@ -28,9 +28,9 @@ setInterval(async () => {
         await db.query(`
             UPDATE devices 
             SET status = 'offline' 
-            WHERE status = 'online' AND last_heartbeat < NOW() - INTERVAL 2 MINUTE
+            WHERE status = 'online' AND last_heartbeat < NOW() - INTERVAL 30 SECOND
         `);
     } catch (err) {
         logger.error('Error in device offline cron job: ' + err.message);
     }
-}, 60000); // Check every minute
+}, 15000); // Check every 15 seconds

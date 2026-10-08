@@ -268,7 +268,7 @@ void setup() {
 }
 
 unsigned long lastHeartbeatTime = 0;
-const unsigned long HEARTBEAT_INTERVAL = 30000; // 30 seconds
+const unsigned long HEARTBEAT_INTERVAL = 15000; // 15 seconds
 
 void loop() {
   // Always handle non-blocking indicators
