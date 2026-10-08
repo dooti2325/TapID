@@ -195,6 +195,8 @@ void handleIndicators() {
     // Keep red light on if WiFi is disconnected
     if (WiFi.status() != WL_CONNECTED) {
       digitalWrite(RED_LED_PIN, HIGH);
+    } else {
+      digitalWrite(RED_LED_PIN, LOW);
     }
     break;
   }
@@ -240,6 +242,9 @@ void setup() {
   }
 
   Serial.println("\nWiFi connected successfully!");
+  
+  // Turn off the red "disconnected" LED
+  digitalWrite(RED_LED_PIN, LOW);
   
   // Happy double-beep with Green LED to indicate WiFi connection
   digitalWrite(GREEN_LED_PIN, HIGH);
