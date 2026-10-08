@@ -192,6 +192,10 @@ void handleIndicators() {
     break;
 
   case IDLE:
+    // Keep red light on if WiFi is disconnected
+    if (WiFi.status() != WL_CONNECTED) {
+      digitalWrite(RED_LED_PIN, HIGH);
+    }
     break;
   }
 }
@@ -224,6 +228,7 @@ void setup() {
   Serial.println("TapID Firmware Initialized.");
 
   Serial.println("Starting WiFi connection...");
+  digitalWrite(RED_LED_PIN, HIGH); // Turn red light on while not connected
   WiFiManager wifiManager;
   // If no known WiFi credentials exist, it starts an Access Point named
   // "TapID_Setup"

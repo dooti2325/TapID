@@ -117,10 +117,8 @@ exports.heartbeat = async (req, res) => {
             return res.status(403).json({ message: 'Device is revoked and unauthorized' });
         }
 
-        // Keep device marked as online
-        if (device.status !== 'online') {
-            await db.query("UPDATE devices SET status = 'online' WHERE id = ?", [device.id]);
-        }
+        // Keep device marked as online and update last_heartbeat
+        await db.query("UPDATE devices SET status = 'online', last_heartbeat = NOW() WHERE id = ?", [device.id]);
 
         // Query active session for this classroom
         let activeSession = null;

@@ -2,6 +2,7 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const app = require('./app');
 const logger = require('./config/logger');
+const db = require('./config/database');
 
 const PORT = process.env.PORT || 3000;
 
@@ -20,3 +21,16 @@ const shutdown = () => {
 
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
+
+// Background Job: Check for missing heartbeats and mark devices offline
+setInterval(async () => {
+    try {
+        await db.query(`
+            UPDATE devices 
+            SET status = 'offline' 
+            WHERE status = 'online' AND last_heartbeat < NOW() - INTERVAL 2 MINUTE
+        `);
+    } catch (err) {
+        logger.error('Error in device offline cron job: ' + err.message);
+    }
+}, 60000); // Check every minute
