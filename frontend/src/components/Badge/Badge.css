@@ -60,7 +60,7 @@
 
 .tapid-badge--neutral {
   background: rgba(148, 163, 184, 0.15);
-  color: #cbd5e1;
+  color: var(--border-hover);
   border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
@@ -74,7 +74,7 @@
 
 .tapid-badge__dot--success { background-color: #22c55e; box-shadow: 0 0 6px #22c55e; }
 .tapid-badge__dot--warning { background-color: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
-.tapid-badge__dot--danger  { background-color: #ef4444; box-shadow: 0 0 6px #ef4444; }
+.tapid-badge__dot--danger  { background-color: var(--error-color); box-shadow: 0 0 6px var(--error-color); }
 .tapid-badge__dot--info    { background-color: #3b82f6; box-shadow: 0 0 6px #3b82f6; }
 .tapid-badge__dot--purple  { background-color: #a855f7; box-shadow: 0 0 6px #a855f7; }
-.tapid-badge__dot--neutral { background-color: #94a3b8; }
+.tapid-badge__dot--neutral { background-color: var(--text-muted); }

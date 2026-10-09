@@ -17,7 +17,7 @@
 .tapid-navbar__title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--text-primary, #f1f5f9);
+  color: var(--text-primary, var(--bg-primary));
   margin: 0;
 }
 
@@ -75,13 +75,13 @@
 .tapid-navbar__name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--text-primary, #f1f5f9);
+  color: var(--text-primary, var(--bg-primary));
 }
 
 .tapid-navbar__logout-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-secondary, var(--text-muted));
   padding: 0.5rem;
   border-radius: 0.5rem;
   cursor: pointer;

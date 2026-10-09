@@ -8,7 +8,7 @@
   padding: 1.25rem 0.875rem;
   overflow-y: auto;
   border-right: none;
-  box-shadow: 4px 0 16px rgba(106, 43, 144, 0.15);
+  box-shadow: 4px 0 16px rgba(39, 33, 43, 0.15);
 }
 
 .sidebar-header {
@@ -55,7 +55,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #d8bee6;
+  color: var(--border-hover);
   padding: 0.875rem 0.75rem 0.25rem;
 }
 
@@ -81,7 +81,7 @@
   background: var(--sidebar-active) !important;
   color: #ffffff !important;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(242, 101, 34, 0.35);
+  box-shadow: 0 4px 12px rgba(241, 90, 36, 0.35); /* #F15A24 */
 }
 
 .nav-item.active::before {
@@ -105,7 +105,7 @@
   padding: 0.65rem 0.875rem;
   border-radius: 8px;
   background: transparent;
-  color: #fca5a5;
+  color: #FFCDD2;
   border: none;
   cursor: pointer;
   font-size: 0.88rem;
@@ -115,6 +115,6 @@
 }
 
 .logout-btn:hover {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(198, 40, 40, 0.15); /* #C62828 */
   color: #ffffff;
 }

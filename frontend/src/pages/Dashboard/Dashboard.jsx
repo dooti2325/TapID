@@ -316,7 +316,7 @@ const Dashboard = () => {
 
           <div className="lectures-table-wrapper">
             {(!studentData?.records || studentData.records.length === 0) ? (
-              <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
+              <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
                 No attendance scans recorded yet. Tap your RFID card at any classroom reader to register attendance.
               </div>
             ) : (
@@ -354,7 +354,7 @@ const Dashboard = () => {
                         <span className="room-pill">Room {r.room_number || 'Main'}</span>
                       </td>
                       <td>
-                        <span style={{ fontSize: '0.875rem', color: '#334155' }}>{r.faculty_name || 'Assigned Faculty'}</span>
+                        <span style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>{r.faculty_name || 'Assigned Faculty'}</span>
                       </td>
                       <td>
                         <span className={`status-badge ${r.status === 'present' ? 'completed' : 'pending'}`}>

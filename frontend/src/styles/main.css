@@ -9,39 +9,43 @@
 
 :root {
   /* Canvas & Panel Surfaces */
-  --bg-primary:   #f4f6fb;
-  --bg-secondary: #ffffff;
-  --bg-panel:     #ffffff;
-  --bg-card:      #ffffff;
+  --bg-primary:   #F7F5F9;
+  --bg-secondary: #FFFFFF;
+  --bg-panel:     #FFFFFF;
+  --bg-card:      #FFFFFF;
   
-  /* Sidebar Palette — Raisoni Purple */
-  --bg-sidebar:        #6a2b90;
-  --bg-sidebar-dark:   #552273;
-  --sidebar-text:      #d8bee6;
-  --sidebar-active:    #f26522;
+  /* Sidebar Palette */
+  --bg-sidebar:        #702F8A;
+  --bg-sidebar-dark:   #58236F;
+  --sidebar-text:      #F3EAF7;
+  --sidebar-active:    #F15A24;
   --sidebar-hover:     rgba(255, 255, 255, 0.1);
 
   /* Typography */
-  --text-primary:   #0f172a;
-  --text-secondary: #64748b;
-  --text-muted:     #94a3b8;
+  --text-primary:   #27212B;
+  --text-secondary: #6B6470;
+  --text-muted:     #9CA3AF;
 
-  /* Brand Accents - Education Orange */
-  --accent-color:             #f26522;
-  --accent-hover:             #d9581c;
-  --accent-color-transparent: rgba(242, 101, 34, 0.1);
+  /* Brand Accents */
+  --accent-color:             #702F8A;
+  --accent-hover:             #58236F;
+  --accent-color-transparent: #F3EAF7;
+  
+  --secondary-color:          #F15A24;
+  --secondary-hover:          #D94A19;
+  --secondary-transparent:    #FFF0E9;
 
   /* Borders & Shadows */
-  --border-color: #e2e8f0;
-  --border-hover: #cbd5e1;
-  --card-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
-  --card-shadow-hover: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+  --border-color: #E5DFE9;
+  --border-hover: #D1C5DC;
+  --card-shadow: 0 4px 14px -2px rgba(39, 33, 43, 0.05), 0 2px 6px -1px rgba(39, 33, 43, 0.02);
+  --card-shadow-hover: 0 10px 25px -5px rgba(39, 33, 43, 0.08);
 
   /* Status Colors */
-  --error-color:   #ef4444;
-  --success-color: #16a34a;
-  --warning-color: #f59e0b;
-  --info-color:    #0284c7;
+  --error-color:   #C62828;
+  --success-color: #218653;
+  --warning-color: #D97706;
+  --info-color:    #173B70;
 }
 
 @layer base {
@@ -70,12 +74,12 @@
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-track { background: var(--bg-primary); }
   ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: var(--border-hover);
     border-radius: 3px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 }
 
 /* =====================================================
@@ -167,7 +171,7 @@
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(242, 101, 34, 0.35);
+  box-shadow: 0 4px 14px rgba(112, 47, 138, 0.35); /* #702F8A */
 }
 
 .btn-success, .btn-start {
@@ -176,9 +180,9 @@
 }
 
 .btn-success:hover:not(:disabled), .btn-start:hover:not(:disabled) {
-  background: #15803d;
+  background: #196841; /* Darker success */
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+  box-shadow: 0 4px 14px rgba(33, 134, 83, 0.35);
 }
 
 .btn-danger, .btn-stop {
@@ -187,19 +191,19 @@
 }
 
 .btn-danger:hover:not(:disabled), .btn-stop:hover:not(:disabled) {
-  background: #dc2626;
+  background: #9c2020; /* Darker error */
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.35);
 }
 
 .btn-secondary {
-  background: #ffffff;
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f8fafc;
+  background: var(--bg-primary);
   border-color: var(--border-hover);
 }
 
@@ -223,9 +227,9 @@
 .status-badge.registered,
 .status-pill.online,
 .status-pill.active {
-  background: #dcfce7;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+  background: #E8F5E9;
+  color: var(--success-color);
+  border: 1px solid #C8E6C9;
 }
 
 .status-badge.pending,
@@ -234,9 +238,9 @@
 .status-badge.offline,
 .status-pill.offline,
 .status-pill.late {
-  background: #fef3c7;
-  color: #b45309;
-  border: 1px solid #fde68a;
+  background: #FFF8E1;
+  color: var(--warning-color);
+  border: 1px solid #FFECB3;
 }
 
 .status-badge.revoked,
@@ -245,16 +249,16 @@
 .status-badge.completed,
 .status-pill.revoked,
 .status-pill.completed {
-  background: #fee2e2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+  background: #FFEBEE;
+  color: var(--error-color);
+  border: 1px solid #FFCDD2;
 }
 
 .status-badge.info,
 .status-pill.info {
-  background: #dbeafe;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
+  background: #E3F2FD;
+  color: var(--info-color);
+  border: 1px solid #BBDEFB;
 }
 
 /* =====================================================
@@ -264,7 +268,7 @@
   overflow-x: auto;
   border-radius: 12px;
   border: 1px solid var(--border-color);
-  background: #ffffff;
+  background: var(--bg-card);
 }
 
 .data-table {
@@ -280,7 +284,7 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background: #f8fafc;
+  background: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
   white-space: nowrap;
 }
@@ -288,7 +292,7 @@
 .data-table td {
   padding: 1rem 1.25rem;
   color: var(--text-primary);
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border-color);
   font-size: 0.875rem;
   transition: background 0.15s;
 }
@@ -296,7 +300,7 @@
 .data-table tr:last-child td { border-bottom: none; }
 
 .data-table tbody tr:hover td {
-  background: #f8fafc;
+  background: var(--bg-primary);
 }
 
 /* =====================================================
@@ -305,7 +309,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(39, 33, 43, 0.5);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -316,7 +320,7 @@
 }
 
 .modal-box {
-  background: #ffffff;
+  background: var(--bg-panel);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 2rem;
@@ -361,7 +365,7 @@
 .form-select {
   width: 100%;
   padding: 0.7rem 1rem;
-  background: #ffffff;
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-primary);
@@ -374,11 +378,11 @@
 .form-input:focus,
 .form-select:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(242, 101, 34, 0.12);
+  box-shadow: 0 0 0 3px rgba(112, 47, 138, 0.12); /* #702F8A */
 }
 
 .form-select option {
-  background: #ffffff;
+  background: var(--bg-secondary);
   color: var(--text-primary);
 }
 
@@ -386,7 +390,7 @@
    Loader Spinner
    ===================================================== */
 .loader {
-  border: 3px solid #e2e8f0;
+  border: 3px solid var(--border-color);
   border-left-color: var(--accent-color);
   border-radius: 50%;
   width: 36px;
@@ -444,7 +448,7 @@
   position: absolute;
   top: 1.125rem;
   right: 1.125rem;
-  background: #f1f5f9;
+  background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-secondary);
@@ -457,7 +461,7 @@
 }
 
 .modal-close-btn:hover {
-  background: #e2e8f0;
+  background: var(--border-color);
   color: var(--text-primary);
 }
 
@@ -469,28 +473,28 @@
   height: 32px;
   border-radius: 6px;
   border: 1px solid var(--border-color);
-  background: #ffffff;
+  background: var(--bg-secondary);
   cursor: pointer;
   transition: all 0.15s;
   color: var(--text-secondary);
 }
 
 .action-icon-btn.edit:hover {
-  background: #eff6ff;
-  border-color: #bfdbfe;
+  background: var(--accent-color-transparent);
+  border-color: var(--accent-color);
   color: var(--accent-color);
 }
 
 .action-icon-btn.delete:hover {
-  background: #fef2f2;
-  border-color: #fecaca;
+  background: #FFEBEE;
+  border-color: #FFCDD2;
   color: var(--error-color);
 }
 
 .form-error {
-  background: #fee2e2;
-  border: 1px solid #fecaca;
-  color: #b91c1c;
+  background: #FFEBEE;
+  border: 1px solid #FFCDD2;
+  color: var(--error-color);
   padding: 0.75rem 1rem;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -510,13 +514,13 @@
 }
 
 .badge-rfid.issued {
-  background: #f5f3ff;
-  color: #7c3aed;
-  border: 1px solid #ddd6fe;
+  background: var(--accent-color-transparent);
+  color: var(--accent-color);
+  border: 1px solid var(--border-color);
 }
 
 .badge-rfid.missing {
-  background: #fef3c7;
-  color: #b45309;
-  border: 1px solid #fde68a;
+  background: var(--secondary-transparent);
+  color: var(--warning-color);
+  border: 1px solid var(--secondary-hover);
 }

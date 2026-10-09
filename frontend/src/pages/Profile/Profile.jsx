@@ -156,7 +156,7 @@ const Profile = () => {
             )}
 
             {profileError && (
-              <div className="profile-alert-error" style={{ marginBottom: '1rem', color: '#b91c1c' }}>
+              <div className="profile-alert-error" style={{ marginBottom: '1rem', color: 'var(--error-color)' }}>
                 {profileError}
               </div>
             )}

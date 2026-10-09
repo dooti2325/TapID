@@ -175,7 +175,7 @@ const Students = () => {
       </div>
 
       {fetchError && (
-        <div className="form-error-alert" style={{ marginBottom: '1rem', padding: '0.75rem 1rem', background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: '8px', color: '#b91c1c' }}>
+        <div className="form-error-alert" style={{ marginBottom: '1rem', padding: '0.75rem 1rem', background: '#FFEBEE', border: '1px solid #fca5a5', borderRadius: '8px', color: 'var(--error-color)' }}>
           {fetchError}
         </div>
       )}

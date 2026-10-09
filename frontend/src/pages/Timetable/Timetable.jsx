@@ -112,13 +112,13 @@ const Timetable = () => {
                 {filtered.map((e) => (
                   <tr key={e.id}>
                     <td><span className="day-chip">{e.day_of_week}</span></td>
-                    <td className="font-mono" style={{ color: '#000000ff', fontSize: '0.85rem' }}>
+                    <td className="font-mono" style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>
                       {e.start_time?.slice(0, 5)} – {e.end_time?.slice(0, 5)}
                     </td>
-                    <td style={{ fontWeight: 600, color: '#000000ff' }}>{e.subject_name}</td>
-                    <td style={{ color: '#0eaa00ff' }}>{e.faculty_name}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{e.subject_name}</td>
+                    <td style={{ color: 'var(--success-color)' }}>{e.faculty_name}</td>
                     <td><span className="section-chip">{e.section_name}</span></td>
-                    <td style={{ color: '#15ff00ff' }}>Room {e.room_number}</td>
+                    <td style={{ color: 'var(--success-color)' }}>Room {e.room_number}</td>
                     <td>
                       <button onClick={() => handleDelete(e.id)} className="action-icon-btn delete"><Trash2 size={15} /></button>
                     </td>

@@ -49,7 +49,7 @@
 }
 
 .tapid-spinner__text {
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-secondary, var(--text-muted));
   font-size: 0.9rem;
   letter-spacing: 0.025em;
 }

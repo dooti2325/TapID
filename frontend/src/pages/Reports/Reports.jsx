@@ -194,7 +194,7 @@ function Reports() {
             <FileSpreadsheet size={16} />
             <span>Export CSV</span>
           </button>
-          <button onClick={exportPDF} className="btn-export-excel" style={{ background: '#f8fafc', color: '#0f172a', border: '1px solid #cbd5e1' }} title="Download PDF Report">
+          <button onClick={exportPDF} className="btn-export-excel" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border-hover)' }} title="Download PDF Report">
             <FileText size={16} />
             <span>Export PDF</span>
           </button>
@@ -283,7 +283,7 @@ function Reports() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', marginTop: '0.5rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginTop: '0.5rem' }}>
         <button
           onClick={() => setActiveTab('summary')}
           style={{
@@ -291,7 +291,7 @@ function Reports() {
             borderRadius: '6px',
             border: 'none',
             background: activeTab === 'summary' ? '#2563eb' : 'transparent',
-            color: activeTab === 'summary' ? '#fff' : '#64748b',
+            color: activeTab === 'summary' ? '#fff' : 'var(--text-secondary)',
             fontWeight: 600,
             cursor: 'pointer',
             fontSize: '0.875rem'
@@ -306,7 +306,7 @@ function Reports() {
             borderRadius: '6px',
             border: 'none',
             background: activeTab === 'scans' ? '#2563eb' : 'transparent',
-            color: activeTab === 'scans' ? '#fff' : '#64748b',
+            color: activeTab === 'scans' ? '#fff' : 'var(--text-secondary)',
             fontWeight: 600,
             cursor: 'pointer',
             fontSize: '0.875rem'
@@ -337,7 +337,7 @@ function Reports() {
         <div className="reports-table-wrap">
           {activeTab === 'summary' ? (
             reportsData.studentSummaries.length === 0 ? (
-              <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+              <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
                 No student records found matching the selected filter.
               </div>
             ) : (
@@ -401,7 +401,7 @@ function Reports() {
             )
           ) : (
             reportsData.records.length === 0 ? (
-              <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+              <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
                 No RFID scan logs found for the selected criteria.
               </div>
             ) : (
@@ -445,7 +445,7 @@ function Reports() {
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(15, 23, 42, 0.6)',
+          background: 'rgba(39, 33, 43, 0.6)',
           backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
@@ -466,22 +466,22 @@ function Reports() {
           }}>
             <div style={{
               padding: '1.25rem 1.5rem',
-              borderBottom: '1px solid #e2e8f0',
+              borderBottom: '1px solid var(--border-color)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
             }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                   {selectedStudentLogs.student.name}
                 </h3>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                   Roll No: <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{selectedStudentLogs.student.roll_no}</span> &middot; Attendance: {selectedStudentLogs.student.percentage}%
                 </p>
               </div>
               <button 
                 onClick={() => setSelectedStudentLogs(null)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
               >
                 <X size={20} />
               </button>
@@ -492,7 +492,7 @@ function Reports() {
                 Recorded RFID Scans ({selectedStudentLogs.scans.length})
               </h4>
               {selectedStudentLogs.scans.length === 0 ? (
-                <p style={{ color: '#94a3b8', fontSize: '0.875rem', fontStyle: 'italic' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontStyle: 'italic' }}>
                   No individual scan records found for this student in the current filter range.
                 </p>
               ) : (
@@ -500,9 +500,9 @@ function Reports() {
                   {selectedStudentLogs.scans.map((scan, idx) => (
                     <div key={idx} style={{
                       padding: '0.75rem 1rem',
-                      background: '#f8fafc',
+                      background: 'var(--bg-primary)',
                       borderRadius: '8px',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid var(--border-color)',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center'
@@ -511,7 +511,7 @@ function Reports() {
                         <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#1e293b' }}>
                           {scan.subject_name || 'Lecture Session'}
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <Clock size={12} />
                           {scan.time ? new Date(scan.time).toLocaleString() : 'N/A'}
                         </div>
@@ -525,10 +525,10 @@ function Reports() {
               )}
             </div>
 
-            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #e2e8f0', textAlign: 'right' }}>
+            <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--border-color)', textAlign: 'right' }}>
               <button 
                 onClick={() => setSelectedStudentLogs(null)}
-                style={{ padding: '0.5rem 1rem', background: '#e2e8f0', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}
+                style={{ padding: '0.5rem 1rem', background: 'var(--border-color)', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', color: 'var(--text-primary)' }}
               >
                 Close
               </button>

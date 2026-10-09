@@ -140,10 +140,10 @@ function LiveAttendance() {
   if (!sessionId && error) {
     return (
       <div className="live-page animate-fade-in" style={{ padding: '3rem 1rem', textAlign: 'center' }}>
-        <div style={{ maxWidth: '480px', margin: '0 auto', background: '#fff', borderRadius: '12px', padding: '2rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-          <AlertCircle size={48} color="#ef4444" style={{ margin: '0 auto 1rem' }} />
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#0f172a', marginBottom: '0.5rem' }}>No Active Session</h2>
-          <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.5rem' }}>{error}</p>
+        <div style={{ maxWidth: '480px', margin: '0 auto', background: '#fff', borderRadius: '12px', padding: '2rem', border: '1px solid var(--border-color)', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+          <AlertCircle size={48} color="var(--error-color)" style={{ margin: '0 auto 1rem' }} />
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>No Active Session</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>{error}</p>
           <button 
             onClick={() => navigate('/attendance/start')}
             style={{ background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontWeight: 600, cursor: 'pointer' }}
@@ -241,7 +241,7 @@ function LiveAttendance() {
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1e293b', marginBottom: '0.35rem' }}>
                   Waiting for RFID Card Taps...
                 </h3>
-                <p style={{ color: '#64748b', fontSize: '0.875rem', maxWidth: '380px', margin: '0 auto', lineHeight: 1.5 }}>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', maxWidth: '380px', margin: '0 auto', lineHeight: 1.5 }}>
                   The ESP32 reader in <strong>{roomDisplay}</strong> is active. Students can tap their RFID identity cards now to automatically register presence.
                 </p>
               </div>

@@ -40,9 +40,9 @@
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 700;
-  background: rgba(25, 28, 196, 0.178);
-  color: #002aff;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: rgba(112, 47, 138, 0.178);
+  color: var(--accent-color);
+  border: 1px solid rgba(112, 47, 138, 0.2);
 }
 
 .section-chip {

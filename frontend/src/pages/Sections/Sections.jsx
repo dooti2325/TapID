@@ -109,7 +109,7 @@ const Sections = () => {
                     <tr key={s.id}>
                       <td style={{ fontWeight: 700, color: '#748bfdff' }}>{s.name}</td>
                       <td>Semester {s.semester}</td>
-                      <td className="font-mono" style={{ color: '#94a3b8', fontSize: '0.8rem' }}>#{s.id}</td>
+                      <td className="font-mono" style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>#{s.id}</td>
                       <td style={{ textAlign: 'right', paddingRight: '1.5rem' }}>
                         <div className="flex justify-end gap-3">
                           <button onClick={() => openEdit(s)} className="action-icon-btn edit"><Edit size={15} /></button>

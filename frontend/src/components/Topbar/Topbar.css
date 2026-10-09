@@ -3,20 +3,20 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.85rem 2.25rem;
-  background: #ffffff !important;
+  background: var(--bg-panel) !important;
   border-bottom: 1px solid var(--border-color);
   z-index: 20;
   position: sticky;
   top: 0;
   border-radius: 0;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 1px 3px rgba(39, 33, 43, 0.04);
 }
 
 .search-bar {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #f8fafc;
+  background: var(--bg-primary);
   padding: 0.55rem 1rem;
   border-radius: 8px;
   border: 1px solid var(--border-color);
@@ -26,8 +26,8 @@
 
 .search-bar:focus-within {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(242, 101, 34, 0.12);
-  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(112, 47, 138, 0.12);
+  background: var(--bg-panel);
 }
 
 .search-bar input {
@@ -51,7 +51,7 @@
 }
 
 .icon-btn {
-  background: #f8fafc;
+  background: var(--bg-primary);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
   cursor: pointer;
@@ -67,7 +67,7 @@
 
 .icon-btn:hover {
   color: var(--text-primary);
-  background: #f1f5f9;
+  background: var(--border-color);
 }
 
 .badge {
@@ -95,14 +95,14 @@
 }
 
 .user-profile:hover {
-  background: #f8fafc;
+  background: var(--bg-primary);
   border-color: var(--border-color);
 }
 
 .user-avatar {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, var(--accent-color), var(--bg-sidebar));
+  background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
   color: white;
   border-radius: 50%;
   display: flex;
@@ -112,7 +112,7 @@
   font-size: 0.85rem;
   letter-spacing: 0.02em;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(242, 101, 34, 0.25);
+  box-shadow: 0 2px 6px rgba(112, 47, 138, 0.25);
 }
 
 .user-info {
@@ -153,10 +153,10 @@
   min-width: 200px;
   padding: 0.5rem;
   z-index: 100;
-  background: #ffffff;
+  background: var(--bg-panel);
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 10px 25px -5px rgba(39, 33, 43, 0.12);
   animation: slide-down 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -184,7 +184,7 @@
 }
 
 .dropdown-item:hover {
-  background: #f1f5f9;
+  background: var(--bg-primary);
   color: var(--accent-color);
 }
 
@@ -193,8 +193,8 @@
 }
 
 .dropdown-item.danger:hover {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: #FFEBEE;
+  color: var(--error-color);
 }
 
 .dropdown-divider {
