@@ -14,22 +14,22 @@
   --bg-panel:     #ffffff;
   --bg-card:      #ffffff;
   
-  /* Sidebar Palette — Deep Royal Navy */
-  --bg-sidebar:        #0b2351;
-  --bg-sidebar-dark:   #081b40;
-  --sidebar-text:      #93a8cf;
-  --sidebar-active:    #1e5bff;
-  --sidebar-hover:     rgba(255, 255, 255, 0.08);
+  /* Sidebar Palette — Raisoni Purple */
+  --bg-sidebar:        #6a2b90;
+  --bg-sidebar-dark:   #552273;
+  --sidebar-text:      #d8bee6;
+  --sidebar-active:    #f26522;
+  --sidebar-hover:     rgba(255, 255, 255, 0.1);
 
   /* Typography */
   --text-primary:   #0f172a;
   --text-secondary: #64748b;
   --text-muted:     #94a3b8;
 
-  /* Brand Accents */
-  --accent-color:             #1e5bff;
-  --accent-hover:             #1748cc;
-  --accent-color-transparent: rgba(30, 91, 255, 0.1);
+  /* Brand Accents - Education Orange */
+  --accent-color:             #f26522;
+  --accent-hover:             #d9581c;
+  --accent-color-transparent: rgba(242, 101, 34, 0.1);
 
   /* Borders & Shadows */
   --border-color: #e2e8f0;
@@ -167,7 +167,7 @@
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(30, 91, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(242, 101, 34, 0.35);
 }
 
 .btn-success, .btn-start {
@@ -374,7 +374,7 @@
 .form-input:focus,
 .form-select:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(30, 91, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(242, 101, 34, 0.12);
 }
 
 .form-select option {
@@ -433,7 +433,7 @@
 .font-mono {
   font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   font-size: 0.88em;
-  color: #6366f1;
+  color: var(--accent-color);
 }
 
 .cell-details       { display: flex; flex-direction: column; gap: 2px; }

@@ -53,8 +53,8 @@
 }
 
 .admin-action-btn:hover {
-  border-color: #1e5bff;
-  color: #1e5bff;
+  border-color: var(--accent-color);
+  color: var(--accent-color);
   background: #f8fafc;
 }
 
@@ -131,7 +131,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  color: #1e5bff;
+  color: var(--accent-color);
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
@@ -240,7 +240,7 @@
   height: 32px;
   border-radius: 50%;
   background: #eff6ff;
-  color: #1e5bff;
+  color: var(--accent-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -298,8 +298,8 @@
 }
 
 .admin-search-input:focus {
-  border-color: #1e5bff;
-  box-shadow: 0 0 0 2px rgba(30, 91, 255, 0.15);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(242, 101, 34, 0.15);
 }
 
 .admin-count-pill {

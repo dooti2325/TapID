@@ -22,7 +22,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--accent-color, #1e5bff);
+  background: var(--accent-color, var(--accent-color));
   opacity: 0;
   transition: opacity 0.25s ease;
 }
@@ -43,7 +43,7 @@
 
 /* Color Accents */
 .tapid-stat-card--blue {
-  --accent-color: #1e5bff;
+  --accent-color: var(--accent-color);
   --icon-bg: #eff6ff;
   --icon-color: #2563eb;
 }

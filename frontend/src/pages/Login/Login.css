@@ -36,13 +36,13 @@
 }
 
 .login-logo-icon {
-  color: #1e5bff;
+  color: var(--accent-color);
 }
 
 .login-brand-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #0b2351;
+  color: var(--bg-sidebar);
   margin: 0;
   letter-spacing: -0.02em;
 }
@@ -87,8 +87,8 @@
 }
 
 .preset-select:focus {
-  border-color: #1e5bff;
-  box-shadow: 0 0 0 2px rgba(30, 91, 255, 0.15);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(242, 101, 34, 0.15);
 }
 
 .login-form {
@@ -123,8 +123,8 @@
 }
 
 .input-group input:focus {
-  border-color: #1e5bff;
-  box-shadow: 0 0 0 3px rgba(30, 91, 255, 0.15);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(242, 101, 34, 0.15);
 }
 
 .input-group input::placeholder {
@@ -148,14 +148,14 @@
 }
 
 .remember-me-label input[type="checkbox"] {
-  accent-color: #1e5bff;
+  accent-color: var(--accent-color);
   width: 16px;
   height: 16px;
   cursor: pointer;
 }
 
 .forgot-password-link {
-  color: #1e5bff;
+  color: var(--accent-color);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.15s;
@@ -167,7 +167,7 @@
 }
 
 .login-btn {
-  background: #1e5bff;
+  background: var(--accent-color);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -177,13 +177,13 @@
   cursor: pointer;
   transition: all 0.2s;
   margin-top: 0.5rem;
-  box-shadow: 0 4px 12px rgba(30, 91, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(242, 101, 34, 0.3);
 }
 
 .login-btn:hover {
   background: #1748cc;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(30, 91, 255, 0.4);
+  box-shadow: 0 6px 16px rgba(242, 101, 34, 0.4);
 }
 
 .login-btn:disabled {

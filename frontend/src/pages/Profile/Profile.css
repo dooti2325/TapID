@@ -81,14 +81,14 @@
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: #1e5bff;
+  background: var(--accent-color);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.35rem;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(30, 91, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(242, 101, 34, 0.25);
   flex-shrink: 0;
 }
 
@@ -116,7 +116,7 @@
   font-size: 0.775rem;
   font-weight: 600;
   background: #eff6ff;
-  color: #1e5bff;
+  color: var(--accent-color);
   border: 1px solid #bfdbfe;
   padding: 0.15rem 0.55rem;
   border-radius: 9999px;
@@ -164,8 +164,8 @@
 
 .profile-input:focus {
   outline: none;
-  border-color: #1e5bff;
-  box-shadow: 0 0 0 3px rgba(30, 91, 255, 0.12);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(242, 101, 34, 0.12);
 }
 
 .profile-input[readonly] {
@@ -221,7 +221,7 @@
 }
 
 .btn-update-profile {
-  background: #1e5bff;
+  background: var(--accent-color);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -233,7 +233,7 @@
   align-items: center;
   gap: 0.45rem;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(30, 91, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(242, 101, 34, 0.2);
 }
 
 .btn-update-profile:hover {

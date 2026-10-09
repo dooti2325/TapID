@@ -32,13 +32,13 @@
 }
 
 .start-attendance-cta {
-  background: #1e5bff;
+  background: var(--accent-color);
   color: #ffffff;
   padding: 0.65rem 1.25rem;
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.875rem;
-  box-shadow: 0 4px 12px rgba(30, 91, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(242, 101, 34, 0.25);
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
@@ -48,7 +48,7 @@
 
 .start-attendance-cta:hover {
   background: #1548cc;
-  box-shadow: 0 6px 16px rgba(30, 91, 255, 0.35);
+  box-shadow: 0 6px 16px rgba(242, 101, 34, 0.35);
   transform: translateY(-1px);
 }
 
@@ -106,7 +106,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  color: #1e5bff;
+  color: var(--accent-color);
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
@@ -168,7 +168,7 @@
   height: 36px;
   border-radius: 8px;
   background: #eff6ff;
-  color: #1e5bff;
+  color: var(--accent-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -224,7 +224,7 @@
 
 .action-view {
   background: #eff6ff;
-  color: #1e5bff;
+  color: var(--accent-color);
   border: 1px solid #bfdbfe;
 }
 
@@ -234,7 +234,7 @@
 }
 
 .action-start {
-  background: #1e5bff;
+  background: var(--accent-color);
   color: #ffffff;
 }
 

@@ -121,12 +121,12 @@
 }
 
 .filter-select:focus {
-  border-color: #1e5bff;
-  box-shadow: 0 0 0 3px rgba(30, 91, 255, 0.12);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(242, 101, 34, 0.12);
 }
 
 .btn-apply-filter {
-  background: #1e5bff;
+  background: var(--accent-color);
   color: #ffffff;
   padding: 0.625rem 1.25rem;
   border-radius: 8px;
@@ -278,7 +278,7 @@
   padding: 0.35rem 0.75rem;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #1e5bff;
+  color: var(--accent-color);
   cursor: pointer;
   transition: all 0.15s ease;
 }
