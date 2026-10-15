@@ -9,8 +9,14 @@
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "test": "npm --prefix backend test && npm --prefix frontend test",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
     "setup:cloud-db": "node backend/setup_cloud_db.js",
+    "setup:local-db": "node backend/init_local_db.js",
     "db:backup": "node scripts/backup_database.js",
-    "db:restore": "node scripts/restore_database.js"
+    "db:restore": "node scripts/restore_database.js",
+    "db:audit": "node scripts/audit_database.js",
+    "test:backend": "npm --prefix backend test",
+    "test:frontend": "npm --prefix frontend test",
+    "test:e2e": "node backend/test_e2e_live.js"
   }
 }

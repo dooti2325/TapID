@@ -55,46 +55,47 @@ TapID/
 ├── backend/                  # Node.js Express REST API
 │   ├── config/               # Database pool, JWT, Winston logging, config tokens
 │   ├── controllers/          # Business logic for auth, attendance, devices, etc.
-│   ├── middleware/           # JWT verification, RBAC, audit logging, rate limiting
-│   ├── models/               # Domain abstractions
+│   ├── middleware/           # Auth verification, RBAC, audit logging, rate limiting
+│   ├── models/               # Domain abstractions & MySQL schemas
 │   ├── routes/               # Express routing modules mounted under /api/*
 │   ├── services/             # Analytics, report generation, email services
-│   ├── tests/                # 10 Jest test suites (44 passing unit tests)
+│   ├── tests/                # 11 Jest test suites (55 passing unit tests)
 │   ├── uploads/              # Uploaded avatars and images (git-ignored)
 │   ├── logs/                 # Winston daily rotate logs (git-ignored)
 │   ├── server.js             # Runtime entrypoint (port 3000)
-│   └── app.js                # Express app definition & static dist serving
+│   ├── app.js                # Express app definition & static dist serving
+│   ├── setup_cloud_db.js     # Cloud database schema & seed migration utility
+│   ├── init_local_db.js      # Local database initializer utility
+│   ├── test_e2e_live.js      # Live HTTP end-to-end integration test runner
+│   └── test_production_deploy.js # Production SPA static-serving verification
 ├── frontend/                 # React 18 + Vite Web Application
-│   ├── public/               # Static assets (favicon.svg, logo.png, manifest.json)
+│   ├── public/               # Static assets (favicon, brand logo, manifest.json)
 │   ├── src/
 │   │   ├── components/       # Reusable UI (Sidebar, Topbar, DataTable, StatCard, Modals)
 │   │   ├── context/          # AuthContext with token persistence
-│   │   ├── pages/            # Admin, Faculty, Attendance, Devices, Reports, Login
-│   │   ├── services/         # Axios API clients
-│   │   └── styles/           # Modern glassmorphism & responsive design system
-│   └── tests/                # 5 Vitest test suites (17 passing unit tests)
+│   │   ├── hooks/            # Custom hooks (useDebounce, useFetch, useModal)
+│   │   ├── pages/            # Admin, Faculty, Attendance, Devices, Reports, Login, etc.
+│   │   ├── services/         # Axios API clients & endpoints
+│   │   ├── styles/           # Raisoni institutional SaaS design system
+│   │   └── utils/            # Formatters, PDF/Excel exporters, constants
+│   ├── tests/                # 5 Vitest test suites (17 passing unit tests)
+│   ├── nginx.conf            # Production Nginx reverse-proxy configuration
+│   └── Dockerfile            # Multi-stage production container build
 ├── firmware/                 # ESP32 Microcontroller Firmware
-│   ├── platformio.ini        # PlatformIO configuration & dependency management
-│   ├── README.md             # Hardware BOM, wiring diagrams, and pinouts
-│   └── esp32/
-│       ├── main.ino          # Canonical PlatformIO entrypoint
-│       ├── config.h          # Pin numbers, timeouts, baud rate
-│       ├── secrets.h         # Wi-Fi SSID, password, API URL, and MAC address
-│       ├── wifi_manager.*    # Auto-reconnect & NTP time sync
-│       ├── rfid_reader.*     # RC522 SPI driver & UID parser
-│       ├── offline_queue.*   # In-memory FIFO ring buffer for network dropouts
-│       ├── api_client.*      # HTTP client for single & bulk REST calls
-│       ├── buzzer.* / led.*  # Multi-tone acoustic & visual feedback
-│       └── tapid_reader/     # Self-contained Arduino IDE sketch folder
+│   └── firmware.ino          # Complete standalone Arduino IDE sketch for ESP32 & RC522
 ├── database/                 # Database Definitions & Seed Data
 │   ├── schema.sql            # Table definitions, foreign keys, constraints
-│   ├── indexes.sql           # Query optimization indexes
+│   ├── indexes.sql           # Query optimization composite indexes
 │   ├── triggers.sql          # Auto device status triggers
 │   └── seed.sql              # Deterministic demo accounts, rooms, & timetable
-├── deployment/               # Container & Nginx Configurations
-│   ├── docker/               # Backend & Frontend Dockerfiles
-│   └── nginx/                # Production reverse proxy configuration
-└── docker-compose.yml        # Multi-container orchestration (DB, API, Web)
+├── scripts/                  # Operations & Maintenance Scripts
+│   ├── audit_database.js     # Database health, integrity, and trigger check
+│   ├── backup_database.js    # Gzip-compressed automated database backup utility
+│   └── restore_database.js   # Zero-downtime database restore utility
+├── backups/                  # Database backup archives (git-ignored rolling archives)
+├── docker-compose.yml        # Multi-container orchestration (MySQL, Backend, Web)
+├── render.yaml               # Render Cloud Blueprint specification
+└── vercel.json               # Vercel Edge SPA deployment configuration
 ```
 
 ### URLs, Ports & Locations
@@ -332,26 +333,23 @@ Navigate to `http://localhost:5173` (or `http://localhost` on Docker).
 All test suites are fully automated and verified:
 
 ```bash
-# Run full repository test suite (Backend + Frontend)
+# Run full repository test suite (Backend Jest + Frontend Vitest)
 npm test
 
-# Run firmware offline-queue C++ unit tests
-npm run test:firmware
+# Run Backend unit tests (55 tests across 11 suites)
+npm run test:backend
 
-# Run Backend unit tests (44 tests in 10 suites)
-cd backend && npm test
+# Run Frontend unit tests (17 tests across 5 suites)
+npm run test:frontend
 
-# Run Backend code linting (0 errors)
-cd backend && npm run lint
+# Run Live HTTP End-to-End integration test
+npm run test:e2e
 
-# Run Frontend unit tests (17 tests in 5 suites)
-cd frontend && npm test
-
-# Run Frontend code linting (0 errors)
-cd frontend && npm run lint
+# Run repository code linting (Backend + Frontend with 0 errors)
+npm run lint
 
 # Build Frontend production bundle
-cd frontend && npm run build
+npm run build
 ```
 
 ---

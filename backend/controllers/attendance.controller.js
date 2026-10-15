@@ -26,7 +26,7 @@ exports.recordAttendance = async (req, res) => {
                     "INSERT INTO audit_logs (action, entity_type, details) VALUES ('ATTENDANCE_FAILED_NO_SESSION', 'device', ?)",
                     [JSON.stringify({ mac_address, classroom_id, uid: cleanUid })]
                 );
-            } catch (_) {}
+            } catch {}
             return res.status(400).json({ success: false, status: 'no_session', message: 'No active session in this classroom' });
         }
         const session = sessions[0];
@@ -43,7 +43,7 @@ exports.recordAttendance = async (req, res) => {
                     "INSERT INTO audit_logs (action, entity_type, details) VALUES ('ATTENDANCE_UNKNOWN_CARD', 'rfid_card', ?)",
                     [JSON.stringify({ uid: cleanUid, mac_address, classroom_id })]
                 );
-            } catch (_) {}
+            } catch {}
             return res.status(404).json({ success: false, status: 'unknown_card', message: 'Card not found' });
         }
         if (cards[0].status !== 'active') {
@@ -52,7 +52,7 @@ exports.recordAttendance = async (req, res) => {
                     "INSERT INTO audit_logs (action, entity_type, details) VALUES ('ATTENDANCE_INACTIVE_CARD', 'rfid_card', ?)",
                     [JSON.stringify({ uid: cleanUid, mac_address, classroom_id })]
                 );
-            } catch (_) {}
+            } catch {}
             return res.status(403).json({ success: false, status: 'inactive_card', message: 'Card not active' });
         }
         
@@ -68,7 +68,7 @@ exports.recordAttendance = async (req, res) => {
                     "INSERT INTO audit_logs (action, entity_type, entity_id, details) VALUES ('ATTENDANCE_PROXY_DETECTED', 'student', ?, ?)",
                     [student.id, JSON.stringify({ student_name: student.name, uid: cleanUid, mac_address, session_id })]
                 );
-            } catch (_) {}
+            } catch {}
             return res.status(429).json({
                 success: false,
                 status: 'proxy_detected',
@@ -92,7 +92,7 @@ exports.recordAttendance = async (req, res) => {
                         "INSERT INTO audit_logs (action, entity_type, entity_id, details) VALUES ('ATTENDANCE_WRONG_SECTION', 'student', ?, ?)",
                         [student.id, JSON.stringify({ student_name: student.name, student_section_id: student.section_id, session_section_id: session.section_id, mac_address, session_id })]
                     );
-                } catch (_) {}
+                } catch {}
                 return res.status(422).json({
                     success: false,
                     status: 'wrong_section',
@@ -110,7 +110,7 @@ exports.recordAttendance = async (req, res) => {
                     "INSERT INTO audit_logs (action, entity_type, entity_id, details) VALUES ('ATTENDANCE_RECORDED', 'student', ?, ?)",
                     [student.id, JSON.stringify({ student_name: student.name, session_id, mac_address })]
                 );
-            } catch (_) {}
+            } catch {}
             res.json({ success: true, status: 'success', message: 'Attendance recorded', student_name: student.name });
         } catch (duplicateErr) {
             if (duplicateErr.code === 'ER_DUP_ENTRY') {
@@ -119,7 +119,7 @@ exports.recordAttendance = async (req, res) => {
                         "INSERT INTO audit_logs (action, entity_type, entity_id, details) VALUES ('ATTENDANCE_DUPLICATE', 'student', ?, ?)",
                         [student.id, JSON.stringify({ student_name: student.name, session_id, mac_address })]
                     );
-                } catch (_) {}
+                } catch {}
                 res.status(409).json({ success: false, status: 'duplicate', message: 'Attendance already recorded', student_name: student.name });
             } else {
                 throw duplicateErr;

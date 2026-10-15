@@ -16,7 +16,6 @@
    - [5.2 Faculty / Instructor Guide](#52-faculty--instructor-guide)
    - [5.3 Student Portal Guide](#53-student-portal-guide)
    - [5.4 Hardware Terminal Operation](#54-hardware-terminal-operation)
-   - [5.5 AI Attendance Copilot (Mistral Nemotron)](#55-ai-attendance-copilot)
 6. [Database Management & Automated Backups](#6-database-management--automated-backups)
 7. [Over-The-Air (OTA) Firmware Fleet Updates](#7-over-the-air-ota-firmware-fleet-updates)
 8. [Production Deployment & Containerization](#8-production-deployment--containerization)
@@ -26,7 +25,7 @@
 
 ## 1. System Architecture & Overview
 
-TapID is an enterprise-grade IoT and web platform engineered for real-time, tamper-proof student attendance tracking across collegiate campuses. It unifies physical RFID hardware terminals, an Express REST API, a single-page React management portal, a high-performance relational database with automated security triggers, and an AI analytics copilot.
+TapID is an enterprise-grade IoT and web platform engineered for real-time, tamper-proof student attendance tracking across collegiate campuses. It unifies physical RFID hardware terminals, an Express REST API, a single-page React management portal, and a high-performance relational database with automated security triggers.
 
 ```mermaid
 flowchart TB
@@ -46,12 +45,10 @@ flowchart TB
         API[Node.js / Express REST API]
         MySQL[(MySQL 5.7 / 8.0 Database)]
         Trigger[Database Triggers & Revocation Checks]
-        AI[Python FastAPI / Mistral Nemotron]
         
         ESP32 -->|HTTPS REST with X-Device-Key| API
         API --> MySQL
         MySQL --> Trigger
-        API <--> AI
     end
 
     subgraph Client_Layer [Web Portal Layer]
@@ -71,7 +68,6 @@ flowchart TB
 - **Strict Revocation Enforcement:** Stolen or lost cards are denied at both the database trigger level and the application layer with HTTP 403 Forbidden.
 - **Real-Time Live Lecture Monitoring:** Instructors can project or view a live attendance roster that dynamically marks students present as they tap in at the door.
 - **Export Engine:** Client-side vector PDF generation with university branding and instant CSV spreadsheet download.
-- **AI Analytics:** Integrated with NVIDIA NIM (`mistralai/mistral-nemotron`) for attendance anomaly detection and predictive defaulter warnings.
 
 ---
 
@@ -112,8 +108,7 @@ Each classroom terminal consists of an ESP32 microcontroller, an MFRC522 13.56 M
 ### Prerequisites
 - **Node.js**: v18.0.0 or higher (v20+ recommended)
 - **MySQL**: 5.7 or 8.0 running locally or via Docker
-- **Python**: 3.10+ (for AI Copilot service)
-- **Compiler**: GCC / G++ (for firmware tests) or Arduino IDE 2.x (for flashing hardware)
+- **Hardware Tooling**: Arduino IDE 2.x or PlatformIO (for flashing ESP32 hardware)
 
 ### 1. Clone & Configure Environment
 ```bash
@@ -136,7 +131,6 @@ DB_PASS=tapid_password
 DB_NAME=tapid
 JWT_SECRET=tapid-super-secure-jwt-secret-key-2026
 DEVICE_API_KEY=tapid-esp32-device-key-2026
-NVIDIA_API_KEY=nvapi-your-key-here
 ```
 
 ### 2. Initialize the Database
@@ -161,11 +155,6 @@ npm run dev:backend
 
 # Terminal 2: Frontend Web Client (Vite Dev Server)
 npm run dev:frontend
-
-# Terminal 3: AI Copilot Service (Optional)
-cd ai
-source .venv/bin/activate  # or .\.venv\Scripts\Activate.ps1
-uvicorn main:app --port 8000 --reload
 ```
 
 ---
@@ -261,17 +250,7 @@ TapID features strict Role-Based Access Control (RBAC). The seed database comes 
    - Valid taps continue to be accepted and stored in the 50-item EEPROM ring buffer.
    - Once network is restored, the terminal flushes all buffered records in a single bulk request (`/api/attendance/bulk-record`).
 
----
 
-### 5.5 AI Attendance Copilot
-
-Powered by `mistralai/mistral-nemotron`, the AI service analyzes historical attendance patterns to surface actionable insights.
-
-- **Defaulter Prediction:** Identifies students mathematically on track to fall below the mandatory 75% attendance threshold before end-of-semester.
-- **Natural Language Queries:** Instructors can prompt:
-  > *"Who has missed more than 3 consecutive lectures in Computer Networks?"*  
-  > *"Generate an attendance summary for Section G1 this week."*
-- The AI service cross-references attendance records without exposing sensitive credentials or PII.
 
 ---
 
